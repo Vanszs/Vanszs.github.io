@@ -6,8 +6,6 @@
     <title>Modern Tournament Form</title>
     <!-- Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- AOS (Animate On Scroll) CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Web3.js -->
@@ -17,8 +15,8 @@
 
     <!-- Authentication Section -->
     <section class="py-12">
-        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" id="authSection" data-aos="fade-up">
-            <h2 class="text-2xl font-semibold text-center mb-6">Authentication</h2>
+        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-center mb-6">Check your address here</h2>
             <form id="authForm" class="space-y-4">
                 <!-- Wallet Address -->
                 <div>
@@ -31,11 +29,8 @@
         </div>
     </section>
 
-    <!-- AOS (Animate On Scroll) and Authentication Script -->
-    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <!-- Authentication Script -->
     <script>
-        AOS.init();
-
         // Web3.js setup to verify if user owns the required token
         const infuraUrl = 'https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c';
         const web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
