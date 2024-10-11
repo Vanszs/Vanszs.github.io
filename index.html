@@ -10,13 +10,28 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Web3.js -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <style>
+        /* Center both form and authentication vertically and horizontally */
+        .centered {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Hidden by default, will be shown after authentication */
+        #formSection {
+            display: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
 
     <!-- Authentication Section -->
-    <section class="py-12">
-        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-semibold text-center mb-6">Check your address here</h2>
+    <div class="centered">
+        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" id="authSection">
+            <h2 class="text-2xl font-semibold text-center mb-6">Authentication</h2>
             <form id="authForm" class="space-y-4">
                 <!-- Wallet Address -->
                 <div>
@@ -27,9 +42,33 @@
                 <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Authenticate</button>
             </form>
         </div>
-    </section>
 
-    <!-- Authentication Script -->
+        <!-- Registration Form Section (hidden by default) -->
+        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" id="formSection">
+            <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
+            <form id="registrationForm" class="space-y-4">
+                <!-- Discord Username -->
+                <div>
+                    <label for="discordUsername" class="block text-sm font-medium text-gray-700">Discord Username</label>
+                    <input type="text" id="discordUsername" name="discordUsername" placeholder="@YourDiscordUsername" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Mobile Legend ID -->
+                <div>
+                    <label for="mlID" class="block text-sm font-medium text-gray-700">Mobile Legend ID</label>
+                    <input type="text" id="mlID" name="mlID" placeholder="Your Mobile Legend ID" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Mobile Legend Nickname -->
+                <div>
+                    <label for="mlNickname" class="block text-sm font-medium text-gray-700">Mobile Legend Nickname</label>
+                    <input type="text" id="mlNickname" name="mlNickname" placeholder="Your ML Nickname" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script for Authentication and Form Handling -->
     <script>
         // Web3.js setup to verify if user owns the required token
         const infuraUrl = 'https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c';
@@ -68,14 +107,13 @@
                 const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
 
                 if (parseInt(balance) > 0) {
-                    // Save authentication state in sessionStorage and redirect to form page
-                    sessionStorage.setItem("authenticated", "true");
+                    // Hide the authentication section and show the form section
+                    document.getElementById('authSection').style.display = 'none';
+                    document.getElementById('formSection').style.display = 'block';
                     Swal.fire({
                         title: 'Success!',
-                        text: 'You are eligible. Redirecting to the registration form...',
+                        text: 'You are eligible. Please fill out the registration form.',
                         icon: 'success',
-                    }).then(() => {
-                        window.location.href = "form.html"; // Redirect to form page
                     });
                 } else {
                     Swal.fire({
