@@ -103,100 +103,111 @@
             }
         ];
 
-        document.getElementById('verifyForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const walletAddress = document.getElementById('walletAddress').value;
+  document.getElementById('verifyForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const walletAddress = document.getElementById('walletAddress').value;
 
-            // Validate if the entered value is a valid Ethereum address
-            if (!web3.utils.isAddress(walletAddress)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Address',
-                    text: 'Please enter a valid wallet address!',
-                });
-                return;
+    // Validate if the entered value is a valid Ethereum address
+    if (!web3.utils.isAddress(walletAddress)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Address',
+            text: 'Please enter a valid wallet address!',
+        });
+        return;
+    }
+
+    try {
+        const contract = new web3.eth.Contract(nftABI, nftContractAddress);
+        let isEligible = false;
+
+        // Loop through the tokenIds to check if the user has any of the eligible tokens
+        for (let tokenId of tokenIds) {
+            const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+            if (parseInt(balance) > 0) {
+                isEligible = true;
+                break;
             }
+        }
 
-            try {
-                const contract = new web3.eth.Contract(nftABI, nftContractAddress);
-                let isEligible = false;
-
-                // Loop through the tokenIds to check if the user has any of the eligible tokens
-                for (let tokenId of tokenIds) {
-                    const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
-                    if (parseInt(balance) > 0) {
-                        isEligible = true;
-                        break;
-                    }
-                }
-
-                if (isEligible) {
-                    // Check if the wallet address has already submitted
-                    fetch(`${scriptURL}?checkWallet=${walletAddress}`, {
-                        method: 'GET'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.exists) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Already Registered',
-                                text: 'This wallet has already been used for registration.',
-                            });
-                        } else {
-                            // Show the form and hide the verification form
-                            document.getElementById('formSection').style.display = 'block';
-                            document.getElementById('verifyForm').style.display = 'none';
-                            Swal.fire({
-                                title: 'Success!',
-                                text: 'You are eligible. Please fill out the registration form.',
-                                icon: 'success',
-                            });
-                        }
+        if (isEligible) {
+            // Check if the wallet address has already submitted
+            fetch(`${scriptURL}?checkWallet=${walletAddress}`, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Already Registered',
+                        text: 'This wallet has already been used for registration.',
                     });
                 } else {
+                    // Show the form and hide the verification form
+                    document.getElementById('formSection').style.display = 'block';
+                    document.getElementById('verifyForm').style.display = 'none';
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Not Eligible',
-                        text: 'You do not own the required token to access this form.',
+                        title: 'Success!',
+                        text: 'You are eligible. Please fill out the registration form.',
+                        icon: 'success',
                     });
                 }
-            } catch (error) {
-                console.error('Error checking token ownership:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: `An error occurred: ${error.message}`,
-                });
-            }
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Not Eligible',
+                text: 'You do not own the required token to access this form.',
+            });
+        }
+    } catch (error) {
+        console.error('Error checking token ownership:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `An error occurred: ${error.message}`,
         });
+    }
+});
 
-        // Handle form submission to Google Sheets
-        document.getElementById('registrationForm').addEventListener('submit', (e) => {
-            e.preventDefault();
+// Handle form submission to Google Sheets
+document.getElementById('registrationForm').addEventListener('submit', (e) => {
+    e.preventDefault();
 
-            const formData = new FormData(document.getElementById('registrationForm'));
-            formData.append('walletAddress', document.getElementById('walletAddress').value);
+    const formData = new FormData(document.getElementById('registrationForm'));
+    formData.append('walletAddress', document.getElementById('walletAddress').value);
 
-            fetch(scriptURL, {
-                method: 'POST',
-                body: formData
-            }).then(response => {
+    fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        response.json().then(result => {
+            if (result.result === 'duplicate') {
+                Swal.fire({
+                    title: 'Duplicate Entry',
+                    text: 'This wallet has already been registered.',
+                    icon: 'warning'
+                });
+            } else {
                 Swal.fire({
                     title: 'Success!',
                     text: 'Your form has been submitted successfully.',
                     icon: 'success'
                 });
                 document.getElementById('registrationForm').reset(); // Reset form after successful submission
-            }).catch(error => {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'There was an error submitting your form.',
-                    icon: 'error'
-                });
-                console.error('Error!', error.message);
-            });
+            }
         });
+    }).catch(error => {
+        Swal.fire({
+            title: 'Error!',
+            text: 'There was an error submitting your form.',
+            icon: 'error'
+        });
+        console.error('Error!', error.message);
+    });
+});
+
     </script>
 
 </body>
