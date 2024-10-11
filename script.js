@@ -36,9 +36,55 @@ async function getImplementationAddress() {
 }
 
 // Panggil fungsi ini untuk mendapatkan address dari kontrak logika
-getImplementationAddress().then((implementationAddress) => {
+getImplementationAddress().then(async (implementationAddress) => {
     if (implementationAddress) {
         console.log(`Address of the logic contract: ${implementationAddress}`);
-        // Anda bisa melanjutkan dengan menggunakan ABI dan address yang sesuai dengan kontrak logika
+        // ABI dari kontrak logika ERC-721 (misalnya balanceOf)
+        const nftABI = [
+            // ERC721 function: balanceOf(address owner)
+            {
+                "constant": true,
+                "inputs": [{ "name": "owner", "type": "address" }],
+                "name": "balanceOf",
+                "outputs": [{ "name": "", "type": "uint256" }],
+                "type": "function"
+            }
+        ];
+
+        document.getElementById('nftForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const cryptoAddress = document.getElementById('cryptoAddress').value;
+
+            // Check if cryptoAddress is a valid Ethereum/Polygon address
+            if (!web3.utils.isAddress(cryptoAddress)) {
+                document.getElementById('result').innerText = "Invalid crypto address. Please enter a valid Polygon address.";
+                return;
+            }
+
+            try {
+                // Check if the crypto address owns any NFTs from the logic contract address
+                const contract = new web3.eth.Contract(nftABI, implementationAddress);
+                const balance = await contract.methods.balanceOf(cryptoAddress).call();
+
+                if (balance > 0) {
+                    // Jika balance lebih dari 0, tampilkan SweetAlert dan redirect ke form.html
+                    Swal.fire({
+                        title: 'Selamat!',
+                        text: 'Anda eligible untuk ikut turnamen ini. Klik "Selanjutnya" untuk daftar.',
+                        icon: 'success',
+                        confirmButtonText: 'Selanjutnya'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "form.html";
+                        }
+                    });
+                } else {
+                    document.getElementById('result').innerText = "Address does not own the specified NFT on Polygon.";
+                }
+            } catch (error) {
+                console.error('Error checking NFT ownership:', error);
+                document.getElementById('result').innerText = `An error occurred while checking NFT ownership: ${error.message}`;
+            }
+        });
     }
 });
