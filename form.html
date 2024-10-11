@@ -8,48 +8,14 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- AOS (Animate On Scroll) CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&display=swap" rel="stylesheet">
-    <!-- SimpleParallax.js -->
-    <script src="https://cdn.jsdelivr.net/npm/simple-parallax-js@5.6.1/dist/simpleParallax.min.js"></script>
-    <!-- Custom CSS for styling -->
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-        }
-        .bg-custom {
-            background-image: url('https://images.unsplash.com/photo-1593642532973-d31b6557fa68');
-            background-size: cover;
-            background-position: center;
-            height: 400px;
-            position: relative;
-        }
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-        }
-    </style>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100">
 
-    <!-- Hero section with Parallax -->
-    <div class="bg-custom">
-        <div class="overlay"></div>
-        <div class="container mx-auto flex justify-center items-center h-full">
-            <div class="text-center text-white z-10">
-                <h1 class="text-4xl font-bold mb-4" data-aos="fade-down">Join Our Tournament</h1>
-                <p class="text-lg" data-aos="fade-up">Fill the form below to register for our exclusive event</p>
-            </div>
-        </div>
-    </div>
-
     <!-- Registration Form Section -->
     <section class="py-12">
-        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up">
+        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" id="formSection" data-aos="fade-up">
             <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
             <form id="registrationForm" class="space-y-4">
                 <!-- Discord Username -->
@@ -73,18 +39,24 @@
         </div>
     </section>
 
-    <!-- AOS (Animate On Scroll) and Parallax Script Initialization -->
+    <!-- AOS (Animate On Scroll) Script -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
         AOS.init();
 
-        // Parallax effect for the background
-        const image = document.querySelector('.bg-custom');
-        new simpleParallax(image, {
-            scale: 1.5,
-            delay: .6,
-            transition: 'cubic-bezier(0,0,0,1)'
-        });
+        // Check if user is authenticated by verifying sessionStorage
+        const isAuthenticated = sessionStorage.getItem("authenticated");
+
+        if (isAuthenticated !== "true") {
+            // Redirect to index.html if the user is not authenticated
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized Access',
+                text: 'You are not authorized to access this page. Redirecting...',
+            }).then(() => {
+                window.location.href = "index.html"; // Redirect to index page
+            });
+        }
     </script>
 </body>
 </html>
