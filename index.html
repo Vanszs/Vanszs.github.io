@@ -131,28 +131,11 @@
         }
 
         if (isEligible) {
-            // Check if the wallet address has already submitted
-            fetch(`${scriptURL}?checkWallet=${walletAddress}`, {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Already Registered',
-                        text: 'This wallet has already been used for registration.',
-                    });
-                } else {
-                    // Show the form and hide the verification form
-                    document.getElementById('formSection').style.display = 'block';
-                    document.getElementById('verifyForm').style.display = 'none';
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'You are eligible. Please fill out the registration form.',
-                        icon: 'success',
-                    });
-                }
+            // Wallet is eligible, but form is not opened yet.
+            Swal.fire({
+                title: 'Success!',
+                text: 'You are eligible, but the form is not opened yet.',
+                icon: 'success',
             });
         } else {
             Swal.fire({
@@ -171,40 +154,15 @@
     }
 });
 
-// Handle form submission to Google Sheets
+// Handle form submission (even though it's not supposed to be opened)
 document.getElementById('registrationForm').addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const formData = new FormData(document.getElementById('registrationForm'));
-    formData.append('walletAddress', document.getElementById('walletAddress').value);
-
-    fetch(scriptURL, {
-        method: 'POST',
-        body: formData
-    }).then(response => {
-        response.json().then(result => {
-            if (result.result === 'duplicate') {
-                Swal.fire({
-                    title: 'Duplicate Entry',
-                    text: 'This wallet has already been registered.',
-                    icon: 'warning'
-                });
-            } else {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Your form has been submitted successfully.',
-                    icon: 'success'
-                });
-                document.getElementById('registrationForm').reset(); // Reset form after successful submission
-            }
-        });
-    }).catch(error => {
-        Swal.fire({
-            title: 'Error!',
-            text: 'There was an error submitting your form.',
-            icon: 'error'
-        });
-        console.error('Error!', error.message);
+    // Show popup to notify that the form is not yet opened
+    Swal.fire({
+        title: 'Form belum dibuka',
+        text: 'Saat ini, form registrasi belum dibuka.',
+        icon: 'info'
     });
 });
 
