@@ -4,18 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check NFT Ownership on Polygon</title>
-    <!-- Include Web3.js from CDN -->
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Material Icons for UI enhancements -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Web3.js -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
-    <h1>Check Your Crypto Address for NFTs (Polygon)</h1>
-    <form id="nftForm">
-        <label for="cryptoAddress">Enter your crypto address:</label>
-        <input type="text" id="cryptoAddress" name="cryptoAddress" required>
-        <button type="submit">Check</button>
-    </form>
-
-    <p id="result"></p>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+            <h1 class="text-2xl font-bold text-center mb-4">Check Your Crypto Address for NFTs (Polygon)</h1>
+            <form id="nftForm" class="space-y-4">
+                <div>
+                    <label for="cryptoAddress" class="block text-sm font-medium text-gray-700">Enter your crypto address:</label>
+                    <input type="text" id="cryptoAddress" name="cryptoAddress" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Check</button>
+            </form>
+            <p id="result" class="mt-4 text-center text-gray-500"></p>
+        </div>
+    </div>
 
     <!-- Include the external JavaScript file -->
     <script src="script.js"></script>
