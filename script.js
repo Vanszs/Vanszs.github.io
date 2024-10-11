@@ -1,15 +1,18 @@
+// Import Web3 module (for Node.js, you may need to adjust depending on how you set up your environment)
+import Web3 from 'web3';
+
 // Infura URL for Polygon Mainnet
 const infuraUrl = 'https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c';
 const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // NFT Contract Address
 const tokenId = 1135; // The specific token ID you're checking for
 
-// Create a Web3 instance using the latest Web3.js v4
-const web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
+// Create a Web3 instance using Web3.js v4
+const provider = new Web3.providers.HttpProvider(infuraUrl);
+const web3 = new Web3(provider);
 
 // ABI (Application Binary Interface) for the NFT contract (ERC721 standard)
 const nftABI = [
     {
-        "constant": true,
         "inputs": [{ "name": "tokenId", "type": "uint256" }],
         "name": "ownerOf",
         "outputs": [{ "name": "", "type": "address" }],
@@ -36,12 +39,9 @@ document.getElementById('nftForm').addEventListener('submit', async function(eve
     try {
         // Create contract instance
         const contract = new web3.eth.Contract(nftABI, nftContractAddress);
-        
-        // Estimate gas to prevent execution reverted due to gas issues
-        const gasEstimate = await contract.methods.ownerOf(tokenId).estimateGas();
 
         // Call the ownerOf method to check ownership of the specific token ID
-        const owner = await contract.methods.ownerOf(tokenId).call({ gas: gasEstimate });
+        const owner = await contract.methods.ownerOf(tokenId).call();
 
         // Check if the input address matches the owner of the specific NFT
         if (owner.toLowerCase() === cryptoAddress.toLowerCase()) {
