@@ -3,19 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Page</title>
+    <title>Modern Tournament Form</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- AOS (Animate On Scroll) CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&display=swap" rel="stylesheet">
+    <!-- SimpleParallax.js -->
+    <script src="https://cdn.jsdelivr.net/npm/simple-parallax-js@5.6.1/dist/simpleParallax.min.js"></script>
+    <!-- Custom CSS for styling -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .bg-custom {
+            background-image: url('https://images.unsplash.com/photo-1593642532973-d31b6557fa68');
+            background-size: cover;
+            background-position: center;
+            height: 400px;
+            position: relative;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+    </style>
 </head>
-<body>
-    <h1>NFT Owner Form</h1>
-    <p>Congratulations! You own the NFT.</p>
-    <form>
-        <label for="name">Enter your name:</label>
-        <input type="text" id="name" name="name" required><br><br>
+<body class="bg-gray-100">
 
-        <label for="email">Enter your email:</label>
-        <input type="email" id="email" name="email" required><br><br>
+    <!-- Hero section with Parallax -->
+    <div class="bg-custom">
+        <div class="overlay"></div>
+        <div class="container mx-auto flex justify-center items-center h-full">
+            <div class="text-center text-white z-10">
+                <h1 class="text-4xl font-bold mb-4" data-aos="fade-down">Join Our Tournament</h1>
+                <p class="text-lg" data-aos="fade-up">Fill the form below to register for our exclusive event</p>
+            </div>
+        </div>
+    </div>
 
-        <button type="submit">Submit</button>
-    </form>
+    <!-- Registration Form Section -->
+    <section class="py-12">
+        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up">
+            <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
+            <form id="registrationForm" class="space-y-4">
+                <!-- Discord Username -->
+                <div>
+                    <label for="discordUsername" class="block text-sm font-medium text-gray-700">Discord Username</label>
+                    <input type="text" id="discordUsername" name="discordUsername" placeholder="@YourDiscordUsername" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Mobile Legend ID -->
+                <div>
+                    <label for="mlID" class="block text-sm font-medium text-gray-700">Mobile Legend ID</label>
+                    <input type="text" id="mlID" name="mlID" placeholder="Your Mobile Legend ID" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Mobile Legend Nickname -->
+                <div>
+                    <label for="mlNickname" class="block text-sm font-medium text-gray-700">Mobile Legend Nickname</label>
+                    <input type="text" id="mlNickname" name="mlNickname" placeholder="Your ML Nickname" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- AOS (Animate On Scroll) and Parallax Script Initialization -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        // Parallax effect for the background
+        const image = document.querySelector('.bg-custom');
+        new simpleParallax(image, {
+            scale: 1.5,
+            delay: .6,
+            transition: 'cubic-bezier(0,0,0,1)'
+        });
+    </script>
 </body>
 </html>
