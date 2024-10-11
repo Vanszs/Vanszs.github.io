@@ -20,7 +20,13 @@ const nftABI = [
 document.getElementById('nftForm').addEventListener('submit', async function(event) {
     event.preventDefault();
     const cryptoAddress = document.getElementById('cryptoAddress').value;
-    
+
+    // Check if cryptoAddress is a valid Ethereum/Polygon address
+    if (!web3.utils.isAddress(cryptoAddress)) {
+        document.getElementById('result').innerText = "Invalid crypto address. Please enter a valid Polygon address.";
+        return;
+    }
+
     try {
         // Check if the crypto address owns any NFTs from the contract address
         const contract = new web3.eth.Contract(nftABI, nftContractAddress);
@@ -34,6 +40,6 @@ document.getElementById('nftForm').addEventListener('submit', async function(eve
         }
     } catch (error) {
         console.error('Error checking NFT ownership:', error);
-        document.getElementById('result').innerText = "An error occurred while checking NFT ownership.";
+        document.getElementById('result').innerText = `An error occurred while checking NFT ownership: ${error.message}`;
     }
 });
