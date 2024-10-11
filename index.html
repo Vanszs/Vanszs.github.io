@@ -10,43 +10,79 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Web3.js -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <style>
+        body {
+            background-color: white;
+        }
+        /* Center both form and authentication vertically and horizontally */
+        .centered {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Hidden by default, will be shown after authentication */
+        #formSection {
+            display: none;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body>
 
     <!-- Form Section -->
-    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="relative isolate overflow-hidden bg-white px-6 py-20 text-center sm:px-16 sm:shadow-sm">
-            <p class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                Verify your wallet to access the registration form
-            </p>
+    <div class="centered">
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="relative isolate overflow-hidden bg-white px-6 py-20 text-center sm:px-16 sm:shadow-sm">
+                <p class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                    Verify your wallet to access the registration form
+                </p>
 
-            <!-- Wallet Verification Form -->
-            <form id="verifyForm" class="mx-auto mt-8 relative bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300">
+                <!-- Wallet Verification Form -->
+                <form id="verifyForm"
+                    class="mx-auto mt-8 relative bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300">
 
-                <input id="walletAddress" placeholder="Enter your wallet address" name="wallet"
-                    class="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white" required>
-                <button type="submit"
-                    class="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all">
-                    <div class="flex items-center transition-all opacity-1">
-                        <span class="text-sm font-semibold whitespace-nowrap truncate mx-auto">
-                            Check
-                        </span>
-                    </div>
-                </button>
-            </form>
+                    <input id="walletAddress" placeholder="Enter your wallet address" name="wallet"
+                        class="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white" required>
+                    <button type="submit"
+                        class="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all">
+                        <div class="flex items-center transition-all opacity-1">
+                            <span class="text-sm font-semibold whitespace-nowrap truncate mx-auto">
+                                Check
+                            </span>
+                        </div>
+                    </button>
+                </form>
 
-            <svg viewBox="0 0 1024 1024"
-                class="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-x-1/2 [mask-image:radial-gradient(closest-side,white,transparent)]"
-                aria-hidden="true">
-                <circle cx="512" cy="512" r="512" fill="url(#827591b1-ce8c-4110-b064-7cb85a0b1217)" fill-opacity="0.7">
-                </circle>
-                <defs>
-                    <radialGradient id="827591b1-ce8c-4110-b064-7cb85a0b1217">
-                        <stop stop-color="#3b82f6"></stop>
-                        <stop offset="1" stop-color="#1d4ed8"></stop>
-                    </radialGradient>
-                </defs>
-            </svg>
+                <!-- Registration Form Section (hidden by default) -->
+                <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg mt-8" id="formSection">
+                    <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
+                    <form id="registrationForm" class="space-y-4">
+                        <!-- Discord Username -->
+                        <div>
+                            <label for="discordUsername" class="block text-sm font-medium text-gray-700">Discord Username</label>
+                            <input type="text" id="discordUsername" name="discordUsername" placeholder="@YourDiscordUsername"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        </div>
+                        <!-- Mobile Legend ID -->
+                        <div>
+                            <label for="mlID" class="block text-sm font-medium text-gray-700">Mobile Legend ID</label>
+                            <input type="text" id="mlID" name="mlID" placeholder="Your Mobile Legend ID"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        </div>
+                        <!-- Mobile Legend Nickname -->
+                        <div>
+                            <label for="mlNickname" class="block text-sm font-medium text-gray-700">Mobile Legend Nickname</label>
+                            <input type="text" id="mlNickname" name="mlNickname" placeholder="Your ML Nickname"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        </div>
+                        <!-- Submit Button -->
+                        <button type="submit"
+                            class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -56,7 +92,7 @@
         const infuraUrl = 'https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c';
         const web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
         const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // Example NFT Contract Address
-        const tokenId = 1135; // Token ID to check
+        const tokenIds = [1134, 1135, 921, 922]; // Token IDs to check
         const nftABI = [
             {
                 "constant": true,
@@ -88,16 +124,26 @@
 
             try {
                 const contract = new web3.eth.Contract(nftABI, nftContractAddress);
-                const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+                let isEligible = false;
 
-                if (parseInt(balance) > 0) {
-                    // Successful verification
+                // Loop through the tokenIds to check if the user has any of the eligible tokens
+                for (let tokenId of tokenIds) {
+                    const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+                    if (parseInt(balance) > 0) {
+                        isEligible = true;
+                        break;
+                    }
+                }
+
+                if (isEligible) {
+                    // Show the form and hide the verification form
+                    document.getElementById('formSection').style.display = 'block';
+                    document.getElementById('verifyForm').style.display = 'none';
                     Swal.fire({
                         title: 'Success!',
-                        text: 'You are eligible to proceed.',
+                        text: 'You are eligible. Please fill out the registration form.',
                         icon: 'success',
                     });
-                    // You can proceed to show form or redirect the user
                 } else {
                     Swal.fire({
                         icon: 'error',
