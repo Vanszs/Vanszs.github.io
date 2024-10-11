@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check NFT Ownership</title>
+    <title>Check NFT Ownership on Polygon</title>
+    <!-- Include Web3.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
 </head>
 <body>
-    <h1>Check Your Crypto Address for NFTs</h1>
+    <h1>Check Your Crypto Address for NFTs (Polygon)</h1>
     <form id="nftForm">
         <label for="cryptoAddress">Enter your crypto address:</label>
         <input type="text" id="cryptoAddress" name="cryptoAddress" required>
@@ -15,22 +17,7 @@
 
     <p id="result"></p>
 
-    <script>
-        // Address to check against (you can adjust this to check dynamically)
-        const nftAddressToCheck = "0x6d778a0f5e07c01211672F57f246166ccF6541C1";
-        
-        document.getElementById('nftForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const cryptoAddress = document.getElementById('cryptoAddress').value;
-            
-            // Check if the entered address matches the NFT address
-            if (cryptoAddress.toLowerCase() === nftAddressToCheck.toLowerCase()) {
-                // Redirect to form.html if address owns the NFT
-                window.location.href = "form.html";
-            } else {
-                document.getElementById('result').innerText = "Address does not own the NFT.";
-            }
-        });
-    </script>
+    <!-- Include the external JavaScript file -->
+    <script src="script.js"></script>
 </body>
 </html>
