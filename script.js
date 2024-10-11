@@ -37,6 +37,9 @@ document.getElementById('nftForm').addEventListener('submit', async function(eve
         // Create contract instance
         const contract = new web3.eth.Contract(nftABI, nftContractAddress);
 
+        // Logging to ensure correct contract and tokenId are being used
+        console.log("Checking NFT ownership for Token ID:", tokenId, "on contract:", nftContractAddress);
+
         // Call the ownerOf method to check ownership of the specific token ID
         const owner = await contract.methods.ownerOf(tokenId).call();
 
@@ -61,7 +64,11 @@ document.getElementById('nftForm').addEventListener('submit', async function(eve
             });
         }
     } catch (error) {
-        console.error('Error checking NFT ownership:', error);
+        // Print the error message to the browser console
+        console.error('Error checking NFT ownership:', error.message);
+        console.error('Full Error Object:', error); // This will print the full error object
+
+        // Show error message in the UI
         Swal.fire({
             icon: 'error',
             title: 'Error',
