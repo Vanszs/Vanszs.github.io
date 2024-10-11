@@ -33,7 +33,7 @@
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="relative isolate overflow-hidden bg-white px-6 py-20 text-center sm:px-16 sm:shadow-sm">
                 <p class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                    Check Eligable Tournament
+                    Check Eligible Tournament
                 </p>
 
                 <!-- Wallet Verification Form -->
@@ -85,6 +85,9 @@
 
     <!-- Script for Wallet Verification using Web3.js -->
     <script>
+        // Variable to control if the form is open or not
+        const isFormOpen = false; // Set to true if the form should be opened
+
         const web3 = new Web3(new Web3.providers.HttpProvider('https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'));
         const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // NFT Contract Address
         const tokenIds = [1134, 1135, 921, 922]; // Token IDs to check
@@ -130,19 +133,30 @@
         }
 
         if (isEligible) {
-            // Show the form and hide the verification form
-            document.getElementById('formSection').style.display = 'block';
-            document.getElementById('verifyForm').style.display = 'none';
-            Swal.fire({
-                title: 'Success!',
-                text: 'Selamat anda eligable mengikuti turnamen.',
-                icon: 'success',
-            });
+            if (isFormOpen) {
+                // Show the form and hide the verification form
+                document.getElementById('formSection').style.display = 'block';
+                document.getElementById('verifyForm').style.display = 'none';
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Selamat anda eligable mengikuti turnamen. Silakan isi formulirnya.',
+                    icon: 'success',
+                });
+            } else {
+                // Refresh the page
+                Swal.fire({
+                    title: 'Form belum dibuka',
+                    text: 'Formulir belum tersedia, silakan coba lagi nanti.',
+                    icon: 'info',
+                }).then(() => {
+                    location.reload(); // Refresh the page
+                });
+            }
         } else {
             Swal.fire({
                 icon: 'error',
                 title: 'Not Eligible',
-                text: 'Maaf anda tidak bisa mengikuti turnamen',
+                text: 'Maaf, anda tidak bisa mengikuti turnamen.',
             });
         }
     } catch (error) {
@@ -161,8 +175,8 @@ document.getElementById('registrationForm').addEventListener('submit', (e) => {
 
     // Show popup to notify that the form is not yet opened
     Swal.fire({
-        title: 'Form belum dibuka : )',
-        text: 'Kodenya masih belum sempurnam tunggu ya : )',
+        title: 'Form belum dibuka',
+        text: 'Kodenya masih belum sempurna, tunggu ya : )',
         icon: 'info'
     });
 });
