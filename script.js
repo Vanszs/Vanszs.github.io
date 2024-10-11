@@ -1,17 +1,20 @@
 // Infura URL for Polygon Mainnet
-const infuraUrl = 'https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'; // Replace with your actual Infura project ID
-const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // Address of the NFT contract you're checking
+const infuraUrl = 'https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'; // Infura project ID
+const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // NFT Contract Address
+const tokenId = 1135; // The specific token ID you're checking for
 
-// Create a Web3 instance connected to the Infura Polygon node
+// Create a Web3 instance
 const web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
 
 // ABI (Application Binary Interface) for the NFT contract (ERC721 standard)
 const nftABI = [
+    // ERC721 function: ownerOf(uint256 tokenId)
     {
         "constant": true,
-        "inputs": [{ "name": "owner", "type": "address" }],
-        "name": "balanceOf",
-        "outputs": [{ "name": "", "type": "uint256" }],
+        "inputs": [{ "name": "tokenId", "type": "uint256" }],
+        "name": "ownerOf",
+        "outputs": [{ "name": "", "type": "address" }],
+        "stateMutability": "view",
         "type": "function"
     }
 ];
@@ -21,7 +24,7 @@ document.getElementById('nftForm').addEventListener('submit', async function(eve
     event.preventDefault();
     const cryptoAddress = document.getElementById('cryptoAddress').value;
 
-    // Check if the crypto address is valid
+    // Validate crypto address
     if (!web3.utils.isAddress(cryptoAddress)) {
         Swal.fire({
             icon: 'error',
@@ -35,11 +38,12 @@ document.getElementById('nftForm').addEventListener('submit', async function(eve
         // Create contract instance
         const contract = new web3.eth.Contract(nftABI, nftContractAddress);
         
-        // Call the balanceOf method to check NFT ownership
-        const balance = await contract.methods.balanceOf(cryptoAddress).call();
+        // Call the ownerOf method to check the owner of the specific token ID
+        const owner = await contract.methods.ownerOf(tokenId).call();
 
-        if (balance > 0) {
-            // If balance is greater than 0, show SweetAlert notification and redirect
+        // Check if the input address matches the owner of the specific NFT
+        if (owner.toLowerCase() === cryptoAddress.toLowerCase()) {
+            // If the address is the owner of the NFT, show SweetAlert notification and redirect
             Swal.fire({
                 title: 'Selamat!',
                 text: 'Anda eligible untuk ikut turnamen ini. Klik "Selanjutnya" untuk daftar.',
@@ -51,10 +55,18 @@ document.getElementById('nftForm').addEventListener('submit', async function(eve
                 }
             });
         } else {
-            document.getElementById('result').innerText = "Address does not own the specified NFT on Polygon.";
+            Swal.fire({
+                icon: 'error',
+                title: 'Not Eligible',
+                text: 'Address does not own the specified NFT.',
+            });
         }
     } catch (error) {
         console.error('Error checking NFT ownership:', error);
-        document.getElementById('result').innerText = `An error occurred while checking NFT ownership: ${error.message}`;
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `An error occurred: ${error.message}`,
+        });
     }
 });
