@@ -3,32 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carv Indonesia Tournament</title>
+    <title>Modern Tournament Form</title>
     <!-- Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Material Icons for UI enhancements -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Web3.js (v1.x) CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <!-- AOS (Animate On Scroll) CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&display=swap" rel="stylesheet">
+    <!-- SimpleParallax.js -->
+    <script src="https://cdn.jsdelivr.net/npm/simple-parallax-js@5.6.1/dist/simpleParallax.min.js"></script>
+    <!-- Web3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .bg-custom {
+            background-image: url('https://images.unsplash.com/photo-1593642532973-d31b6557fa68');
+            background-size: cover;
+            background-position: center;
+            height: 400px;
+            position: relative;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        #formSection {
+            display: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
-            <h1 class="text-2xl font-bold text-center mb-4">CARV-ID Mobile Legends Tournament</h1>
-            <form id="nftForm" class="space-y-4">
-                <div>
-                    <label for="cryptoAddress" class="block text-sm font-medium text-gray-700">Enter your crypto address:</label>
-                    <input type="text" id="cryptoAddress" name="cryptoAddress" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                </div>
-                <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Check</button>
-            </form>
-            <p id="result" class="mt-4 text-center text-gray-500"></p>
+
+    <!-- Hero section with Parallax -->
+    <div class="bg-custom">
+        <div class="overlay"></div>
+        <div class="container mx-auto flex justify-center items-center h-full">
+            <div class="text-center text-white z-10">
+                <h1 class="text-4xl font-bold mb-4" data-aos="fade-down">Join Our Tournament</h1>
+                <p class="text-lg" data-aos="fade-up">Please authenticate yourself to register for the event</p>
+            </div>
         </div>
     </div>
 
-    <!-- Include the external JavaScript file -->
-    <script src="script.js"></script>
+    <!-- Authentication Section -->
+    <section class="py-12">
+        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" id="authSection" data-aos="fade-up">
+            <h2 class="text-2xl font-semibold text-center mb-6">Authentication</h2>
+            <form id="authForm" class="space-y-4">
+                <!-- Wallet Address -->
+                <div>
+                    <label for="walletAddress" class="block text-sm font-medium text-gray-700">Enter your wallet address</label>
+                    <input type="text" id="walletAddress" name="walletAddress" placeholder="Your Wallet Address" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Authenticate</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Registration Form Section -->
+    <section class="py-12" id="formSection">
+        <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up">
+            <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
+            <form id="registrationForm" class="space-y-4">
+                <!-- Discord Username -->
+                <div>
+                    <label for="discordUsername" class="block text-sm font-medium text-gray-700">Discord Username</label>
+                    <input type="text" id="discordUsername" name="discordUsername" placeholder="@YourDiscordUsername" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Mobile Legend ID -->
+                <div>
+                    <label for="mlID" class="block text-sm font-medium text-gray-700">Mobile Legend ID</label>
+                    <input type="text" id="mlID" name="mlID" placeholder="Your Mobile Legend ID" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Mobile Legend Nickname -->
+                <div>
+                    <label for="mlNickname" class="block text-sm font-medium text-gray-700">Mobile Legend Nickname</label>
+                    <input type="text" id="mlNickname" name="mlNickname" placeholder="Your ML Nickname" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- AOS (Animate On Scroll) and Parallax Script Initialization -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        // Parallax effect for the background
+        const image = document.querySelector('.bg-custom');
+        new simpleParallax(image, {
+            scale: 1.5,
+            delay: .6,
+            transition: 'cubic-bezier(0,0,0,1)'
+        });
+
+        // Web3.js setup to verify if user owns the required token
+        const infuraUrl = 'https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c';
+        const web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
+        const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // Example NFT Contract Address
+        const tokenId = 1135; // Token ID to check
+        const nftABI = [
+            {
+                "constant": true,
+                "inputs": [
+                    { "name": "account", "type": "address" },
+                    { "name": "id", "type": "uint256" }
+                ],
+                "name": "balanceOf",
+                "outputs": [{ "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        document.getElementById('authForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const walletAddress = document.getElementById('walletAddress').value;
+
+            if (!web3.utils.isAddress(walletAddress)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Address',
+                    text: 'Please enter a valid wallet address!',
+                });
+                return;
+            }
+
+            try {
+                const contract = new web3.eth.Contract(nftABI, nftContractAddress);
+                const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+
+                if (parseInt(balance) > 0) {
+                    // Show form if the user owns the required token
+                    document.getElementById('authSection').style.display = 'none';
+                    document.getElementById('formSection').style.display = 'block';
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'You are eligible. Please fill out the registration form.',
+                        icon: 'success',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Not Eligible',
+                        text: 'You do not own the required token to access this form.',
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking token ownership:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `An error occurred: ${error.message}`,
+                });
+            }
+        });
+    </script>
 </body>
 </html>
