@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polygon Wallet Verification & Registration Form</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,7 +32,7 @@
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="relative isolate overflow-hidden bg-white px-6 py-20 text-center sm:px-16 sm:shadow-sm">
                 <p class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                    Check Eligible Tournament
+                    Check Eligibility for Tournament
                 </p>
 
                 <!-- Wallet Verification Form -->
@@ -133,25 +132,27 @@
         }
 
         if (isEligible) {
-            if (isFormOpen) {
-                // Show the form and hide the verification form
-                document.getElementById('formSection').style.display = 'block';
-                document.getElementById('verifyForm').style.display = 'none';
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Selamat anda eligable mengikuti turnamen. Silakan isi formulirnya.',
-                    icon: 'success',
-                });
-            } else {
-                // Refresh the page
-                Swal.fire({
-                    title: 'Form belum dibuka',
-                    text: 'Formulir belum tersedia, silakan coba lagi nanti.',
-                    icon: 'info',
-                }).then(() => {
-                    location.reload(); // Refresh the page
-                });
-            }
+            // Show eligibility success message
+            Swal.fire({
+                title: 'Success!',
+                text: 'Selamat anda eligible mengikuti turnamen.',
+                icon: 'success',
+            }).then(() => {
+                if (isFormOpen) {
+                    // Show the form and hide the verification form
+                    document.getElementById('formSection').style.display = 'block';
+                    document.getElementById('verifyForm').style.display = 'none';
+                } else {
+                    // If form is not open, refresh the page
+                    Swal.fire({
+                        title: 'Form belum dibuka',
+                        text: 'Formulir belum tersedia, silakan coba lagi nanti.',
+                        icon: 'info',
+                    }).then(() => {
+                        location.reload(); // Refresh the page
+                    });
+                }
+            });
         } else {
             Swal.fire({
                 icon: 'error',
