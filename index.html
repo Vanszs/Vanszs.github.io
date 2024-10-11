@@ -56,22 +56,22 @@
                 <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg mt-8" id="formSection">
                     <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
                     <form id="registrationForm" class="space-y-4">
-                        <!-- Discord Username -->
+                        <!-- Full Name -->
                         <div>
-                            <label for="discordUsername" class="block text-sm font-medium text-gray-700">Discord Username</label>
-                            <input type="text" id="discordUsername" name="discordUsername" placeholder="@YourDiscordUsername"
+                            <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" placeholder="Your Full Name"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                         </div>
-                        <!-- Mobile Legend ID -->
+                        <!-- Email Address -->
                         <div>
-                            <label for="mlID" class="block text-sm font-medium text-gray-700">Mobile Legend ID</label>
-                            <input type="text" id="mlID" name="mlID" placeholder="Your Mobile Legend ID"
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="Your Email Address"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                         </div>
-                        <!-- Mobile Legend Nickname -->
+                        <!-- Mobile Number -->
                         <div>
-                            <label for="mlNickname" class="block text-sm font-medium text-gray-700">Mobile Legend Nickname</label>
-                            <input type="text" id="mlNickname" name="mlNickname" placeholder="Your ML Nickname"
+                            <label for="mobileNumber" class="block text-sm font-medium text-gray-700">Mobile Number</label>
+                            <input type="text" id="mobileNumber" name="mobileNumber" placeholder="Your Mobile Number"
                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                         </div>
                         <!-- Submit Button -->
@@ -85,7 +85,6 @@
 
     <!-- Script for Wallet Verification using Web3.js -->
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzBhRJKKSKJbgZhs7gFMg4r6K209AiXJOtedgzSpQSaUfGCUKdyY1NlEURK4UU7v7oc/exec'; // Web App URL
         const web3 = new Web3(new Web3.providers.HttpProvider('https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'));
         const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // NFT Contract Address
         const tokenIds = [1134, 1135, 921, 922]; // Token IDs to check
@@ -131,17 +130,19 @@
         }
 
         if (isEligible) {
-            // Wallet is eligible, but form is not opened yet.
+            // Show the form and hide the verification form
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('verifyForm').style.display = 'none';
             Swal.fire({
                 title: 'Success!',
-                text: 'You are eligible, but the form is not opened yet.',
+                text: 'Selamat anda eligable mengikuti turnamen.',
                 icon: 'success',
             });
         } else {
             Swal.fire({
                 icon: 'error',
                 title: 'Not Eligible',
-                text: 'You do not own the required token to access this form.',
+                text: 'Maaf anda tidak bisa mengikuti turnamen',
             });
         }
     } catch (error) {
@@ -160,8 +161,8 @@ document.getElementById('registrationForm').addEventListener('submit', (e) => {
 
     // Show popup to notify that the form is not yet opened
     Swal.fire({
-        title: 'Form belum dibuka',
-        text: 'Saat ini, form registrasi belum dibuka.',
+        title: 'Form belum dibuka : )',
+        text: 'Kodenya masih belum sempurnam tunggu ya : )',
         icon: 'info'
     });
 });
