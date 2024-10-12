@@ -76,7 +76,7 @@
                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
         </div>
         <!-- Submit Button -->
-        <button type="submit"
+        <button type="submit" id="submitButton"
             class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
     </form>
 </div>
@@ -87,13 +87,17 @@
     </div>
 
     <!-- Script for Wallet Verification using Web3.js -->
-    <script>
-        // Variable to control if the form is open or not
-        const isFormOpen = true; // Set to true if the form should be opened
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     
-        const web3 = new Web3(new Web3.providers.HttpProvider('https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'));
-        const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // NFT Contract Address
-        const tokenIds = [1134, 1135, 921, 922]; // Token IDs to check
+    <script>
+        const MORALIS_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjJmOWY5ZWNhLTY3OTAtNDZhYi1hZDExLWE3OWEzMTkwMTk2NCIsIm9yZ0lkIjoiNDExNDI5IiwidXNlcklkIjoiNDIyODA3IiwidHlwZUlkIjoiZjcwMGRhODQtNGI1My00ZTA0LTk5MGMtZTNiY2VmMzBkZjI0IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Mjg3MTgwODcsImV4cCI6NDg4NDQ3ODA4N30.bgZiFF9wEkfboR0BANSOuMol8bXQnSAkuUJEGWzm8SA'; // Replace with your Moralis API key
+        const polygonProvider = new Web3.providers.HttpProvider('https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'); // Replace with your Infura project ID
+        const web3 = new Web3(polygonProvider);
+        const polygonNFTContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1";
+        const polygonTokenIds = [1134, 1135, 921, 922];
+        const roninContractAddress = '0x7d119ca651d7ea07a8f78a1dc3f0805be05d1e7e';
+        const roninTokenId = '19';
         const nftABI = [
             {
                 "constant": true,
@@ -108,122 +112,97 @@
             }
         ];
     
+        async function checkRoninOwnership(walletAddress) {
+            try {
+                const apiUrl = `https://deep-index.moralis.io/api/v2/${walletAddress}/nft/${roninContractAddress}?chain=ronin`;
+                const response = await axios.get(apiUrl, {
+                    headers: { 'X-API-Key': MORALIS_API_KEY }
+                });
+                const nfts = response.data.result;
+                return nfts.some((nft) => nft.token_id === roninTokenId);
+            } catch (error) {
+                console.error('Error checking Ronin NFT ownership:', error);
+                return false;
+            }
+        }
+    
+        async function checkPolygonOwnership(walletAddress) {
+            try {
+                const contract = new web3.eth.Contract(nftABI, polygonNFTContractAddress);
+                for (let tokenId of polygonTokenIds) {
+                    const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+                    if (parseInt(balance) > 0) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.error('Error checking Polygon NFT ownership:', error);
+                return false;
+            }
+        }
+    
         document.getElementById('verifyForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const walletAddress = document.getElementById('walletAddress').value;
     
-            // Validate if the entered value is a valid Ethereum address
             if (!web3.utils.isAddress(walletAddress)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Address',
-                    text: 'Please enter a valid wallet address!',
-                });
+                Swal.fire({ icon: 'error', title: 'Invalid Address', text: 'Please enter a valid wallet address!' });
                 return;
             }
     
             try {
-                const contract = new web3.eth.Contract(nftABI, nftContractAddress);
-                let isEligible = false;
+                const ownsRoninNFT = await checkRoninOwnership(walletAddress);
+                const ownsPolygonNFT = await checkPolygonOwnership(walletAddress);
     
-                // Loop through the tokenIds to check if the user has any of the eligible tokens
-                for (let tokenId of tokenIds) {
-                    const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
-                    if (parseInt(balance) > 0) {
-                        isEligible = true;
-                        break;
-                    }
-                }
-    
-                if (isEligible) {
-                    // Show eligibility success message
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Selamat anda eligible mengikuti turnamen.',
-                        icon: 'success',
-                    }).then(() => {
-                        if (isFormOpen) {
-                            // Show the form and hide the verification form
-                            document.getElementById('formSection').style.display = 'block';
-                            document.getElementById('verifyForm').style.display = 'none';
-                        } else {
-                            // If form is not open, refresh the page
-                            Swal.fire({
-                                title: 'Form belum dibuka',
-                                text: 'Silahkan ditunggu open registrasi yaaa : ).',
-                                icon: 'info',
-                            }).then(() => {
-                                location.reload(); // Refresh the page
-                            });
-                        }
-                    });
+                if (ownsRoninNFT || ownsPolygonNFT) {
+                    Swal.fire({ title: 'Success!', text: 'You are eligible for the tournament.', icon: 'success' })
+                        .then(() => { document.getElementById('formSection').style.display = 'block'; document.getElementById('verifyForm').style.display = 'none'; });
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Not Eligible',
-                        text: 'Maaf, anda tidak bisa mengikuti turnamen.',
-                    });
+                    Swal.fire({ icon: 'error', title: 'Not Eligible', text: 'Sorry, you cannot participate in the tournament.' });
                 }
             } catch (error) {
-                console.error('Error checking token ownership:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: `An error occurred: ${error.message}`,
-                });
+                console.error('Error during ownership check:', error);
+                Swal.fire({ icon: 'error', title: 'Error', text: `An error occurred: ${error.message}` });
             }
         });
     
-        // Handle registration form submission to Google Sheets
         document.getElementById('registrationForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-        
-            const discordNickname = document.getElementById('discordNickname').value;
-            const mlId = document.getElementById('mlId').value;
-            const mlNickname = document.getElementById('mlNickname').value;
-            const walletAddress = document.getElementById('walletAddress').value;
-        
-            // Google Apps Script Web App URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyymIPq1pP-for0DMF5KVRZlYMSQROnNrvGt9KCPY7oqYD6gU36KztG4EbE_YEXpYvX/exec'; 
-        
-            // Send the form data to Google Sheets via Google Apps Script
-            fetch(scriptURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  // Set headers
-                body: new URLSearchParams({
-                    discordNickname: discordNickname,
-                    mlId: mlId,
-                    mlNickname: mlNickname,
-                    walletAddress: walletAddress
-                })
-            })
-            .then(response => response.json())  // Expect a JSON response
-            .then(result => {
-                if (result.status === 'success') {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Data has been saved to Google Sheets successfully.',
-                        icon: 'success'
-                    }).then(() => {
-                        // Hide registration form and show wallet verification form again
+        e.preventDefault();
+        const submitButton = document.getElementById('submitButton');
+        submitButton.disabled = true; // Disable the submit button
+
+        const discordNickname = document.getElementById('discordNickname').value;
+        const mlId = document.getElementById('mlId').value;
+        const mlNickname = document.getElementById('mlNickname').value;
+        const walletAddress = document.getElementById('walletAddress').value;
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyymIPq1pP-for0DMF5KVRZlYMSQROnNrvGt9KCPY7oqYD6gU36KztG4EbE_YEXpYvX/exec'; // Replace with your Google Apps Script URL
+
+        fetch(scriptURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ discordNickname, mlId, mlNickname, walletAddress })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                Swal.fire({ title: 'Success!', text: 'Your data has been saved successfully.', icon: 'success' })
+                    .then(() => { 
                         document.getElementById('formSection').style.display = 'none';
                         document.getElementById('verifyForm').style.display = 'block';
                         location.reload();
                     });
-                } else if (result.status === 'error' && result.message === 'Duplicate address') {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'This wallet address has already been registered.',
-                        icon: 'error'
-                    }).then(() => {
-                        // Return to the main Check Address page after the error
+            } else if (result.status === 'error' && result.message === 'Duplicate address') {
+                Swal.fire({ title: 'Error!', text: 'This wallet address is already registered.', icon: 'error' })
+                    .then(() => { 
                         document.getElementById('formSection').style.display = 'none';
                         document.getElementById('verifyForm').style.display = 'block';
                         location.reload();
                     });
-                }
-            })
-            .catch(error => {
+            }
+            submitButton.disabled = false; // Re-enable the button after successful submission
+        })
+        .catch(error => {
                 console.error('Error!', error.message);
                 Swal.fire({
                     title: 'Success!',
@@ -236,11 +215,10 @@
                     location.reload();
                 });
             });
-        });
-        
-        
-        
+    });
+
     </script>
+    
     
 
 </body>
