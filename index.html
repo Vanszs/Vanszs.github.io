@@ -52,32 +52,36 @@
                 </form>
 
                 <!-- Registration Form Section (hidden by default) -->
-                <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg mt-8" id="formSection">
-                    <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
-                    <form id="registrationForm" class="space-y-4">
-                        <!-- Full Name -->
-                        <div>
-                            <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
-                            <input type="text" id="fullName" name="fullName" placeholder="Your Full Name"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                        </div>
-                        <!-- Email Address -->
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                            <input type="email" id="email" name="email" placeholder="Your Email Address"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                        </div>
-                        <!-- Mobile Number -->
-                        <div>
-                            <label for="mobileNumber" class="block text-sm font-medium text-gray-700">Mobile Number</label>
-                            <input type="text" id="mobileNumber" name="mobileNumber" placeholder="Your Mobile Number"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                        </div>
-                        <!-- Submit Button -->
-                        <button type="submit"
-                            class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
-                    </form>
-                </div>
+                <!-- Registration Form Section (hidden by default) -->
+<!-- Registration Form Section (hidden by default) -->
+<div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg mt-8" id="formSection">
+    <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
+    <form id="registrationForm" class="space-y-4">
+        <!-- Discord Nickname -->
+        <div>
+            <label for="discordNickname" class="block text-sm font-medium text-gray-700">Discord Nickname</label>
+            <input type="text" id="discordNickname" name="discordNickname" placeholder="Your Discord Nickname"
+                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+        </div>
+        <!-- Mobile Legends ID -->
+        <div>
+            <label for="mlId" class="block text-sm font-medium text-gray-700">Mobile Legends ID</label>
+            <input type="text" id="mlId" name="mlId" placeholder="Your Mobile Legends ID"
+                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+        </div>
+        <!-- Mobile Legends Nickname -->
+        <div>
+            <label for="mlNickname" class="block text-sm font-medium text-gray-700">Mobile Legends Nickname</label>
+            <input type="text" id="mlNickname" name="mlNickname" placeholder="Your Mobile Legends Nickname"
+                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+        </div>
+        <!-- Submit Button -->
+        <button type="submit"
+            class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
+    </form>
+</div>
+
+
             </div>
         </div>
     </div>
@@ -85,8 +89,8 @@
     <!-- Script for Wallet Verification using Web3.js -->
     <script>
         // Variable to control if the form is open or not
-        const isFormOpen = false; // Set to true if the form should be opened
-
+        const isFormOpen = true; // Set to true if the form should be opened
+    
         const web3 = new Web3(new Web3.providers.HttpProvider('https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'));
         const nftContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1"; // NFT Contract Address
         const tokenIds = [1134, 1135, 921, 922]; // Token IDs to check
@@ -103,86 +107,138 @@
                 "type": "function"
             }
         ];
-
-  document.getElementById('verifyForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const walletAddress = document.getElementById('walletAddress').value;
-
-    // Validate if the entered value is a valid Ethereum address
-    if (!web3.utils.isAddress(walletAddress)) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Address',
-            text: 'Please enter a valid wallet address!',
-        });
-        return;
-    }
-
-    try {
-        const contract = new web3.eth.Contract(nftABI, nftContractAddress);
-        let isEligible = false;
-
-        // Loop through the tokenIds to check if the user has any of the eligible tokens
-        for (let tokenId of tokenIds) {
-            const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
-            if (parseInt(balance) > 0) {
-                isEligible = true;
-                break;
+    
+        document.getElementById('verifyForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const walletAddress = document.getElementById('walletAddress').value;
+    
+            // Validate if the entered value is a valid Ethereum address
+            if (!web3.utils.isAddress(walletAddress)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Address',
+                    text: 'Please enter a valid wallet address!',
+                });
+                return;
             }
-        }
-
-        if (isEligible) {
-            // Show eligibility success message
-            Swal.fire({
-                title: 'Success!',
-                text: 'Selamat anda eligible mengikuti turnamen.',
-                icon: 'success',
-            }).then(() => {
-                if (isFormOpen) {
-                    // Show the form and hide the verification form
-                    document.getElementById('formSection').style.display = 'block';
-                    document.getElementById('verifyForm').style.display = 'none';
-                } else {
-                    // If form is not open, refresh the page
+    
+            try {
+                const contract = new web3.eth.Contract(nftABI, nftContractAddress);
+                let isEligible = false;
+    
+                // Loop through the tokenIds to check if the user has any of the eligible tokens
+                for (let tokenId of tokenIds) {
+                    const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+                    if (parseInt(balance) > 0) {
+                        isEligible = true;
+                        break;
+                    }
+                }
+    
+                if (isEligible) {
+                    // Show eligibility success message
                     Swal.fire({
-                        title: 'Form belum dibuka',
-                        text: 'Silahkan ditunggu open registrasi yaaa : ).',
-                        icon: 'info',
+                        title: 'Success!',
+                        text: 'Selamat anda eligible mengikuti turnamen.',
+                        icon: 'success',
                     }).then(() => {
-                        location.reload(); // Refresh the page
+                        if (isFormOpen) {
+                            // Show the form and hide the verification form
+                            document.getElementById('formSection').style.display = 'block';
+                            document.getElementById('verifyForm').style.display = 'none';
+                        } else {
+                            // If form is not open, refresh the page
+                            Swal.fire({
+                                title: 'Form belum dibuka',
+                                text: 'Silahkan ditunggu open registrasi yaaa : ).',
+                                icon: 'info',
+                            }).then(() => {
+                                location.reload(); // Refresh the page
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Not Eligible',
+                        text: 'Maaf, anda tidak bisa mengikuti turnamen.',
                     });
                 }
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Not Eligible',
-                text: 'Maaf, anda tidak bisa mengikuti turnamen.',
-            });
-        }
-    } catch (error) {
-        console.error('Error checking token ownership:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: `An error occurred: ${error.message}`,
+            } catch (error) {
+                console.error('Error checking token ownership:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `An error occurred: ${error.message}`,
+                });
+            }
         });
-    }
-});
-
-// Handle form submission (even though it's not supposed to be opened)
-document.getElementById('registrationForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    // Show popup to notify that the form is not yet opened
-    Swal.fire({
-        title: 'Form belum dibuka',
-        text: 'Kodenya masih belum sempurna, tunggu ya : )',
-        icon: 'info'
-    });
-});
-
+    
+        // Handle registration form submission to Google Sheets
+        document.getElementById('registrationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+        
+            const discordNickname = document.getElementById('discordNickname').value;
+            const mlId = document.getElementById('mlId').value;
+            const mlNickname = document.getElementById('mlNickname').value;
+            const walletAddress = document.getElementById('walletAddress').value;
+        
+            // Google Apps Script Web App URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyymIPq1pP-for0DMF5KVRZlYMSQROnNrvGt9KCPY7oqYD6gU36KztG4EbE_YEXpYvX/exec'; 
+        
+            // Send the form data to Google Sheets via Google Apps Script
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },  // Set headers
+                body: new URLSearchParams({
+                    discordNickname: discordNickname,
+                    mlId: mlId,
+                    mlNickname: mlNickname,
+                    walletAddress: walletAddress
+                })
+            })
+            .then(response => response.json())  // Expect a JSON response
+            .then(result => {
+                if (result.status === 'success') {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Data has been saved to Google Sheets successfully.',
+                        icon: 'success'
+                    }).then(() => {
+                        // Hide registration form and show wallet verification form again
+                        document.getElementById('formSection').style.display = 'none';
+                        document.getElementById('verifyForm').style.display = 'block';
+                    });
+                } else if (result.status === 'error' && result.message === 'Duplicate address') {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'This wallet address has already been registered.',
+                        icon: 'error'
+                    }).then(() => {
+                        // Return to the main Check Address page after the error
+                        document.getElementById('formSection').style.display = 'none';
+                        document.getElementById('verifyForm').style.display = 'block';
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Data anda berhasil direkam, Terima kasih!',
+                    icon: 'success'
+                }).then(() => {
+                    // Return to the main Check Address page even after an error
+                    document.getElementById('formSection').style.display = 'none';
+                    document.getElementById('verifyForm').style.display = 'block';
+                });
+            });
+        });
+        
+        
+        
     </script>
+    
 
 </body>
 </html>
