@@ -208,6 +208,7 @@
                         // Hide registration form and show wallet verification form again
                         document.getElementById('formSection').style.display = 'none';
                         document.getElementById('verifyForm').style.display = 'block';
+                        location.reload();
                     });
                 } else if (result.status === 'error' && result.message === 'Duplicate address') {
                     Swal.fire({
@@ -218,6 +219,7 @@
                         // Return to the main Check Address page after the error
                         document.getElementById('formSection').style.display = 'none';
                         document.getElementById('verifyForm').style.display = 'block';
+                        location.reload();
                     });
                 }
             })
@@ -231,6 +233,7 @@
                     // Return to the main Check Address page even after an error
                     document.getElementById('formSection').style.display = 'none';
                     document.getElementById('verifyForm').style.display = 'block';
+                    location.reload();
                 });
             });
         });
