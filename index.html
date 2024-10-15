@@ -1,151 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
-    <title>(Closed) Polygon Wallet Verification & Registration Form</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Web3.js -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
-    <style>
-        body {
-            background-color: white;
+<script>
+    const isOpenForm = true; // Set to true to bypass the address check
+
+    async function checkRoninOwnership(walletAddress) {
+        try {
+            const apiUrl = `https://deep-index.moralis.io/api/v2/${walletAddress}/nft/${roninContractAddress}?chain=ronin`;
+            const response = await axios.get(apiUrl, {
+                headers: { 'X-API-Key': MORALIS_API_KEY }
+            });
+            const nfts = response.data.result;
+            return nfts.some((nft) => nft.token_id === roninTokenId);
+        } catch (error) {
+            console.error('Error checking Ronin NFT ownership:', error);
+            return false;
         }
-        .centered {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-        #formSection {
-            display: none;
-        }
-    </style>
-</head>
-<body>
+    }
 
-    <!-- Verification Section -->
-    <div class="centered">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="relative isolate overflow-hidden bg-white px-6 py-20 text-center sm:px-16 sm:shadow-sm">
-                <p class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                    Check Eligibility Mobile Legends Tournament
-                </p>
-
-                <!-- Wallet Verification Form -->
-                <form id="verifyForm"
-                    class="mx-auto mt-8 relative bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300">
-
-                    <input id="walletAddress" placeholder="Enter your Polygon or Ronin wallet address" name="wallet"
-                        class="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white" required>
-                    <button type="submit"
-                        class="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all">
-                        <div class="flex items-center transition-all opacity-1">
-                            <span class="text-sm font-semibold whitespace-nowrap truncate mx-auto">
-                                Verify
-                            </span>
-                        </div>
-                    </button>
-                </form>
-
-                <!-- Registration Form Section (hidden by default) -->
-                <!-- Registration Form Section (hidden by default) -->
-<!-- Registration Form Section (hidden by default) -->
-<div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg mt-8" id="formSection">
-    <h2 class="text-2xl font-semibold text-center mb-6">Register Now</h2>
-    <form id="registrationForm" class="space-y-4">
-        <!-- Discord Nickname -->
-        <div>
-            <label for="discordNickname" class="block text-sm font-medium text-gray-700">Discord Username</label>
-            <input type="text" id="discordNickname" name="discordNickname" placeholder="Your Discord Username"
-                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-        </div>
-        <!-- Mobile Legends ID -->
-        <div>
-            <label for="mlId" class="block text-sm font-medium text-gray-700">Mobile Legends ID</label>
-            <input type="text" id="mlId" name="mlId" placeholder="Your Mobile Legends ID"
-                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-        </div>
-        <!-- Mobile Legends Nickname -->
-        <div>
-            <label for="mlNickname" class="block text-sm font-medium text-gray-700">Mobile Legends Nickname</label>
-            <input type="text" id="mlNickname" name="mlNickname" placeholder="Your Mobile Legends Nickname"
-                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-        </div>
-        <!-- Submit Button -->
-        <button type="submit" id="submitButton"
-            class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
-    </form>
-</div>
-
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Script for Wallet Verification using Web3.js -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    
-    <script>
-        const MORALIS_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjJmOWY5ZWNhLTY3OTAtNDZhYi1hZDExLWE3OWEzMTkwMTk2NCIsIm9yZ0lkIjoiNDExNDI5IiwidXNlcklkIjoiNDIyODA3IiwidHlwZUlkIjoiZjcwMGRhODQtNGI1My00ZTA0LTk5MGMtZTNiY2VmMzBkZjI0IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Mjg3MTgwODcsImV4cCI6NDg4NDQ3ODA4N30.bgZiFF9wEkfboR0BANSOuMol8bXQnSAkuUJEGWzm8SA'; // Replace with your Moralis API key
-        const polygonProvider = new Web3.providers.HttpProvider('https://polygon-mainnet.infura.io/v3/afd9253b37f84c958fdd3d2023f6af5c'); // Replace with your Infura project ID
-        const web3 = new Web3(polygonProvider);
-        const polygonNFTContractAddress = "0x6d778a0f5e07c01211672F57f246166ccF6541C1";
-        const polygonTokenIds = [1134, 1135, 921, 922];
-        const roninContractAddress = '0x7d119ca651d7ea07a8f78a1dc3f0805be05d1e7e';
-        const roninTokenId = '19';
-        const nftABI = [
-         {
-            "constant": true,
-            "inputs": [
-                { "name": "account", "type": "address" },
-                { "name": "id", "type": "uint256" }
-            ],
-            "name": "balanceOf",
-            "outputs": [{ "name": "", "type": "uint256" }],
-            "stateMutability": "view",
-            "type": "function"
-        }
-    ];
-    
-    let isFormOpen = false; // Variable to track if the form is open
-
-        async function checkRoninOwnership(walletAddress) {
-            try {
-                const apiUrl = `https://deep-index.moralis.io/api/v2/${walletAddress}/nft/${roninContractAddress}?chain=ronin`;
-                const response = await axios.get(apiUrl, {
-                    headers: { 'X-API-Key': MORALIS_API_KEY }
-                });
-                const nfts = response.data.result;
-                return nfts.some((nft) => nft.token_id === roninTokenId);
-            } catch (error) {
-                console.error('Error checking Ronin NFT ownership:', error);
-                return false;
-            }
-        }
-    
-        async function checkPolygonOwnership(walletAddress) {
-            try {
-                const contract = new web3.eth.Contract(nftABI, polygonNFTContractAddress);
-                for (let tokenId of polygonTokenIds) {
-                    const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
-                    if (parseInt(balance) > 0) {
-                        return true;
-                    }
+    async function checkPolygonOwnership(walletAddress) {
+        try {
+            const contract = new web3.eth.Contract(nftABI, polygonNFTContractAddress);
+            for (let tokenId of polygonTokenIds) {
+                const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+                if (parseInt(balance) > 0) {
+                    return true;
                 }
-                return false;
-            } catch (error) {
-                console.error('Error checking Polygon NFT ownership:', error);
-                return false;
             }
+            return false;
+        } catch (error) {
+            console.error('Error checking Polygon NFT ownership:', error);
+            return false;
         }
+    }
 
     document.getElementById('verifyForm').addEventListener('submit', async function(event) {
         event.preventDefault();
+        if (isOpenForm) {
+            Swal.fire({
+                title: 'Form Ditutup',
+                text: 'Turnamen saat ini telah berakhir, silakan tunggu turnamen berikutnya.',
+                icon: 'info'
+            });
+            return;
+        }
+
         const walletAddress = document.getElementById('walletAddress').value;
 
         if (!web3.utils.isAddress(walletAddress)) {
@@ -158,18 +54,10 @@
             const ownsPolygonNFT = await checkPolygonOwnership(walletAddress);
 
             if (ownsRoninNFT || ownsPolygonNFT) {
-                if (!isFormOpen) {
-                    Swal.fire({ title: 'Success!', text: 'You are eligible for the tournament.', icon: 'success' })
-                        .then(() => {
-                            document.getElementById('formSection').style.display = 'block';
-                            document.getElementById('verifyForm').style.display = 'none';
-                            isFormOpen = false; // Mark form as open
-                        });
-                }
+                Swal.fire({ title: 'Success!', text: 'You are eligible for the tournament.', icon: 'success' })
+                    .then(() => { document.getElementById('formSection').style.display = 'block'; document.getElementById('verifyForm').style.display = 'none'; });
             } else {
-                if (!isFormOpen) {
-                    Swal.fire({ icon: 'error', title: 'Not Eligible', text: 'Sorry, you cannot participate in the tournament.' });
-                }
+                Swal.fire({ icon: 'error', title: 'Not Eligible', text: 'Sorry, you cannot participate in the tournament.' });
             }
         } catch (error) {
             console.error('Error during ownership check:', error);
@@ -177,22 +65,4 @@
         }
     });
 
-    document.getElementById('registrationForm').addEventListener('submit', (e) => {
-        // ... (existing code)
-    });
-
-    // Handle closing the form (add an explicit close event or button)
-    function closeForm() {
-        isFormOpen = false; // Mark form as closed
-        document.getElementById('formSection').style.display = 'none';
-        document.getElementById('verifyForm').style.display = 'block';
-    }
-    
-    // Example of how to call closeForm
-    // You might want to add a close button and attach this function to its click event.
 </script>
-    
-    
-
-</body>
-</html>
