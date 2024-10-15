@@ -114,13 +114,35 @@
     
     let isFormOpen = false; // Variable to track if the form is open
 
-    async function checkRoninOwnership(walletAddress) {
-        // ... (existing code)
-    }
-
-    async function checkPolygonOwnership(walletAddress) {
-        // ... (existing code)
-    }
+        async function checkRoninOwnership(walletAddress) {
+            try {
+                const apiUrl = `https://deep-index.moralis.io/api/v2/${walletAddress}/nft/${roninContractAddress}?chain=ronin`;
+                const response = await axios.get(apiUrl, {
+                    headers: { 'X-API-Key': MORALIS_API_KEY }
+                });
+                const nfts = response.data.result;
+                return nfts.some((nft) => nft.token_id === roninTokenId);
+            } catch (error) {
+                console.error('Error checking Ronin NFT ownership:', error);
+                return false;
+            }
+        }
+    
+        async function checkPolygonOwnership(walletAddress) {
+            try {
+                const contract = new web3.eth.Contract(nftABI, polygonNFTContractAddress);
+                for (let tokenId of polygonTokenIds) {
+                    const balance = await contract.methods.balanceOf(walletAddress, tokenId).call();
+                    if (parseInt(balance) > 0) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.error('Error checking Polygon NFT ownership:', error);
+                return false;
+            }
+        }
 
     document.getElementById('verifyForm').addEventListener('submit', async function(event) {
         event.preventDefault();
