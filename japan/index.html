@@ -51,17 +51,23 @@
             margin-bottom: 1.5rem;
         }
 
-        /* Mode Selector */
+        /* Mode Selectors */
+        .mode-selector-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
         .mode-selector {
             display: inline-flex;
             gap: 0.5rem;
             background: var(--surface);
             padding: 0.5rem;
             border-radius: 0.75rem;
-            margin-bottom: 2rem;
         }
 
-        .mode-btn {
+        .mode-btn, .submode-btn {
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 0.5rem;
@@ -71,7 +77,7 @@
             transition: all 0.2s ease;
         }
 
-        .mode-btn.active {
+        .mode-btn.active, .submode-btn.active {
             background: var(--primary);
             color: white;
             box-shadow: 0 4px 6px rgba(99, 102, 241, 0.1);
@@ -154,6 +160,7 @@
             font-family: 'Noto Sans JP', sans-serif;
             margin: 2rem 0;
             text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            word-break: break-all;
         }
 
         .input-container {
@@ -244,6 +251,11 @@
             .group-card {
                 padding: 1rem;
             }
+            
+            .mode-btn, .submode-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -251,9 +263,15 @@
     <div class="container">
         <header class="header">
             <h1 class="title">Kana Master</h1>
-            <div class="mode-selector">
-                <button class="mode-btn active" data-mode="hiragana">Hiragana</button>
-                <button class="mode-btn" data-mode="katakana">Katakana</button>
+            <div class="mode-selector-container">
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="hiragana">Hiragana</button>
+                    <button class="mode-btn" data-mode="katakana">Katakana</button>
+                </div>
+                <div class="mode-selector">
+                    <button class="submode-btn active" data-submode="character">Per Huruf</button>
+                    <button class="submode-btn" data-submode="word">Per Kata</button>
+                </div>
             </div>
         </header>
 
@@ -312,7 +330,7 @@
                 special: ['ン']
             }
         };
-    
+
         const romajiMap = {
             'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
             'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
@@ -331,8 +349,9 @@
             'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
             'ん': 'n'
         };
-    
+
         let currentMode = 'hiragana';
+        let currentSubMode = 'character';
         let selectedGroups = new Set();
         let currentQuestion = null;
         let attempts = 0;
@@ -341,8 +360,9 @@
         let poolIndex = 0;
         let questionHistory = [];
         const HISTORY_LIMIT = 5;
-    
-        // Initialize groups
+        const MIN_WORD_LENGTH = 3;
+        const MAX_WORD_LENGTH = 5;
+
         function initGroups() {
             const groupsGrid = document.getElementById('groupsGrid');
             groupsGrid.innerHTML = '';
@@ -364,7 +384,7 @@
                 groupsGrid.appendChild(groupCard);
             });
         }
-    
+
         function toggleGroup(group, element) {
             if (selectedGroups.has(group)) {
                 selectedGroups.delete(group);
@@ -376,48 +396,56 @@
             resetQuestionSystem();
             generateNewQuestion();
         }
-    
+
         function resetQuestionSystem() {
             questionPool = [];
             poolIndex = 0;
             questionHistory = [];
             attempts = 0;
         }
-    
+
         function generateNewQuestion() {
             const selectedCharacters = getSelectedCharacters();
             if(selectedCharacters.length === 0) {
                 document.getElementById('quizContainer').classList.remove('active');
                 return;
             }
-    
-            // Regenerate pool if empty or groups changed
-            if(questionPool.length === 0) {
-                questionPool = createShuffledPool(selectedCharacters);
-                poolIndex = 0;
-            }
-    
-            // Find next unique question
+
             let newQuestion;
-            let safetyCounter = 0;
-            while(safetyCounter < questionPool.length * 2) {
-                newQuestion = questionPool[poolIndex];
-                
-                // Check history
-                if(!questionHistory.includes(newQuestion.kana)) {
-                    break;
+            
+            if(currentSubMode === 'character') {
+                if(questionPool.length === 0) {
+                    questionPool = createShuffledPool(selectedCharacters);
+                    poolIndex = 0;
+                }
+
+                let safetyCounter = 0;
+                while(safetyCounter < questionPool.length * 2) {
+                    newQuestion = questionPool[poolIndex];
+                    if(!questionHistory.includes(newQuestion.kana)) break;
+                    poolIndex = (poolIndex + 1) % questionPool.length;
+                    safetyCounter++;
                 }
                 
                 poolIndex = (poolIndex + 1) % questionPool.length;
-                safetyCounter++;
+            } else {
+                const wordLength = Math.floor(Math.random() * (MAX_WORD_LENGTH - MIN_WORD_LENGTH + 1)) + MIN_WORD_LENGTH;
+                const wordCharacters = [];
+                
+                for(let i = 0; i < wordLength; i++) {
+                    const randomIndex = Math.floor(Math.random() * selectedCharacters.length);
+                    wordCharacters.push(selectedCharacters[randomIndex]);
+                }
+                
+                newQuestion = {
+                    kana: wordCharacters.map(c => c.kana).join(''),
+                    romaji: wordCharacters.map(c => c.romaji).join('')
+                };
             }
-    
-            // Update tracking
+
             currentQuestion = newQuestion;
-            poolIndex = (poolIndex + 1) % questionPool.length;
             updateQuestionHistory(newQuestion.kana);
-    
-            // Update UI
+
             document.getElementById('kanaDisplay').textContent = currentQuestion.kana;
             document.getElementById('quizContainer').classList.add('active');
             document.getElementById('feedback').classList.remove('show');
@@ -425,31 +453,20 @@
             document.getElementById('answerInput').value = '';
             attempts = 0;
         }
-    
+
         function createShuffledPool(characters) {
             const pool = [...characters];
-            
-            // Fisher-Yates shuffle
             for(let i = pool.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [pool[i], pool[j]] = [pool[j], pool[i]];
             }
-            
-            // Ensure first question not same as last in previous pool
-            if(questionHistory.length > 0 && pool.length > 1) {
-                const lastQuestion = questionHistory[0];
-                if(pool[0].kana === lastQuestion) {
-                    [pool[0], pool[1]] = [pool[1], pool[0]];
-                }
-            }
-            
             return pool;
         }
-    
+
         function updateQuestionHistory(kana) {
             questionHistory = [kana, ...questionHistory].slice(0, HISTORY_LIMIT);
         }
-    
+
         function getSelectedCharacters() {
             const characters = [];
             selectedGroups.forEach(group => {
@@ -462,12 +479,15 @@
             });
             return characters;
         }
-    
+
         function checkAnswer() {
-            const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+            const userAnswer = document.getElementById('answerInput').value
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, '');
             const feedback = document.getElementById('feedback');
             
-            if(userAnswer === currentQuestion.romaji) {
+            if(userAnswer === currentQuestion.romaji.toLowerCase()) {
                 feedback.textContent = 'Correct! 🎉';
                 feedback.className = 'feedback success show';
                 setTimeout(generateNewQuestion, 1000);
@@ -482,7 +502,7 @@
                 }
             }
         }
-    
+
         // Event Listeners
         document.querySelectorAll('.mode-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -494,12 +514,22 @@
                 generateNewQuestion();
             });
         });
-    
+
+        document.querySelectorAll('.submode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.submode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentSubMode = this.dataset.submode;
+                resetQuestionSystem();
+                generateNewQuestion();
+            });
+        });
+
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
         document.getElementById('answerInput').addEventListener('keypress', (e) => {
             if(e.key === 'Enter') checkAnswer();
         });
-    
+
         // Initialization
         initGroups();
         generateNewQuestion();
