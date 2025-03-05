@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Kana Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --error: #ef4444;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Mode Selector */
+        .mode-selector {
+            display: inline-flex;
+            gap: 0.5rem;
+            background: var(--surface);
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .mode-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Group Selection */
+        .groups-panel {
+            background: var(--surface);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .group-card {
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .group-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .group-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(145deg, 
+                rgba(99, 102, 241, 0.15), 
+                rgba(99, 102, 241, 0.1));
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .group-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .group-characters {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Quiz Area */
+        .quiz-container {
+            background: var(--surface);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-container.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .kana-display {
+            font-size: 6rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 2rem 0;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-container {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .submit-btn {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.75rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Feedback System */
+        .feedback {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .feedback.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error);
+        }
+
+        .hint {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .kana-display {
+                font-size: 4rem;
+            }
+            
+            .group-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Kana Master</h1>
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="hiragana">Hiragana</button>
+                <button class="mode-btn" data-mode="katakana">Katakana</button>
+            </div>
+        </header>
+
+        <div class="groups-panel">
+            <h2>Select Character Groups</h2>
+            <div class="groups-grid" id="groupsGrid"></div>
+        </div>
+
+        <div class="quiz-container" id="quizContainer">
+            <div class="kana-display" id="kanaDisplay"></div>
+            <div class="input-container">
+                <input type="text" class="answer-input" id="answerInput" placeholder="Type romanization..." autocomplete="off">
+                <button class="submit-btn" id="submitBtn">Check</button>
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <div class="hint" id="hint"></div>
+        </div>
+    </div>
+
+    <script>
+        const kanaData = {
+            hiragana: {
+                vowels: ['あ', 'い', 'う', 'え', 'お'],
+                k: ['か', 'き', 'く', 'け', 'こ'],
+                s: ['さ', 'し', 'す', 'せ', 'そ'],
+                t: ['た', 'ち', 'つ', 'て', 'と'],
+                n: ['な', 'に', 'ぬ', 'ね', 'の'],
+                h: ['は', 'ひ', 'ふ', 'へ', 'ほ'],
+                m: ['ま', 'み', 'む', 'め', 'も'],
+                y: ['や', 'ゆ', 'よ'],
+                r: ['ら', 'り', 'る', 'れ', 'ろ'],
+                w: ['わ', 'を'],
+                g: ['が', 'ぎ', 'ぐ', 'げ', 'ご'],
+                z: ['ざ', 'じ', 'ず', 'ぜ', 'ぞ'],
+                d: ['だ', 'ぢ', 'づ', 'で', 'ど'],
+                b: ['ば', 'び', 'ぶ', 'べ', 'ぼ'],
+                p: ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ'],
+                special: ['ん']
+            },
+            katakana: {
+                vowels: ['ア', 'イ', 'ウ', 'エ', 'オ'],
+                k: ['カ', 'キ', 'ク', 'ケ', 'コ'],
+                s: ['サ', 'シ', 'ス', 'セ', 'ソ'],
+                t: ['タ', 'チ', 'ツ', 'テ', 'ト'],
+                n: ['ナ', 'ニ', 'ヌ', 'ネ', 'ノ'],
+                h: ['ハ', 'ヒ', 'フ', 'ヘ', 'ホ'],
+                m: ['マ', 'ミ', 'ム', 'メ', 'モ'],
+                y: ['ヤ', 'ユ', 'ヨ'],
+                r: ['ラ', 'リ', 'ル', 'レ', 'ロ'],
+                w: ['ワ', 'ヲ'],
+                g: ['ガ', 'ギ', 'グ', 'ゲ', 'ゴ'],
+                z: ['ザ', 'ジ', 'ズ', 'ゼ', 'ゾ'],
+                d: ['ダ', 'ヂ', 'ヅ', 'デ', 'ド'],
+                b: ['バ', 'ビ', 'ブ', 'ベ', 'ボ'],
+                p: ['パ', 'ピ', 'プ', 'ペ', 'ポ'],
+                special: ['ン']
+            }
+        };
+
+        const romajiMap = {
+            'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+            'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+            'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+            'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+            'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+            'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+            'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+            'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+            'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+            'わ': 'wa', 'を': 'wo',
+            'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+            'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+            'だ': 'da', 'ぢ': 'ji', 'づ': 'zu', 'で': 'de', 'ど': 'do',
+            'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+            'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+            'ん': 'n'
+        };
+
+        let currentMode = 'hiragana';
+        let selectedGroups = new Set();
+        let currentQuestion = null;
+        let attempts = 0;
+        const maxAttempts = 3;
+
+        // Initialize groups
+        function initGroups() {
+            const groupsGrid = document.getElementById('groupsGrid');
+            groupsGrid.innerHTML = '';
+            
+            Object.keys(kanaData.hiragana).forEach(group => {
+                const groupCard = document.createElement('div');
+                groupCard.className = 'group-card';
+                groupCard.innerHTML = `
+                    <div class="group-header">
+                        <span class="group-name">${group.toUpperCase()}</span>
+                    </div>
+                    <div class="group-characters">
+                        ${kanaData.hiragana[group].join(' ')}
+                    </div>
+                `;
+                
+                groupCard.addEventListener('click', () => toggleGroup(group, groupCard));
+                groupsGrid.appendChild(groupCard);
+            });
+        }
+
+        function toggleGroup(group, element) {
+            if (selectedGroups.has(group)) {
+                selectedGroups.delete(group);
+                element.classList.remove('selected');
+            } else {
+                selectedGroups.add(group);
+                element.classList.add('selected');
+            }
+            generateNewQuestion();
+        }
+
+        function generateNewQuestion() {
+            const selectedCharacters = getSelectedCharacters();
+            if (selectedCharacters.length === 0) {
+                document.getElementById('quizContainer').classList.remove('active');
+                return;
+            }
+            
+            currentQuestion = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
+            attempts = 0;
+            
+            document.getElementById('kanaDisplay').textContent = currentQuestion.kana;
+            document.getElementById('quizContainer').classList.add('active');
+            document.getElementById('feedback').classList.remove('show');
+            document.getElementById('hint').textContent = '';
+            document.getElementById('answerInput').value = '';
+        }
+
+        function getSelectedCharacters() {
+            const characters = [];
+            selectedGroups.forEach(group => {
+                kanaData[currentMode][group].forEach(kana => {
+                    characters.push({
+                        kana,
+                        romaji: romajiMap[kana]
+                    });
+                });
+            });
+            return characters;
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback');
+            
+            if (userAnswer === currentQuestion.romaji) {
+                feedback.textContent = 'Correct! 🎉';
+                feedback.className = 'feedback success show';
+                setTimeout(generateNewQuestion, 1000);
+            } else {
+                attempts++;
+                feedback.textContent = `Incorrect! Attempts left: ${maxAttempts - attempts}`;
+                feedback.className = 'feedback error show';
+                
+                if (attempts >= maxAttempts) {
+                    document.getElementById('hint').textContent = `Correct answer: ${currentQuestion.romaji}`;
+                    setTimeout(generateNewQuestion, 2000);
+                }
+            }
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentMode = this.dataset.mode;
+                initGroups();
+                generateNewQuestion();
+            });
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+        document.getElementById('answerInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+
+        // Initialize
+        initGroups();
+        generateNewQuestion();
+    </script>
+</body>
+</html>
