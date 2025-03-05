@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandarin Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --success: #10B981;
+            --error: #EF4444;
+            --bg: #0F172A;
+            --surface: #1E293B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        /* Mode Selector */
+        .mode-selector {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--surface);
+            background: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Group Selection */
+        .groups-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .group-card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .group-card.selected {
+            background: var(--primary);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Quiz Area */
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hanzi-display {
+            font-size: 4rem;
+            margin: 2rem 0;
+            font-family: 'Noto Sans SC', sans-serif;
+            line-height: 1.2;
+        }
+
+        .input-container {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--surface);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .submit-btn {
+            margin-top: 1rem;
+            padding: 0.75rem 2rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Mandarin Practice</h1>
+            <div class="mode-selector">
+                <button class="btn active" data-mode="character">Per Karakter</button>
+                <button class="btn" data-mode="phrase">Per Frasa</button>
+            </div>
+        </header>
+
+        <div class="groups-container">
+            <div class="groups-grid" id="groupsGrid"></div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="hanzi-display" id="hanziDisplay"></div>
+            <div class="input-container">
+                <input type="text" class="answer-input" id="answerInput" placeholder="Ketik pinyin">
+                <button class="submit-btn" id="submitBtn">Cek</button>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <script>
+        const mandarinData = {
+            basic: [
+                { hanzi: '你好', pinyin: 'nǐ hǎo', type: 'phrase' },
+                { hanzi: '谢谢', pinyin: 'xiè xie', type: 'phrase' },
+                { hanzi: '再见', pinyin: 'zài jiàn', type: 'phrase' },
+                { hanzi: '人', pinyin: 'rén', type: 'character' },
+                { hanzi: '大', pinyin: 'dà', type: 'character' },
+                { hanzi: '小', pinyin: 'xiǎo', type: 'character' }
+            ],
+            numbers: [
+                { hanzi: '一', pinyin: 'yī', type: 'character' },
+                { hanzi: '二', pinyin: 'èr', type: 'character' },
+                { hanzi: '三', pinyin: 'sān', type: 'character' },
+                { hanzi: '四', pinyin: 'sì', type: 'character' },
+                { hanzi: '五', pinyin: 'wǔ', type: 'character' }
+            ],
+            family: [
+                { hanzi: '爸爸', pinyin: 'bà ba', type: 'phrase' },
+                { hanzi: '妈妈', pinyin: 'mā ma', type: 'phrase' },
+                { hanzi: '哥哥', pinyin: 'gē ge', type: 'phrase' },
+                { hanzi: '妹妹', pinyin: 'mèi mei', type: 'phrase' }
+            ]
+        };
+
+        let currentMode = 'character';
+        let currentQuestion = null;
+        let selectedGroups = new Set();
+        let attempts = 0;
+        const maxAttempts = 3;
+        let questionHistory = [];
+        const HISTORY_LIMIT = 5;
+
+        function initGroups() {
+            const groupsGrid = document.getElementById('groupsGrid');
+            groupsGrid.innerHTML = '';
+            
+            Object.keys(mandarinData).forEach(group => {
+                const groupCard = document.createElement('div');
+                groupCard.className = 'group-card';
+                groupCard.innerHTML = `
+                    <h3>${group.toUpperCase()}</h3>
+                    <div style="font-family: 'Noto Sans SC'; font-size: 1.5rem;">
+                        ${mandarinData[group].map(item => item.hanzi).join(' ')}
+                    </div>
+                `;
+                
+                groupCard.addEventListener('click', () => toggleGroup(group, groupCard));
+                groupsGrid.appendChild(groupCard);
+            });
+        }
+
+        function toggleGroup(group, element) {
+            if (selectedGroups.has(group)) {
+                selectedGroups.delete(group);
+                element.classList.remove('selected');
+            } else {
+                selectedGroups.add(group);
+                element.classList.add('selected');
+            }
+            generateNewQuestion();
+        }
+
+        function generateNewQuestion() {
+            let pool = [];
+            selectedGroups.forEach(group => {
+                pool.push(...mandarinData[group].filter(item => 
+                    currentMode === 'character' ? item.type === 'character' : item.type === 'phrase'
+                ));
+            });
+
+            if(pool.length === 0) {
+                pool = Object.values(mandarinData).flat().filter(item => 
+                    currentMode === 'character' ? item.type === 'character' : item.type === 'phrase'
+                );
+            }
+
+            // Cari pertanyaan yang belum muncul di HISTORY_LIMIT terakhir
+            let newQuestion;
+            let safetyCounter = 0;
+            do {
+                newQuestion = pool[Math.floor(Math.random() * pool.length)];
+                safetyCounter++;
+            } while(
+                questionHistory.includes(newQuestion.hanzi) && 
+                safetyCounter < pool.length * 2
+            );
+
+            currentQuestion = newQuestion;
+            questionHistory = [newQuestion.hanzi, ...questionHistory].slice(0, HISTORY_LIMIT);
+            
+            document.getElementById('hanziDisplay').textContent = currentQuestion.hanzi;
+            document.getElementById('feedback').textContent = '';
+            attempts = 0;
+        }
+
+        function normalizePinyin(pinyin) {
+            return pinyin
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '') // Hapus karakter khusus
+                .replace(/\s+/g, ' ') // Normalisasi spasi
+                .trim();
+        }
+
+        function checkAnswer() {
+            const userAnswer = normalizePinyin(document.getElementById('answerInput').value);
+            const correctAnswer = normalizePinyin(currentQuestion.pinyin);
+
+            if(userAnswer === correctAnswer) {
+                document.getElementById('feedback').textContent = 'Benar! 🎉';
+                document.getElementById('feedback').style.backgroundColor = '#10B981';
+                setTimeout(generateNewQuestion, 1000);
+            } else {
+                attempts++;
+                if(attempts >= maxAttempts) {
+                    document.getElementById('feedback').textContent = `Jawaban: ${currentQuestion.pinyin}`;
+                    document.getElementById('feedback').style.backgroundColor = '#EF4444';
+                    setTimeout(generateNewQuestion, 2000);
+                } else {
+                    document.getElementById('feedback').textContent = `Salah! Percobaan tersisa: ${maxAttempts - attempts}`;
+                    document.getElementById('feedback').style.backgroundColor = '#EF4444';
+                }
+            }
+        }
+
+        // Event listeners
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentMode = this.dataset.mode;
+                generateNewQuestion();
+            });
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+        document.getElementById('answerInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') checkAnswer();
+        });
+
+        // Initialization
+        initGroups();
+        generateNewQuestion();
+    </script>
+</body>
+</html>
