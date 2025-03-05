@@ -312,7 +312,7 @@
                 special: ['ン']
             }
         };
-
+    
         const romajiMap = {
             'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
             'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
@@ -331,13 +331,17 @@
             'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
             'ん': 'n'
         };
-
+    
         let currentMode = 'hiragana';
         let selectedGroups = new Set();
         let currentQuestion = null;
         let attempts = 0;
         const maxAttempts = 3;
-
+        let questionPool = [];
+        let poolIndex = 0;
+        let questionHistory = [];
+        const HISTORY_LIMIT = 5;
+    
         // Initialize groups
         function initGroups() {
             const groupsGrid = document.getElementById('groupsGrid');
@@ -351,15 +355,16 @@
                         <span class="group-name">${group.toUpperCase()}</span>
                     </div>
                     <div class="group-characters">
-                        ${kanaData.hiragana[group].join(' ')}
+                        ${kanaData[currentMode][group].join(' ')}
                     </div>
                 `;
                 
                 groupCard.addEventListener('click', () => toggleGroup(group, groupCard));
+                if(selectedGroups.has(group)) groupCard.classList.add('selected');
                 groupsGrid.appendChild(groupCard);
             });
         }
-
+    
         function toggleGroup(group, element) {
             if (selectedGroups.has(group)) {
                 selectedGroups.delete(group);
@@ -368,26 +373,83 @@
                 selectedGroups.add(group);
                 element.classList.add('selected');
             }
+            resetQuestionSystem();
             generateNewQuestion();
         }
-
+    
+        function resetQuestionSystem() {
+            questionPool = [];
+            poolIndex = 0;
+            questionHistory = [];
+            attempts = 0;
+        }
+    
         function generateNewQuestion() {
             const selectedCharacters = getSelectedCharacters();
-            if (selectedCharacters.length === 0) {
+            if(selectedCharacters.length === 0) {
                 document.getElementById('quizContainer').classList.remove('active');
                 return;
             }
-            
-            currentQuestion = selectedCharacters[Math.floor(Math.random() * selectedCharacters.length)];
-            attempts = 0;
-            
+    
+            // Regenerate pool if empty or groups changed
+            if(questionPool.length === 0) {
+                questionPool = createShuffledPool(selectedCharacters);
+                poolIndex = 0;
+            }
+    
+            // Find next unique question
+            let newQuestion;
+            let safetyCounter = 0;
+            while(safetyCounter < questionPool.length * 2) {
+                newQuestion = questionPool[poolIndex];
+                
+                // Check history
+                if(!questionHistory.includes(newQuestion.kana)) {
+                    break;
+                }
+                
+                poolIndex = (poolIndex + 1) % questionPool.length;
+                safetyCounter++;
+            }
+    
+            // Update tracking
+            currentQuestion = newQuestion;
+            poolIndex = (poolIndex + 1) % questionPool.length;
+            updateQuestionHistory(newQuestion.kana);
+    
+            // Update UI
             document.getElementById('kanaDisplay').textContent = currentQuestion.kana;
             document.getElementById('quizContainer').classList.add('active');
             document.getElementById('feedback').classList.remove('show');
             document.getElementById('hint').textContent = '';
             document.getElementById('answerInput').value = '';
+            attempts = 0;
         }
-
+    
+        function createShuffledPool(characters) {
+            const pool = [...characters];
+            
+            // Fisher-Yates shuffle
+            for(let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            
+            // Ensure first question not same as last in previous pool
+            if(questionHistory.length > 0 && pool.length > 1) {
+                const lastQuestion = questionHistory[0];
+                if(pool[0].kana === lastQuestion) {
+                    [pool[0], pool[1]] = [pool[1], pool[0]];
+                }
+            }
+            
+            return pool;
+        }
+    
+        function updateQuestionHistory(kana) {
+            questionHistory = [kana, ...questionHistory].slice(0, HISTORY_LIMIT);
+        }
+    
         function getSelectedCharacters() {
             const characters = [];
             selectedGroups.forEach(group => {
@@ -400,12 +462,12 @@
             });
             return characters;
         }
-
+    
         function checkAnswer() {
             const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
             const feedback = document.getElementById('feedback');
             
-            if (userAnswer === currentQuestion.romaji) {
+            if(userAnswer === currentQuestion.romaji) {
                 feedback.textContent = 'Correct! 🎉';
                 feedback.className = 'feedback success show';
                 setTimeout(generateNewQuestion, 1000);
@@ -414,30 +476,31 @@
                 feedback.textContent = `Incorrect! Attempts left: ${maxAttempts - attempts}`;
                 feedback.className = 'feedback error show';
                 
-                if (attempts >= maxAttempts) {
-                    document.getElementById('hint').textContent = `Correct answer: ${currentQuestion.romaji}`;
+                if(attempts >= maxAttempts) {
+                    document.getElementById('hint').textContent = `Answer: ${currentQuestion.romaji}`;
                     setTimeout(generateNewQuestion, 2000);
                 }
             }
         }
-
+    
         // Event Listeners
         document.querySelectorAll('.mode-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 currentMode = this.dataset.mode;
+                resetQuestionSystem();
                 initGroups();
                 generateNewQuestion();
             });
         });
-
+    
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
         document.getElementById('answerInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') checkAnswer();
+            if(e.key === 'Enter') checkAnswer();
         });
-
-        // Initialize
+    
+        // Initialization
         initGroups();
         generateNewQuestion();
     </script>
