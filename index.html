@@ -31,6 +31,13 @@
             --background: #f0f2f7;
             --card-bg: #fbfbfd;
             --card-border: rgba(0, 0, 0, 0.06);
+            --transition-fast: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-default: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-slow: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.05), 0 5px 10px rgba(0,0,0,0.03);
+            --shadow-hover: 0 14px 28px rgba(0,0,0,0.08), 0 10px 10px rgba(0,0,0,0.04);
         }
 
         * {
@@ -38,6 +45,8 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
@@ -49,6 +58,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            transition: background-color var(--transition-default);
         }
 
         .container {
@@ -56,9 +66,14 @@
             max-width: 700px;
             background: var(--card-bg);
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(98, 71, 170, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
             border: 1px solid var(--card-border);
+            transition: box-shadow var(--transition-default), transform var(--transition-default);
+        }
+        
+        .container:hover {
+            box-shadow: var(--shadow-lg);
         }
 
         header {
@@ -67,6 +82,7 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             position: relative;
+            transition: all var(--transition-default);
         }
 
         header::after {
@@ -150,13 +166,13 @@
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            box-shadow: var(--shadow-sm);
             border: 1px solid var(--card-border);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform var(--transition-default), box-shadow var(--transition-default);
         }
 
         .form-section:hover {
-            box-shadow: 0 8px 18px rgba(98, 71, 170, 0.07);
+            box-shadow: var(--shadow-md);
             transform: translateY(-2px);
         }
 
@@ -194,7 +210,8 @@
             font-size: 16px;
             background-color: var(--gray-100);
             color: var(--gray-800);
-            transition: all 0.3s ease;
+            transition: all var(--transition-default);
+            -webkit-appearance: none; /* Improves iOS styling */
         }
 
         textarea {
@@ -207,6 +224,7 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(98, 71, 170, 0.15);
             outline: none;
+            background-color: #fff;
         }
 
         .rating-group {
@@ -232,7 +250,9 @@
             align-items: center;
             cursor: pointer;
             flex: 1;
-            transition: transform 0.2s ease;
+            transition: transform var(--transition-default);
+            position: relative;
+            z-index: 1;
         }
 
         .rating-label:hover {
@@ -252,15 +272,31 @@
             border-radius: 50%;
             border: 2px solid var(--gray-300);
             font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all var(--transition-default);
             font-size: 18px;
             color: var(--gray-600);
             background-color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rating-circle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: -1;
         }
 
         .rating-label:hover .rating-circle {
             border-color: var(--primary-light);
-            background-color: rgba(98, 71, 170, 0.05);
+            color: var(--primary);
+            transform: scale(1.05);
         }
 
         .rating input[type="radio"]:checked + .rating-circle {
@@ -269,6 +305,10 @@
             color: white;
             transform: scale(1.1);
             box-shadow: 0 5px 15px rgba(98, 71, 170, 0.3);
+        }
+        
+        .rating input[type="radio"]:checked + .rating-circle::before {
+            transform: translateY(0);
         }
 
         .rating-text {
@@ -294,7 +334,7 @@
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-default);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -303,23 +343,46 @@
             margin-top: 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 10px rgba(98, 71, 170, 0.3);
         }
 
         button:hover {
-            opacity: 0.95;
+            opacity: 1;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(98, 71, 170, 0.2);
+            box-shadow: 0 8px 20px rgba(98, 71, 170, 0.3);
         }
 
         button:active {
             transform: translateY(0);
+            box-shadow: 0 4px 8px rgba(98, 71, 170, 0.2);
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+            transform: translateX(-100%);
+        }
+        
+        button:hover::after {
+            animation: btnShine 1.5s infinite;
+        }
+        
+        @keyframes btnShine {
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         .thank-you {
             display: none;
             text-align: center;
             padding: 40px;
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeIn var(--transition-default) ease-out;
         }
 
         .thank-you-icon {
@@ -353,6 +416,14 @@
             padding-left: 10px;
             border-left: 3px solid var(--error);
             animation: shake 0.3s ease;
+            transform-origin: left center;
+            opacity: 0;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+        
+        .error-message.show {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         /* Reward banner styles */
@@ -387,8 +458,8 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
 
         @keyframes fadeIn {
@@ -400,6 +471,18 @@
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
+        }
+        
+        /* Enhanced animations */
+        @keyframes floatIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive Styles */
@@ -430,6 +513,15 @@
             .section-title {
                 font-size: 16px;
             }
+            
+            .form-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .rating-title {
+                font-size: 15px;
+            }
         }
 
         @media (max-width: 576px) {
@@ -455,6 +547,28 @@
                 padding: 14px;
                 font-size: 16px;
             }
+            
+            body {
+                padding: 15px 10px;
+            }
+            
+            .container {
+                border-radius: 14px;
+            }
+            
+            .rating {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .rating-label {
+                margin-bottom: 8px;
+            }
+            
+            form {
+                padding: 20px;
+            }
         }
 
         @media (max-width: 400px) {
@@ -465,6 +579,33 @@
             .rating-circle {
                 width: 36px;
                 height: 36px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .description {
+                font-size: 14px;
+            }
+            
+            .form-section {
+                padding: 15px;
+            }
+            
+            .section-title {
+                font-size: 15px;
+                margin-bottom: 15px;
+            }
+            
+            input[type="text"], textarea {
+                padding: 12px 15px 12px 40px;
+                font-size: 14px;
+            }
+            
+            button {
+                padding: 14px;
+                font-size: 16px;
             }
         }
 
@@ -523,6 +664,28 @@
             flex: none;
         }
     }
+        
+        /* Touch device optimizations */
+        @media (hover: none) {
+            .form-section:hover {
+                transform: none;
+                box-shadow: var(--shadow-sm);
+            }
+            
+            .rating-label:hover .rating-circle {
+                transform: none;
+                border-color: var(--gray-300);
+            }
+            
+            button:hover {
+                transform: none;
+                box-shadow: 0 4px 10px rgba(98, 71, 170, 0.3);
+            }
+            
+            button:hover::after {
+                animation: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -869,7 +1032,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Configuration - Set to false to disable date restriction
             const config = {
-                enableDateRestriction: false
+                enableDateRestriction: false,
+                animateOnScroll: true,
+                smoothScrolling: true
             };
 
             const form = document.getElementById('feedbackForm');
@@ -918,70 +1083,108 @@
             // Replace this URL with your own Google Apps Script web app URL
             const scriptURL = 'https://script.google.com/macros/s/AKfycbwQ1Ea-WyfakHnxb_S_o2jQQPCorv1mpvsIlaNuyKLtzSt6Qb1EPbinNeqCni-rCfnp/exec';
             
-            // Form validation
+            // Form validation with improved error feedback
             function validateForm() {
                 let isValid = true;
                 
                 // Check Discord username
                 const discordInput = document.getElementById('discord');
+                const discordError = document.getElementById('discord-error');
                 if(!discordInput.value.trim()) {
-                    document.getElementById('discord-error').style.display = 'block';
+                    showError(discordError);
+                    animateShake(discordInput);
                     isValid = false;
                 } else {
-                    document.getElementById('discord-error').style.display = 'none';
+                    hideError(discordError);
                 }
                 
                 // Check UID CARV
                 const uidCarvInput = document.getElementById('uidCarv');
+                const uidCarvError = document.getElementById('uidCarv-error');
                 if(!uidCarvInput.value.trim()) {
-                    document.getElementById('uidCarv-error').style.display = 'block';
+                    showError(uidCarvError);
+                    animateShake(uidCarvInput);
                     isValid = false;
                 } else {
-                    document.getElementById('uidCarv-error').style.display = 'none';
+                    hideError(uidCarvError);
                 }
                 
                 // Check Wallet Address
                 const walletAddressInput = document.getElementById('walletAddress');
+                const walletAddressError = document.getElementById('walletAddress-error');
                 if(!walletAddressInput.value.trim()) {
-                    document.getElementById('walletAddress-error').style.display = 'block';
+                    showError(walletAddressError);
+                    animateShake(walletAddressInput);
                     isValid = false;
                 } else {
-                    document.getElementById('walletAddress-error').style.display = 'none';
+                    hideError(walletAddressError);
                 }
     
                 // Check all rating groups
                 ['gamenight', 'guardian', 'region', 'games', 'carvpass', 'infiniteplay', 'events'].forEach(group => {
                     const selected = document.querySelector(`input[name="${group}"]:checked`);
+                    const errorElement = document.getElementById(`${group}-error`);
                     if(!selected) {
-                        document.getElementById(`${group}-error`).style.display = 'block';
+                        showError(errorElement);
+                        const ratingGroup = errorElement.closest('.rating-group');
+                        animateShake(ratingGroup);
                         isValid = false;
                     } else {
-                        document.getElementById(`${group}-error`).style.display = 'none';
+                        hideError(errorElement);
                     }
                 });
     
                 return isValid;
             }
+            
+            // Helper functions for error handling
+            function showError(element) {
+                element.style.display = 'block';
+                element.classList.add('show');
+                setTimeout(() => {
+                    element.classList.remove('show');
+                }, 300);
+            }
+            
+            function hideError(element) {
+                element.style.display = 'none';
+                element.classList.remove('show');
+            }
+            
+            function animateShake(element) {
+                element.style.animation = 'none';
+                setTimeout(() => {
+                    element.style.animation = 'shake 0.5s ease';
+                }, 10);
+            }
     
-            // Submit form handler
+            // Submit form handler with improved transitions
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 if(!validateForm()) {
-                    // Scroll to first error
+                    // Scroll to first error with smooth behavior
                     const firstError = document.querySelector('.error-message[style="display: block;"]');
                     if(firstError) {
-                        firstError.scrollIntoView({ 
-                            behavior: 'smooth',
-                            block: 'center'
+                        const errorOffset = firstError.getBoundingClientRect().top + window.pageYOffset - 100;
+                        window.scrollTo({
+                            top: errorOffset,
+                            behavior: config.smoothScrolling ? 'smooth' : 'auto'
                         });
                     }
                     return;
                 }
     
-                // Show loader and disable button
+                // Show loader and disable button with animation
                 loader.style.display = 'block';
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.opacity = '1';
+                }, 10);
+                
                 submitButton.disabled = true;
+                submitButton.style.opacity = '0.7';
+                submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mengirim...';
     
                 // Collect form data
                 const formData = {
@@ -1019,62 +1222,101 @@
                 .then(response => {
                     console.log("Response received");
                     
-                    // Hide form and show thank you message
-                    form.style.display = 'none';
-                    loader.style.display = 'none';
-                    thankYou.style.display = 'block';
-                    
-                    // Scroll to thank you message
-                    thankYou.scrollIntoView({ behavior: 'smooth' });
+                    // Hide form and show thank you message with smooth transition
+                    form.style.opacity = '0';
+                    setTimeout(() => {
+                        form.style.display = 'none';
+                        loader.style.display = 'none';
+                        thankYou.style.display = 'block';
+                        thankYou.style.opacity = '0';
+                        setTimeout(() => {
+                            thankYou.style.opacity = '1';
+                        }, 10);
+                        
+                        // Scroll to thank you message
+                        thankYou.scrollIntoView({ behavior: config.smoothScrolling ? 'smooth' : 'auto' });
+                    }, 300);
                 })
                 .catch(error => {
                     console.error('Error submitting form:', error);
                     alert(`Terjadi kesalahan saat mengirim feedback: ${error.message}`);
                     loader.style.display = 'none';
                     submitButton.disabled = false;
+                    submitButton.style.opacity = '1';
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Feedback';
                 });
             });
     
-            // Rating hover effects
+            // Enhanced rating hover effects
             document.querySelectorAll('.rating-label').forEach(label => {
                 label.addEventListener('mouseenter', function() {
-                    this.querySelector('.rating-circle').style.transform = 'scale(1.05)';
+                    if (window.matchMedia('(hover: hover)').matches) {
+                        this.querySelector('.rating-circle').style.transform = 'scale(1.05)';
+                    }
                 });
                 
                 label.addEventListener('mouseleave', function() {
-                    if(!this.querySelector('input').checked) {
+                    if(!this.querySelector('input').checked && window.matchMedia('(hover: hover)').matches) {
                         this.querySelector('.rating-circle').style.transform = 'scale(1)';
+                    }
+                });
+                
+                // Add touch feedback for mobile
+                label.addEventListener('touchstart', function() {
+                    this.querySelector('.rating-circle').style.transform = 'scale(1.05)';
+                });
+                
+                label.addEventListener('touchend', function() {
+                    if(!this.querySelector('input').checked) {
+                        setTimeout(() => {
+                            this.querySelector('.rating-circle').style.transform = 'scale(1)';
+                        }, 200);
                     }
                 });
             });
     
-            // Responsive adjustments
+            // Improved responsive handling
             function handleResponsive() {
-                const ratingLabels = document.querySelectorAll('.rating-label');
+                const screenWidth = window.innerWidth;
+                document.documentElement.style.setProperty('--viewport-width', `${screenWidth}px`);
                 
-                if(window.innerWidth < 576) {
-                    // Mobile - 2 items per row
-                    ratingLabels.forEach(label => {
-                        label.style.flex = '0 0 48%';
-                        label.style.marginBottom = '10px';
+                // Add animations to form sections for better UX
+                if (config.animateOnScroll) {
+                    setupScrollAnimations();
+                }
+            }
+            
+            // Adds reveal animations to elements as they scroll into view
+            function setupScrollAnimations() {
+                if ('IntersectionObserver' in window) {
+                    const sections = document.querySelectorAll('.form-section, header, .reward-banner');
+                    
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.animation = 'floatIn 0.6s ease-out forwards';
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, {
+                        threshold: 0.1,
+                        rootMargin: '0px 0px -50px 0px'
                     });
-                } else if(window.innerWidth < 768) {
-                    // Tablet - 3-4 items per row
-                    ratingLabels.forEach(label => {
-                        label.style.flex = '0 0 30%';
-                        label.style.marginBottom = '10px';
-                    });
-                } else {
-                    // Desktop - all items in one row
-                    ratingLabels.forEach(label => {
-                        label.style.flex = '1';
-                        label.style.marginBottom = '0';
+                    
+                    sections.forEach(section => {
+                        section.style.opacity = '0';
+                        observer.observe(section);
                     });
                 }
             }
     
             window.addEventListener('resize', handleResponsive);
             handleResponsive();
+            
+            // Improve touch response on mobile
+            document.addEventListener('touchstart', function() {
+                // This empty handler enables :active CSS states on iOS
+            }, false);
         });
     </script>
 </body>
