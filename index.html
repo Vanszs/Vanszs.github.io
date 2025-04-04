@@ -123,6 +123,24 @@
     }
 }
 
+        /* Date restriction message styles */
+        .date-restriction-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-out;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            margin: 20px auto;
+        }
+        
+        .calendar-icon {
+            font-size: 60px;
+            color: var(--info);
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
         form {
             padding: 30px 40px 40px;
         }
@@ -490,6 +508,16 @@
             <p class="description">Bantu kami meningkatkan komunitas dengan memberikan feedback Anda</p>
         </header>
 
+        <!-- Add date restriction message -->
+        <div class="date-restriction-message" id="dateRestrictionMessage">
+            <div class="calendar-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h2>Form Belum Tersedia</h2>
+            <p>Form feedback hanya tersedia pada 7 hari terakhir setiap bulan. Silakan kembali nanti.</p>
+            <p id="nextAvailableDate" style="margin-top: 10px; font-weight: 500; color: var(--primary);"></p>
+        </div>
+
         <form id="feedbackForm">
             <!-- User Information Section -->
             <div class="form-section">
@@ -785,10 +813,53 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Configuration - Set to false to disable date restriction
+            const config = {
+                enableDateRestriction: true
+            };
+
             const form = document.getElementById('feedbackForm');
             const thankYou = document.getElementById('thankYou');
             const loader = document.querySelector('.loader');
             const submitButton = document.getElementById('submitButton');
+            const dateRestrictionMessage = document.getElementById('dateRestrictionMessage');
+            const nextAvailableDate = document.getElementById('nextAvailableDate');
+            
+            // Function to check if current date is within last 7 days of the month
+            function isWithinLastSevenDays() {
+                const today = new Date();
+                const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+                const currentDay = today.getDate();
+                
+                return currentDay > (lastDay - 7);
+            }
+
+            // Function to get the next available date text
+            function getNextAvailableDate() {
+                const today = new Date();
+                const nextMonth = new Date(today.getFullYear(), today.getMonth() + (isWithinLastSevenDays() ? 1 : 0) + 1, 0);
+                const startDay = nextMonth.getDate() - 6;
+                const startDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), startDay);
+                
+                // Format date to Indonesian format
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                return `Tersedia mulai: ${startDate.toLocaleDateString('id-ID', options)}`;
+            }
+
+            // Handle form visibility based on date restriction
+            function handleFormVisibility() {
+                if (config.enableDateRestriction && !isWithinLastSevenDays()) {
+                    form.style.display = 'none';
+                    dateRestrictionMessage.style.display = 'block';
+                    nextAvailableDate.textContent = getNextAvailableDate();
+                } else {
+                    form.style.display = 'block';
+                    dateRestrictionMessage.style.display = 'none';
+                }
+            }
+
+            // Check form visibility on page load
+            handleFormVisibility();
             
             // Replace this URL with your own Google Apps Script web app URL
             const scriptURL = 'https://script.google.com/macros/s/AKfycbwQ1Ea-WyfakHnxb_S_o2jQQPCorv1mpvsIlaNuyKLtzSt6Qb1EPbinNeqCni-rCfnp/exec';
