@@ -355,6 +355,33 @@
             animation: shake 0.3s ease;
         }
 
+        /* Reward banner styles */
+        .reward-banner {
+            background: linear-gradient(135deg, var(--info) 0%, #2A81EA 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(76, 201, 240, 0.15);
+        }
+        
+        .reward-banner i {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .reward-banner-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .reward-banner-text strong {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -501,9 +528,7 @@
 <body>
     <div class="container">
         <header>
-
-<!-- With this line -->
-<div class="logo"><img src="carv.png" alt="CARV Logo"></div>
+            <div class="logo"><img src="carv.png" alt="CARV Logo"></div>
             <h1>CARV Indonesia Monthly Feedback</h1>
             <p class="description">Bantu kami meningkatkan komunitas dengan memberikan feedback Anda</p>
         </header>
@@ -519,6 +544,15 @@
         </div>
 
         <form id="feedbackForm">
+            <!-- Reward Banner -->
+            <div class="reward-banner">
+                <i class="fas fa-gift"></i>
+                <div class="reward-banner-text">
+                    <strong>Dapatkan Reward!</strong><br>
+                    5 feedback terbaik akan mendapatkan hadiah sebesar <strong>250k IDR/TOKEN CARV</strong>.
+                </div>
+            </div>
+            
             <!-- User Information Section -->
             <div class="form-section">
                 <div class="section-title">
@@ -532,6 +566,26 @@
                         <input type="text" id="discord" name="discord" placeholder="Masukkan username Discord Anda" required>
                     </div>
                     <div class="error-message" id="discord-error">Username Discord wajib diisi</div>
+                </div>
+                
+                <!-- UID CARV Field -->
+                <div class="form-group">
+                    <label for="uidCarv">UID CARV</label>
+                    <div class="input-group">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="uidCarv" name="uidCarv" placeholder="Masukkan UID CARV Anda" required>
+                    </div>
+                    <div class="error-message" id="uidCarv-error">UID CARV wajib diisi</div>
+                </div>
+                
+                <!-- Wallet Address Field -->
+                <div class="form-group">
+                    <label for="walletAddress">Wallet Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-wallet"></i>
+                        <input type="text" id="walletAddress" name="walletAddress" placeholder="Masukkan Wallet Address Anda" required>
+                    </div>
+                    <div class="error-message" id="walletAddress-error">Wallet Address wajib diisi</div>
                 </div>
             </div>
 
@@ -876,6 +930,24 @@
                 } else {
                     document.getElementById('discord-error').style.display = 'none';
                 }
+                
+                // Check UID CARV
+                const uidCarvInput = document.getElementById('uidCarv');
+                if(!uidCarvInput.value.trim()) {
+                    document.getElementById('uidCarv-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('uidCarv-error').style.display = 'none';
+                }
+                
+                // Check Wallet Address
+                const walletAddressInput = document.getElementById('walletAddress');
+                if(!walletAddressInput.value.trim()) {
+                    document.getElementById('walletAddress-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('walletAddress-error').style.display = 'none';
+                }
     
                 // Check all rating groups
                 ['gamenight', 'guardian', 'region', 'games', 'carvpass', 'infiniteplay', 'events'].forEach(group => {
@@ -893,73 +965,75 @@
     
             // Submit form handler
             form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if(!validateForm()) {
-        // Scroll to first error
-        const firstError = document.querySelector('.error-message[style="display: block;"]');
-        if(firstError) {
-            firstError.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }
-        return;
-    }
+                e.preventDefault();
+                
+                if(!validateForm()) {
+                    // Scroll to first error
+                    const firstError = document.querySelector('.error-message[style="display: block;"]');
+                    if(firstError) {
+                        firstError.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                    return;
+                }
     
                 // Show loader and disable button
                 loader.style.display = 'block';
                 submitButton.disabled = true;
     
                 // Collect form data
-                // Replace the existing fetch block with this one:
                 const formData = {
-        discord: document.getElementById('discord').value,
-        gamenight: document.querySelector('input[name="gamenight"]:checked').value,
-        guardian: document.querySelector('input[name="guardian"]:checked').value,
-        region: document.querySelector('input[name="region"]:checked').value,
-        games: document.querySelector('input[name="games"]:checked').value,
-        carvpass: document.querySelector('input[name="carvpass"]:checked').value,
-        infiniteplay: document.querySelector('input[name="infiniteplay"]:checked').value,
-        events: document.querySelector('input[name="events"]:checked').value,
-        feedback: document.getElementById('feedback').value || 'No feedback provided'
-    };
+                    discord: document.getElementById('discord').value,
+                    uidCarv: document.getElementById('uidCarv').value,
+                    walletAddress: document.getElementById('walletAddress').value,
+                    gamenight: document.querySelector('input[name="gamenight"]:checked').value,
+                    guardian: document.querySelector('input[name="guardian"]:checked').value,
+                    region: document.querySelector('input[name="region"]:checked').value,
+                    games: document.querySelector('input[name="games"]:checked').value,
+                    carvpass: document.querySelector('input[name="carvpass"]:checked').value,
+                    infiniteplay: document.querySelector('input[name="infiniteplay"]:checked').value,
+                    events: document.querySelector('input[name="events"]:checked').value,
+                    feedback: document.getElementById('feedback').value || 'No feedback provided'
+                };
 
-    const formDataObj = new FormData();
-    formDataObj.append('discord', formData.discord);
-    formDataObj.append('gamenight', formData.gamenight);
-    formDataObj.append('guardian', formData.guardian);
-    formDataObj.append('region', formData.region);
-    formDataObj.append('games', formData.games);
-    formDataObj.append('carvpass', formData.carvpass);
-    formDataObj.append('infiniteplay', formData.infiniteplay);
-    formDataObj.append('events', formData.events);
-    formDataObj.append('feedback', formData.feedback);
+                const formDataObj = new FormData();
+                formDataObj.append('discord', formData.discord);
+                formDataObj.append('uidCarv', formData.uidCarv);
+                formDataObj.append('walletAddress', formData.walletAddress);
+                formDataObj.append('gamenight', formData.gamenight);
+                formDataObj.append('guardian', formData.guardian);
+                formDataObj.append('region', formData.region);
+                formDataObj.append('games', formData.games);
+                formDataObj.append('carvpass', formData.carvpass);
+                formDataObj.append('infiniteplay', formData.infiniteplay);
+                formDataObj.append('events', formData.events);
+                formDataObj.append('feedback', formData.feedback);
 
-
-    fetch(scriptURL, {
-        method: 'POST',
-        body: formDataObj,
-        mode: 'no-cors' // This helps with CORS issues
-    })
-    .then(response => {
-        console.log("Response received");
-        
-        // Hide form and show thank you message
-        form.style.display = 'none';
-        loader.style.display = 'none';
-        thankYou.style.display = 'block';
-        
-        // Scroll to thank you message
-        thankYou.scrollIntoView({ behavior: 'smooth' });
-    })
-    .catch(error => {
-        console.error('Error submitting form:', error);
-        alert(`Terjadi kesalahan saat mengirim feedback: ${error.message}`);
-        loader.style.display = 'none';
-        submitButton.disabled = false;
-    });
-});
+                fetch(scriptURL, {
+                    method: 'POST',
+                    body: formDataObj,
+                    mode: 'no-cors' // This helps with CORS issues
+                })
+                .then(response => {
+                    console.log("Response received");
+                    
+                    // Hide form and show thank you message
+                    form.style.display = 'none';
+                    loader.style.display = 'none';
+                    thankYou.style.display = 'block';
+                    
+                    // Scroll to thank you message
+                    thankYou.scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    console.error('Error submitting form:', error);
+                    alert(`Terjadi kesalahan saat mengirim feedback: ${error.message}`);
+                    loader.style.display = 'none';
+                    submitButton.disabled = false;
+                });
+            });
     
             // Rating hover effects
             document.querySelectorAll('.rating-label').forEach(label => {
