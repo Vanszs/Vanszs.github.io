@@ -105,6 +105,24 @@
             border-radius: 50%;
         }
 
+        /* Add this to your existing styles */
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 5px;
+    border-radius: 50%;
+}
+
+/* Make the logo appear properly on mobile too */
+@media (max-width: 480px) {
+    .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
         form {
             padding: 30px 40px 40px;
         }
@@ -465,7 +483,9 @@
 <body>
     <div class="container">
         <header>
-            <div class="logo"><i class="fas fa-gamepad"></i></div>
+
+<!-- With this line -->
+<div class="logo"><img src="carv.png" alt="CARV Logo"></div>
             <h1>CARV Indonesia Monthly Feedback</h1>
             <p class="description">Bantu kami meningkatkan komunitas dengan memberikan feedback Anda</p>
         </header>
