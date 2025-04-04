@@ -381,15 +381,104 @@
         .thank-you {
             display: none;
             text-align: center;
-            padding: 40px;
+            padding: 40px 30px;
             animation: fadeIn var(--transition-default) ease-out;
+            background: var(--card-bg);
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+
+        .thank-you-container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
         }
 
         .thank-you-icon {
-            font-size: 60px;
+            font-size: 70px;
             color: var(--success);
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
+            margin-bottom: 25px;
+            animation: thankYouPulse 2.5s infinite;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            height: 120px;
+            width: 120px;
+            background-color: rgba(6, 214, 160, 0.1);
+            border-radius: 50%;
+            box-shadow: 0 0 0 10px rgba(6, 214, 160, 0.05);
+        }
+
+        .thank-you h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            animation: fadeInUp 0.6s 0.2s forwards;
+            opacity: 0;
+        }
+
+        .thank-you p {
+            color: var(--gray-700);
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.6s 0.4s forwards;
+            opacity: 0;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .thank-you button {
+            margin-top: 10px;
+            animation: fadeInUp 0.6s 0.6s forwards;
+            opacity: 0;
+            width: auto;
+            padding-left: 30px;
+            padding-right: 30px;
+            display: inline-flex;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .decoration-dots {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .dots-top-right {
+            top: -20px;
+            right: -30px;
+            background: radial-gradient(circle, var(--primary-light) 2px, transparent 3px);
+            background-size: 15px 15px;
+            animation: floatAnimation 8s infinite alternate;
+        }
+
+        .dots-bottom-left {
+            bottom: 40px;
+            left: -30px;
+            background: radial-gradient(circle, var(--success) 2px, transparent 3px);
+            background-size: 12px 12px;
+            animation: floatAnimation 6s infinite alternate-reverse;
+        }
+
+        @keyframes thankYouPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 10px rgba(6, 214, 160, 0.05); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(6, 214, 160, 0.08); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes floatAnimation {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to { transform: translate(5px, 5px) rotate(5deg); }
         }
 
         .loader {
@@ -1001,12 +1090,8 @@
                     Kami sangat menghargai pendapat Anda. Tolong luangkan waktu sebentar untuk memberikan feedback dan saran Anda tentang produk/layanan kami. Masukan Anda sangat berharga bagi kami untuk terus meningkatkan.
                 </p>
                 <div class="form-group">
-                    <textarea id="feedback" name="feedback" placeholder="Berikan saran, kritik, atau feedback lainnya untuk membantu kami meningkatkan kualitas komunitas"></textarea>
+                    <textarea id="feedback" name="feedback" placeholder="Berikan saran, kritik, atau feedback anda disini"></textarea>
                 </div>
-            </div>
-
-            <div class="loader">
-                <div class="spinner"></div>
             </div>
 
             <button type="submit" id="submitButton">
@@ -1016,15 +1101,23 @@
         </form>
 
         <div class="thank-you" id="thankYou">
-            <div class="thank-you-icon">
-                <i class="fas fa-check-circle"></i>
+            <div class="thank-you-container">
+                <div class="decoration-dots dots-top-right"></div>
+                <div class="decoration-dots dots-bottom-left"></div>
+                
+                <div class="thank-you-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                
+                <h2>Terima Kasih!</h2>
+                
+                <p>Feedback Anda telah berhasil terkirim dan sangat berharga bagi kami untuk terus meningkatkan kualitas komunitas CARV Indonesia.</p>
+                
+                <button onclick="location.reload()">
+                    <i class="fas fa-plus-circle"></i>
+                    Kirim Feedback Baru
+                </button>
             </div>
-            <h2>Terima Kasih!</h2>
-            <p>Feedback Anda telah berhasil terkirim dan sangat berharga bagi kami untuk meningkatkan komunitas CARV Indonesia.</p>
-            <button onclick="location.reload()">
-                <i class="fas fa-plus-circle"></i>
-                Kirim Feedback Baru
-            </button>
         </div>
     </div>
 
@@ -1039,7 +1132,6 @@
 
             const form = document.getElementById('feedbackForm');
             const thankYou = document.getElementById('thankYou');
-            const loader = document.querySelector('.loader');
             const submitButton = document.getElementById('submitButton');
             const dateRestrictionMessage = document.getElementById('dateRestrictionMessage');
             const nextAvailableDate = document.getElementById('nextAvailableDate');
@@ -1081,7 +1173,7 @@
             handleFormVisibility();
             
             // Replace this URL with your own Google Apps Script web app URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwQ1Ea-WyfakHnxb_S_o2jQQPCorv1mpvsIlaNuyKLtzSt6Qb1EPbinNeqCni-rCfnp/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxXtpqZodXBqEMMrR8TeVIsdvPr9yyW1NT23SAm8J1lzfWOY43ILWq7fVplnbYjEpWN/exec';
             
             // Form validation with improved error feedback
             function validateForm() {
@@ -1175,13 +1267,7 @@
                     return;
                 }
     
-                // Show loader and disable button with animation
-                loader.style.display = 'block';
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.opacity = '1';
-                }, 10);
-                
+                // Update only the submit button to show loading state
                 submitButton.disabled = true;
                 submitButton.style.opacity = '0.7';
                 submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mengirim...';
@@ -1226,21 +1312,28 @@
                     form.style.opacity = '0';
                     setTimeout(() => {
                         form.style.display = 'none';
-                        loader.style.display = 'none';
                         thankYou.style.display = 'block';
                         thankYou.style.opacity = '0';
                         setTimeout(() => {
                             thankYou.style.opacity = '1';
+                            
+                            // Add a small delay before scrolling to ensure smooth animation
+                            setTimeout(() => {
+                                // Scroll to thank you message with offset for better positioning
+                                const offset = window.innerHeight / 2 - thankYou.offsetHeight / 2;
+                                const scrollTarget = thankYou.getBoundingClientRect().top + window.pageYOffset - (offset > 0 ? offset : 100);
+                                
+                                window.scrollTo({
+                                    top: scrollTarget,
+                                    behavior: config.smoothScrolling ? 'smooth' : 'auto'
+                                });
+                            }, 100);
                         }, 10);
-                        
-                        // Scroll to thank you message
-                        thankYou.scrollIntoView({ behavior: config.smoothScrolling ? 'smooth' : 'auto' });
                     }, 300);
                 })
                 .catch(error => {
                     console.error('Error submitting form:', error);
                     alert(`Terjadi kesalahan saat mengirim feedback: ${error.message}`);
-                    loader.style.display = 'none';
                     submitButton.disabled = false;
                     submitButton.style.opacity = '1';
                     submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Feedback';
