@@ -404,6 +404,62 @@
                 height: 36px;
             }
         }
+
+        @media (max-width: 480px) {
+        body {
+            padding: 10px;
+        }
+        
+        .container {
+            border-radius: 10px;
+        }
+        
+        form {
+            padding: 20px 15px;
+        }
+        
+        .form-section {
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            font-size: 20px;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            font-size: 28px;
+        }
+        
+        .rating-title {
+            font-size: 15px;
+        }
+        
+        input[type="text"], textarea {
+            padding: 12px 15px 12px 40px;
+            font-size: 14px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+        }
+    }
+    
+    /* Fix for double stacked rating options on very small screens */
+    @media (max-width: 360px) {
+        .rating {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .rating-label {
+            flex: none;
+        }
+    }
     </style>
 </head>
 <body>
@@ -712,12 +768,11 @@
             const form = document.getElementById('feedbackForm');
             const thankYou = document.getElementById('thankYou');
             const loader = document.querySelector('.loader');
-            const ratingGroups = [
-                'discord', 'gamenight', 'guardian', 
-                'region', 'games', 'carvpass', 
-                'infiniteplay', 'events'
-            ];
-
+            const submitButton = document.getElementById('submitButton');
+            
+            // Replace this URL with your own Google Apps Script web app URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwQ1Ea-WyfakHnxb_S_o2jQQPCorv1mpvsIlaNuyKLtzSt6Qb1EPbinNeqCni-rCfnp/exec';
+            
             // Form validation
             function validateForm() {
                 let isValid = true;
@@ -730,7 +785,7 @@
                 } else {
                     document.getElementById('discord-error').style.display = 'none';
                 }
-
+    
                 // Check all rating groups
                 ['gamenight', 'guardian', 'region', 'games', 'carvpass', 'infiniteplay', 'events'].forEach(group => {
                     const selected = document.querySelector(`input[name="${group}"]:checked`);
@@ -741,41 +796,80 @@
                         document.getElementById(`${group}-error`).style.display = 'none';
                     }
                 });
-
+    
                 return isValid;
             }
-
+    
             // Submit form handler
             form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                if(!validateForm()) {
-                    // Scroll to first error
-                    const firstError = document.querySelector('.error-message[style="display: block;"]');
-                    if(firstError) {
-                        firstError.scrollIntoView({ 
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                    return;
-                }
-
-                // Show loader
-                loader.style.display = 'block';
-                document.getElementById('submitButton').disabled = true;
-
-                // Simulate form submission
-                setTimeout(() => {
-                    form.style.display = 'none';
-                    loader.style.display = 'none';
-                    thankYou.style.display = 'block';
-                    
-                    // Scroll to thank you message
-                    thankYou.scrollIntoView({ behavior: 'smooth' });
-                }, 2000);
+    e.preventDefault();
+    
+    if(!validateForm()) {
+        // Scroll to first error
+        const firstError = document.querySelector('.error-message[style="display: block;"]');
+        if(firstError) {
+            firstError.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'center'
             });
+        }
+        return;
+    }
+    
+                // Show loader and disable button
+                loader.style.display = 'block';
+                submitButton.disabled = true;
+    
+                // Collect form data
+                // Replace the existing fetch block with this one:
+                const formData = {
+        discord: document.getElementById('discord').value,
+        gamenight: document.querySelector('input[name="gamenight"]:checked').value,
+        guardian: document.querySelector('input[name="guardian"]:checked').value,
+        region: document.querySelector('input[name="region"]:checked').value,
+        games: document.querySelector('input[name="games"]:checked').value,
+        carvpass: document.querySelector('input[name="carvpass"]:checked').value,
+        infiniteplay: document.querySelector('input[name="infiniteplay"]:checked').value,
+        events: document.querySelector('input[name="events"]:checked').value,
+        feedback: document.getElementById('feedback').value || 'No feedback provided'
+    };
 
+    const formDataObj = new FormData();
+    formDataObj.append('discord', formData.discord);
+    formDataObj.append('gamenight', formData.gamenight);
+    formDataObj.append('guardian', formData.guardian);
+    formDataObj.append('region', formData.region);
+    formDataObj.append('games', formData.games);
+    formDataObj.append('carvpass', formData.carvpass);
+    formDataObj.append('infiniteplay', formData.infiniteplay);
+    formDataObj.append('events', formData.events);
+    formDataObj.append('feedback', formData.feedback);
+
+
+    fetch(scriptURL, {
+        method: 'POST',
+        body: formDataObj,
+        mode: 'no-cors' // This helps with CORS issues
+    })
+    .then(response => {
+        console.log("Response received");
+        
+        // Hide form and show thank you message
+        form.style.display = 'none';
+        loader.style.display = 'none';
+        thankYou.style.display = 'block';
+        
+        // Scroll to thank you message
+        thankYou.scrollIntoView({ behavior: 'smooth' });
+    })
+    .catch(error => {
+        console.error('Error submitting form:', error);
+        alert(`Terjadi kesalahan saat mengirim feedback: ${error.message}`);
+        loader.style.display = 'none';
+        submitButton.disabled = false;
+    });
+});
+    
             // Rating hover effects
             document.querySelectorAll('.rating-label').forEach(label => {
                 label.addEventListener('mouseenter', function() {
@@ -788,7 +882,7 @@
                     }
                 });
             });
-
+    
             // Responsive adjustments
             function handleResponsive() {
                 const ratingLabels = document.querySelectorAll('.rating-label');
@@ -813,7 +907,7 @@
                     });
                 }
             }
-
+    
             window.addEventListener('resize', handleResponsive);
             handleResponsive();
         });
