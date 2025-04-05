@@ -4,17 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Japanese Kana Master</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #6366f1;
+            --primary-light: #818cf8; 
+            --primary-dark: #4f46e5;
             --secondary: #8b5cf6;
             --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.15);
             --error: #ef4444;
+            --error-light: rgba(239, 68, 68, 0.15);
             --background: #0f172a;
+            --background-gradient: linear-gradient(135deg, #0f172a, #1e1b4b);
             --surface: #1e293b;
+            --surface-accent: #334155;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -25,30 +39,91 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--background);
+            background: var(--background-gradient);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 1rem;
+            padding: 1.5rem;
+            transition: var(--transition-normal);
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Background Effects */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 25%);
+            z-index: 0;
         }
 
         /* Header Styles */
         .header {
             text-align: center;
             padding: 2rem 0;
+            animation: fadeInDown 1s ease-out;
         }
 
         .title {
-            font-size: 2.5rem;
+            font-size: 3rem;
+            font-weight: 700;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             margin-bottom: 1.5rem;
+            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+            letter-spacing: -0.025em;
+            position: relative;
+        }
+
+        .title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 4px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 1s ease-out 0.3s forwards;
+        }
+
+        .stats-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stats-value {
+            font-weight: 600;
+            color: var(--primary-light);
+            font-size: 1.25rem;
+            margin-top: 0.25rem;
         }
 
         /* Mode Selectors */
@@ -56,7 +131,10 @@
             display: flex;
             gap: 1rem;
             justify-content: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 1s ease-out 0.4s forwards;
         }
 
         .mode-selector {
@@ -64,52 +142,143 @@
             gap: 0.5rem;
             background: var(--surface);
             padding: 0.5rem;
-            border-radius: 0.75rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
         }
 
         .mode-btn, .submode-btn {
             padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             background: transparent;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition-fast);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .mode-btn::before, .submode-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0;
+            z-index: -1;
+            transition: var(--transition-fast);
+            border-radius: 0.75rem;
+        }
+
+        .mode-btn:hover, .submode-btn:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .mode-btn:hover::before, .submode-btn:hover::before {
+            opacity: 0.1;
         }
 
         .mode-btn.active, .submode-btn.active {
-            background: var(--primary);
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: white;
-            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.1);
+            box-shadow: var(--shadow-sm);
+            font-weight: 600;
+        }
+
+        .mode-btn.active::before, .submode-btn.active::before {
+            opacity: 0;
         }
 
         /* Group Selection */
         .groups-panel {
             background: var(--surface);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out 0.5s forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .groups-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .groups-panel h2 {
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .groups-panel h2::before {
+            content: "\f0c8";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 0.75rem;
+            color: var(--primary);
+            font-size: 1.25rem;
         }
 
         .groups-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
+            gap: 1.25rem;
         }
 
         .group-card {
-            padding: 1.25rem;
+            padding: 1.5rem;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+
+        .group-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, 
+                rgba(99, 102, 241, 0.1), 
+                rgba(99, 102, 241, 0.05));
+            opacity: 0;
+            transition: var(--transition-normal);
+            z-index: -1;
         }
 
         .group-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .group-card:hover::before {
+            opacity: 1;
         }
 
         .group-card.selected {
@@ -117,6 +286,25 @@
             background: linear-gradient(145deg, 
                 rgba(99, 102, 241, 0.15), 
                 rgba(99, 102, 241, 0.1));
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .group-card.selected::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            color: var(--primary);
+            font-size: 0.9rem;
+            background: rgba(99, 102, 241, 0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .group-header {
@@ -128,26 +316,37 @@
 
         .group-name {
             font-weight: 600;
-            color: var(--primary);
+            color: var(--primary-light);
+            letter-spacing: 0.05em;
         }
 
         .group-characters {
             font-family: 'Noto Sans JP', sans-serif;
             font-size: 1.5rem;
             color: var(--text-secondary);
+            line-height: 1.6;
+            word-break: break-all;
+            transition: var(--transition-normal);
+        }
+
+        .group-card:hover .group-characters {
+            color: var(--text-primary);
         }
 
         /* Quiz Area */
         .quiz-container {
             background: var(--surface);
-            border-radius: 1rem;
-            padding: 3rem 2rem;
-            margin: 2rem auto;
-            max-width: 600px;
+            border-radius: 1.25rem;
+            padding: 3.5rem 2.5rem;
+            margin: 3rem auto;
+            max-width: 650px;
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
-            transition: all 0.3s ease;
+            transition: var(--transition-slow);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            position: relative;
         }
 
         .quiz-container.active {
@@ -155,63 +354,129 @@
             transform: translateY(0);
         }
 
+        .quiz-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-top-left-radius: 1.25rem;
+            transition: width 0.5s ease;
+        }
+
+        .streak-indicator {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            font-size: 0.9rem;
+        }
+
+        .streak-icon {
+            color: #f59e0b;
+        }
+
+        .streak-count {
+            min-width: 24px;
+        }
+
         .kana-display {
-            font-size: 6rem;
+            font-size: 7rem;
             font-family: 'Noto Sans JP', sans-serif;
-            margin: 2rem 0;
-            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            margin: 2.5rem 0;
+            color: var(--text-primary);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             word-break: break-all;
+            letter-spacing: 0.05em;
+            position: relative;
+            transition: var(--transition-normal);
+        }
+
+        .kana-display::after {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0.5;
         }
 
         .input-container {
             position: relative;
-            max-width: 400px;
-            margin: 0 auto;
+            max-width: 450px;
+            margin: 2rem auto 0;
         }
 
         .answer-input {
             width: 100%;
-            padding: 1rem 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 1.25rem 1.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            background: rgba(0, 0, 0, 0.2);
             color: var(--text-primary);
             font-size: 1.1rem;
-            transition: all 0.2s ease;
+            transition: var(--transition-normal);
+            font-family: 'Inter', sans-serif;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.025em;
         }
 
         .answer-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .submit-btn {
             position: absolute;
-            right: 0.5rem;
+            right: 0.6rem;
             top: 50%;
             transform: translateY(-50%);
-            padding: 0.75rem 1.25rem;
-            background: var(--primary);
+            padding: 0.9rem 1.6rem;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.8rem;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: var(--transition-fast);
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(99, 102, 241, 0.2);
         }
 
         .submit-btn:hover {
-            transform: translateY(-50%) scale(1.05);
+            transform: translateY(-50%) translateZ(0) scale(1.03);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-50%) scale(0.98);
         }
 
         /* Feedback System */
         .feedback {
-            margin-top: 1.5rem;
+            margin: 1.75rem auto 0;
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 1rem;
+            max-width: 450px;
             opacity: 0;
             transform: translateY(10px);
-            transition: all 0.3s ease;
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-weight: 500;
         }
 
         .feedback.show {
@@ -220,49 +485,197 @@
         }
 
         .feedback.success {
-            background: rgba(16, 185, 129, 0.15);
+            background: var(--success-light);
             color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
         .feedback.error {
-            background: rgba(239, 68, 68, 0.15);
+            background: var(--error-light);
             color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .feedback i {
+            font-size: 1.2rem;
         }
 
         .hint {
-            margin-top: 1rem;
+            margin: 1.25rem auto 0;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            max-width: 450px;
+            opacity: 0;
+            transition: var(--transition-normal);
         }
 
+        .hint.show {
+            opacity: 1;
+        }
+
+        /* Keyboard Shortcut Hints */
+        .keyboard-hints {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            gap: 1rem;
+            opacity: 0.7;
+        }
+
+        .keyboard-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .key {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.35rem;
+            font-family: monospace;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.6s ease-out;
+        }
+
+        /* Confetti effect */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
             .container {
                 padding: 0.5rem;
             }
             
             .title {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             
             .kana-display {
-                font-size: 4rem;
+                font-size: 5rem;
+                margin: 2rem 0;
             }
             
             .group-card {
-                padding: 1rem;
+                padding: 1.25rem;
             }
             
             .mode-btn, .submode-btn {
-                padding: 0.75rem 1rem;
+                padding: 0.75rem 1.1rem;
                 font-size: 0.9rem;
+            }
+
+            .groups-panel {
+                padding: 2rem 1.5rem;
+            }
+
+            .submit-btn {
+                padding: 0.75rem 1.25rem;
+            }
+
+            .stats-panel {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .mode-selector-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .keyboard-hints {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .kana-display {
+                font-size: 4rem;
+            }
+
+            .groups-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .group-card {
+                padding: 1rem;
+            }
+
+            .group-characters {
+                font-size: 1.25rem;
+            }
+
+            .quiz-container {
+                padding: 2.5rem 1.5rem;
+                margin: 2rem auto;
+            }
+
+            .answer-input {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
+    <canvas id="confetti-canvas"></canvas>
     <div class="container">
         <header class="header">
             <h1 class="title">Kana Master</h1>
+            <div class="stats-panel">
+                <div class="stats-item">
+                    <span>Correct</span>
+                    <span id="correctCounter" class="stats-value">0</span>
+                </div>
+                <div class="stats-item">
+                    <span>Accuracy</span>
+                    <span id="accuracyCounter" class="stats-value">0%</span>
+                </div>
+                <div class="stats-item">
+                    <span>Streak</span>
+                    <span id="streakCounter" class="stats-value">0</span>
+                </div>
+            </div>
             <div class="mode-selector-container">
                 <div class="mode-selector">
                     <button class="mode-btn active" data-mode="hiragana">Hiragana</button>
@@ -281,6 +694,11 @@
         </div>
 
         <div class="quiz-container" id="quizContainer">
+            <div class="quiz-progress" id="quizProgress"></div>
+            <div class="streak-indicator">
+                <i class="fa-solid fa-fire streak-icon"></i>
+                <span class="streak-count" id="currentStreak">0</span>
+            </div>
             <div class="kana-display" id="kanaDisplay"></div>
             <div class="input-container">
                 <input type="text" class="answer-input" id="answerInput" placeholder="Type romanization..." autocomplete="off">
@@ -288,9 +706,14 @@
             </div>
             <div class="feedback" id="feedback"></div>
             <div class="hint" id="hint"></div>
+            <div class="keyboard-hints">
+                <div class="keyboard-hint"><span class="key">Enter</span> Check answer</div>
+                <div class="keyboard-hint"><span class="key">Tab</span> Next question</div>
+            </div>
         </div>
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
     const kanaData = {
         hiragana: {
@@ -363,6 +786,40 @@
     const MIN_WORD_LENGTH = 3;
     const MAX_WORD_LENGTH = 5;
 
+    // Stats tracking
+    let stats = {
+        correct: 0,
+        total: 0,
+        streak: 0,
+        maxStreak: 0
+    };
+
+    function updateStats(isCorrect) {
+        if (isCorrect) {
+            stats.correct++;
+            stats.streak++;
+            stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
+        } else {
+            stats.streak = 0;
+        }
+        stats.total++;
+        
+        // Update UI
+        document.getElementById('correctCounter').textContent = stats.correct;
+        document.getElementById('streakCounter').textContent = stats.maxStreak;
+        document.getElementById('currentStreak').textContent = stats.streak;
+        document.getElementById('accuracyCounter').textContent = 
+            stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) + '%' : '0%';
+        
+        // Update progress bar
+        updateProgressBar();
+    }
+
+    function updateProgressBar() {
+        const progress = document.getElementById('quizProgress');
+        progress.style.width = `${(stats.streak / 10) * 100}%`;
+    }
+
     function initGroups() {
         const groupsGrid = document.getElementById('groupsGrid');
         groupsGrid.innerHTML = '';
@@ -434,11 +891,24 @@
         updateQuestionHistory(newQuestion.kana);
         currentQuestion = newQuestion;
 
-        document.getElementById('kanaDisplay').textContent = currentQuestion.kana;
+        const kanaDisplay = document.getElementById('kanaDisplay');
+        
+        // Add animation for kana transition
+        kanaDisplay.style.opacity = '0';
+        kanaDisplay.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+            kanaDisplay.textContent = currentQuestion.kana;
+            kanaDisplay.style.opacity = '1';
+            kanaDisplay.style.transform = 'translateY(0)';
+        }, 200);
+
         document.getElementById('quizContainer').classList.add('active');
         document.getElementById('feedback').classList.remove('show');
         document.getElementById('hint').textContent = '';
+        document.getElementById('hint').classList.remove('show');
         document.getElementById('answerInput').value = '';
+        document.getElementById('answerInput').focus();
         attempts = 0;
     }
 
@@ -461,33 +931,86 @@
             .map(kana => ({kana, romaji: romajiMap[kana]})));
     }
 
-    function checkAnswer() {
-    const userAnswer = document.getElementById('answerInput').value
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '');
-    const feedback = document.getElementById('feedback');
-    const submitBtn = document.getElementById('submitBtn');
-
-    if(userAnswer === currentQuestion.romaji.toLowerCase()) {
-        feedback.textContent = 'Correct! 🎉';
-        feedback.className = 'feedback success show';
-        submitBtn.textContent = 'Check';
-        setTimeout(generateNewQuestion, 1000);
-    } else {
-        attempts++;
+    function playCorrectAnimation() {
+        // Trigger confetti
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
         
-        if(attempts >= maxAttempts) {
-            document.getElementById('hint').textContent = `Answer: ${currentQuestion.romaji}`;
+        // Add pulse animation to kana display
+        document.getElementById('kanaDisplay').classList.add('pulse');
+        setTimeout(() => {
+            document.getElementById('kanaDisplay').classList.remove('pulse');
+        }, 600);
+    }
+
+    function checkAnswer() {
+        const userAnswer = document.getElementById('answerInput').value
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '');
+        const feedback = document.getElementById('feedback');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if(userAnswer === currentQuestion.romaji.toLowerCase()) {
+            feedback.innerHTML = '<i class="fa-solid fa-check-circle"></i> Correct! 🎉';
+            feedback.className = 'feedback success show';
             submitBtn.textContent = 'Next';
             submitBtn.removeEventListener('click', checkAnswer);
             submitBtn.addEventListener('click', handleNextQuestion);
+            
+            // Update stats and play animation
+            updateStats(true);
+            playCorrectAnimation();
+            
+            // Auto-advance after delay
+            setTimeout(handleNextQuestion, 1500);
         } else {
-            feedback.textContent = `Incorrect! Attempts left: ${maxAttempts - attempts}`;
-            feedback.className = 'feedback error show';
+            attempts++;
+            updateStats(false);
+            
+            if(attempts >= maxAttempts) {
+                const hint = document.getElementById('hint');
+                hint.textContent = `Answer: ${currentQuestion.romaji}`;
+                hint.classList.add('show');
+                
+                feedback.innerHTML = '<i class="fa-solid fa-times-circle"></i> Incorrect! Try the next one.';
+                feedback.className = 'feedback error show';
+                
+                submitBtn.textContent = 'Next';
+                submitBtn.removeEventListener('click', checkAnswer);
+                submitBtn.addEventListener('click', handleNextQuestion);
+            } else {
+                feedback.innerHTML = `<i class="fa-solid fa-times-circle"></i> Incorrect! Attempts left: ${maxAttempts - attempts}`;
+                feedback.className = 'feedback error show';
+                
+                // Shake the input field for incorrect answer
+                document.getElementById('answerInput').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('answerInput').classList.remove('shake');
+                }, 500);
+            }
         }
     }
-}
+
+    function handleNextQuestion() {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.textContent = 'Check';
+        submitBtn.removeEventListener('click', handleNextQuestion);
+        submitBtn.addEventListener('click', checkAnswer);
+        generateNewQuestion();
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab' && document.getElementById('submitBtn').textContent === 'Next') {
+            e.preventDefault();
+            handleNextQuestion();
+        }
+    });
+
     // Event Listeners
     document.querySelectorAll('[data-mode]').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -516,14 +1039,21 @@
     document.getElementById('answerInput').addEventListener('keypress', e => {
         if(e.key === 'Enter') checkAnswer();
     });
-    document.getElementById('submitBtn').addEventListener('click', checkAnswer);
-    function handleNextQuestion() {
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.textContent = 'Check';
-    submitBtn.removeEventListener('click', handleNextQuestion);
-    submitBtn.addEventListener('click', checkAnswer);
-    generateNewQuestion();
-}
+    
+    // Add this to CSS
+    document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+    </style>
+    `);
 
     // Initialization
     initGroups();
