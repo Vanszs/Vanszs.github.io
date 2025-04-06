@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A beautiful gallery of precious memories and lovely moments">
+    <meta name="theme-color" content="#ff8fa3">
+    <title>Vera's Photo Gallery</title>
+    
+    <!-- Preload critical assets -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="script.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff8fa3' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+</head>
+<body>
+    <div class="heart-bg"></div>
+    <div class="particles-container"></div>
+    
+    <header class="header-animate">
+        <div class="header-content">
+            <div class="logo">
+                <svg class="heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <h1 class="title-animate">Vera's <span class="highlight">Beautiful</span> Moments</h1>
+            <p class="subtitle-animate">A collection of precious memories and lovely smiles</p>
+        </div>
+    </header>
+
+    <div class="controls fade-in">
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search memories..." aria-label="Search memories">
+            <button aria-label="Search"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="filter-options">
+            <button class="filter-btn active" data-filter="all">All Photos</button>
+            <button class="filter-btn" data-filter="favorites"><i class="fas fa-heart"></i> Favorites</button>
+            <button class="filter-btn" data-filter="recent"><i class="fas fa-clock"></i> Recent</button>
+        </div>
+        <button id="add-photo" class="add-btn pulse-animation"><i class="fas fa-plus"></i> Add New Memory</button>
+    </div>
+
+    <div class="gallery-container fade-in">
+        <div class="loading-spinner" id="gallery-loader">
+            <div class="heart-spinner"></div>
+            <p>Loading beautiful memories...</p>
+        </div>
+        <div class="gallery" id="photo-gallery">
+            <!-- Photos will be added dynamically via JavaScript -->
+        </div>
+    </div>
+    
+    <div id="photo-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <span class="close-btn" aria-label="Close">&times;</span>
+            <div class="image-container">
+                <img id="modal-img" src="" alt="" aria-describedby="photo-title photo-description">
+                <div class="image-controls">
+                    <button class="nav-btn prev-btn" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+                    <button class="nav-btn next-btn" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="loading-overlay">
+                    <div class="heart-spinner"></div>
+                </div>
+            </div>
+            <div class="photo-details">
+                <h3 id="photo-title">Beautiful Moment</h3>
+                <p id="photo-date">Date: Unknown</p>
+                <p id="photo-description">A lovely memory captured forever.</p>
+                <div class="photo-actions">
+                    <button class="heart-btn" aria-label="Toggle favorite"><i class="fas fa-heart"></i></button>
+                    <button class="share-btn" aria-label="Share"><i class="fas fa-share-alt"></i></button>
+                    <button class="download-btn" aria-label="Download"><i class="fas fa-download"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="upload-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content upload-form">
+            <span class="close-btn" aria-label="Close">&times;</span>
+            <h2>Add a New Memory</h2>
+            <form id="upload-form">
+                <div class="form-group photo-preview-container">
+                    <label for="photo">Choose Photo:</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="photo" accept="image/*" required>
+                        <div class="file-upload-ui">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drop image here</p>
+                        </div>
+                        <div class="image-preview" id="image-preview"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" placeholder="Enter a title" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" placeholder="Write something about this moment..."></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="submit-btn"><i class="fas fa-heart"></i> Save Memory</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <p class="toast-message"></p>
+        </div>
+    </div>
+    
+    <footer class="fade-in">
+        <div class="footer-content">
+            <p>Made with <i class="fas fa-heart pulse"></i> for Vera</p>
+            <p class="copyright">&copy; <span id="current-year"></span> Vera's Photo Gallery</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
