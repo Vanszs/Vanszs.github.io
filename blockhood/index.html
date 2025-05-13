@@ -513,21 +513,66 @@
 
         @media (max-width: 768px) {
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2.2rem; /* Slightly reduced for better fit */
+            }
+
+            .hero p {
+                font-size: 1rem; /* Adjusted for mobile readability */
             }
 
             .hero-cta {
                 flex-direction: column;
                 gap: 15px;
             }
+            
+            .section-title {
+                font-size: 2rem; /* Reduced for mobile */
+                margin-bottom: 40px; /* Adjusted spacing */
+            }
 
             .features-grid {
                 grid-template-columns: 1fr;
             }
 
+            .feature-card {
+                padding: 25px 20px; /* Adjusted padding for mobile */
+            }
+
+            .feature-icon {
+                width: 60px; /* Reduced for mobile */
+                height: 60px;
+                font-size: 24px; /* Adjusted icon size */
+                margin-bottom: 20px;
+            }
+
+            .feature-card h3 {
+                font-size: 1.4rem; /* Reduced for mobile */
+            }
+            
+            .feature-card p {
+                font-size: 0.9rem; /* Adjusted for mobile */
+            }
+
+            .community p.lead-text {
+                font-size: 1.1rem; /* Reduced for mobile */
+                margin-bottom: 40px;
+            }
+
             .social-proof {
                 grid-template-columns: 1fr; /* Stack on mobile */
                 gap: 20px;
+            }
+
+            .social-item {
+                padding: 20px; /* Adjusted padding */
+            }
+
+            .social-value {
+                font-size: 2.2rem; /* Reduced for mobile */
+            }
+
+            .social-label {
+                font-size: 0.85rem; /* Adjusted for mobile */
             }
 
             .community-cta {
@@ -538,7 +583,15 @@
             .cta-button {
                 width: 100%;
                 justify-content: center;
+                padding: 12px 20px; /* Adjusted padding for mobile buttons */
+                font-size: 1rem;
             }
+            
+            .hero-cta .cta-button { /* Specific adjustment if needed for hero buttons */
+                 padding: 14px 25px;
+                 font-size: 1.05rem;
+            }
+
 
             .hero-flex {
                 flex-direction: column;
@@ -546,9 +599,30 @@
             }
 
             .hero-logo {
-                width: 150px;
-                height: 150px;
+                width: 120px; /* Slightly smaller for mobile */
+                height: 120px;
                 margin-bottom: 20px;
+            }
+
+            footer {
+                padding: 40px 0 30px;
+            }
+
+            .footer-tagline {
+                font-size: 0.9rem;
+                margin-bottom: 20px;
+            }
+            .social-links {
+                gap: 20px;
+            }
+            .social-link {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            .footer-copyright {
+                font-size: 0.8rem;
+                margin-top: 20px;
             }
         }
     </style>
@@ -631,15 +705,15 @@
                 
                 <div class="social-proof reveal">
                     <div class="social-item">
-                        <div class="social-value">2,500+</div>
+                        <div class="social-value">250+</div>
                         <div class="social-label">Community Members</div>
                     </div>
                     <div class="social-item">
-                        <div class="social-value">150+</div>
+                        <div class="social-value">100+</div>
                         <div class="social-label">Daily Active Users</div>
                     </div>
                     <div class="social-item">
-                        <div class="social-value">500+</div>
+                        <div class="social-value">10+</div>
                         <div class="social-label">Success Stories</div>
                     </div>
                 </div>
