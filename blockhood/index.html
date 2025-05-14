@@ -316,36 +316,31 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            max-width: 850px; /* Slightly wider */
+            max-width: 850px; 
             margin: 0 auto;
+            padding: 0 20px; /* Add padding for smaller screens */
         }
 
-        .community h2 {
+        .community h2.section-title { /* Target section-title specifically within community if needed */
             margin-bottom: 30px;
         }
 
-        .community p {
-            font-size: 1.1rem;
-            margin-bottom: 40px;
-            line-height: 1.6;
-            opacity: 0.8;
-        }
-
-        .community p.lead-text { /* Class for the main paragraph */
-            font-size: 1.25rem; /* Larger lead text */
-            margin-bottom: 50px;
+        .community p.lead-text {
+            font-size: 1.25rem; 
+            margin-bottom: 40px; /* Adjusted from 50px for better flow */
             line-height: 1.7;
             opacity: 0.85;
             max-width: 700px;
         }
 
         .social-proof {
-            display: grid; /* Use grid for better alignment */
+            display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 30px;
             justify-content: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px; /* Adjusted from 60px */
             width: 100%;
+            max-width: 700px; /* Constrain width for better centering */
         }
 
         .social-item {
@@ -362,9 +357,9 @@
         }
 
         .social-value {
-            font-size: 2.8rem; /* Larger numbers */
+            font-size: 2.8rem; 
             font-weight: 700;
-            color: var(--accent);
+            color: var(--accent); /* Corrected from var (--accent) */
             margin-bottom: 5px;
         }
 
@@ -375,15 +370,192 @@
 
         .community-cta {
             display: flex;
-            gap: 25px; /* Increased gap */
-            margin-top: 20px; /* Added margin for spacing */
+            flex-direction: row; /* Ensure buttons are side-by-side on larger screens */
+            gap: 25px; 
+            margin-top: 20px; 
+            justify-content: center;
+            width: 100%; /* Allow it to take width then center its items */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
         }
         
-        .community-cta .cta-button { /* Ensure consistency */
+        .community-cta .cta-button { 
             padding: 15px 35px;
             font-size: 1.15rem;
+            min-width: 220px; /* Give buttons a minimum width */
+            text-align: center; /* Center text within buttons */
         }
 
+        /* Our Team Section Styles */
+        .team-section {
+            padding: 100px 0;
+            position: relative;
+            background: linear-gradient(180deg, var(--darker) 0%, var(--dark) 50%, var(--darker) 100%);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .team-member-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team-member-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-member-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px auto;
+            border: 3px solid var(--primary);
+            display: block;
+        }
+
+        .team-member-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: var(--light);
+        }
+
+        .team-member-card p {
+            font-size: 0.95rem;
+            color: var(--accent);
+            opacity: 0.8;
+            margin-bottom: 15px; /* Add margin to separate from social links */
+        }
+
+        .team-member-socials {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px; /* Adjusted from 15px to give a bit more space from role */
+        }
+
+        .team-social-link {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--light);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem; /* This size is inherited by the icon */
+        }
+
+        .team-social-link .fab { /* Target Font Awesome brand icons specifically */
+            font-weight: 400; /* Ensure correct weight for brand icons like fa-x-twitter */
+            line-height: 1; /* Good practice for icons */
+        }
+
+        .team-social-link:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(var(--primary-rgb), 0.3);
+            color: var(--light);
+        }
+
+
+        /* Our Partners Section Styles */
+        .partners-section {
+            padding: 100px 0;
+            position: relative;
+            background: linear-gradient(180deg, var(--darker) 0%, var(--dark) 50%, var(--darker) 100%);
+        }
+
+        .partners-container {
+            /* This container is inside .container, so it's already constrained by max-width: 1200px */
+            /* It primarily serves to hide overflow for the carousel and apply fades */
+            position: relative;
+            overflow: hidden; /* This will clip the carousel content if it overflows */
+            margin-top: 60px;
+            width: 100%; /* Take full width of parent .container */
+        }
+
+        .partners-carousel {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            padding: 20px 0; /* Padding for items, fades will overlay this */
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: pan-x; /* Allow horizontal panning */
+            cursor: grab;
+            /* justify-content will be set by JS if count < 5 */
+        }
+
+        .partners-carousel:active {
+            cursor: grabbing;
+        }
+        
+        /* Fading edges for the carousel - applied when .js-scroll-active or always if desired */
+        .partners-container::before,
+        .partners-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 80px; /* Adjust width of the fade */
+            z-index: 2; /* Ensure fades are on top of carousel items */
+            pointer-events: none; /* Allow clicks/drags through the fade */
+            display: none; /* Hidden by default, shown by JS if needed */
+        }
+        
+        .partners-container.has-fades::before {
+            display: block;
+            left: 0;
+            background: linear-gradient(to right, var(--darker) 20%, transparent);
+        }
+        
+        .partners-container.has-fades::after {
+            display: block;
+            right: 0;
+            background: linear-gradient(to left, var(--darker) 20%, transparent);
+        }
+
+        .partner-logo {
+            flex: 0 0 auto; /* Prevent shrinking, allow natural width */
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+
+        .partner-logo:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .partner-logo img {
+            height: 70px;
+            width: auto;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* Prevent image itself from being dragged/interfering */
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .partner-logo:hover img {
+            opacity: 1;
+        }
+        
         footer {
             padding: 60px 0 40px; 
             text-align: center;
@@ -482,12 +654,6 @@
             100% { transform: translateY(0px); }
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.2; }
-            50% { transform: scale(1.1); opacity: 0.3; }
-            100% { transform: scale(1); opacity: 0.2; }
-        }
-
         .hero-flex {
             display: flex;
             align-items: center;
@@ -569,13 +735,14 @@
             }
 
             .community p.lead-text {
-                font-size: 1.1rem; /* Reduced for mobile */
-                margin-bottom: 40px;
+                font-size: 1.1rem; 
+                margin-bottom: 30px; /* Adjusted for mobile */
             }
 
             .social-proof {
-                grid-template-columns: 1fr; /* Stack on mobile */
+                grid-template-columns: 1fr; 
                 gap: 20px;
+                margin-bottom: 40px; /* Adjusted for mobile */
             }
 
             .social-item {
@@ -591,22 +758,22 @@
             }
 
             .community-cta {
-                flex-direction: column;
-                width: 100%;
+                flex-direction: column; /* Stack buttons on mobile */
+                align-items: center; /* Center stacked buttons */
+                gap: 15px; /* Adjust gap for stacked buttons */
             }
 
-            .cta-button {
-                width: 100%;
-                justify-content: center;
-                padding: 12px 20px; /* Adjusted padding for mobile buttons */
+            .community-cta .cta-button {
+                width: 100%; /* Make buttons full width on mobile */
+                max-width: 300px; /* Optional: max-width for very small screens */
+                padding: 12px 20px;
                 font-size: 1rem;
             }
-            
+
             .hero-cta .cta-button { /* Specific adjustment if needed for hero buttons */
                  padding: 14px 25px;
                  font-size: 1.05rem;
             }
-
 
             .hero-flex {
                 flex-direction: column;
@@ -617,6 +784,32 @@
                 width: 120px; /* Slightly smaller for mobile */
                 height: 120px;
                 margin-bottom: 20px;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust for smaller cards */
+            }
+
+            .team-member-img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .team-member-card h3 {
+                font-size: 1.2rem;
+            }
+
+            .team-member-card p {
+                font-size: 0.9rem;
+            }
+
+            .partners-carousel {
+                justify-content: flex-start; /* Allow scrolling from the start */
+                gap: 30px;
+            }
+
+            .partner-logo img {
+                max-height: 45px;
             }
 
             footer {
@@ -640,6 +833,41 @@
                 font-size: 0.8rem;
                 margin-top: 20px;
             }
+
+            .partners-container.has-fades::before,
+            .partners-container.has-fades::after {
+                width: 40px; /* Narrower fade on mobile */
+            }
+        }
+
+        .partners-carousel {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 40px;
+            overflow-x: auto;       /* keep manual scroll when <5 items */
+            padding: 20px 0;
+            margin-top: 40px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .partners-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* marquee mode for ≥5 items */
+        .partners-carousel.marquee {
+            overflow: hidden;       /* hide native scrollbar */
+            animation: scroll-left 20s linear infinite;
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image:         linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+        }
+        .partners-carousel.marquee:hover {
+            animation-play-state: paused;
+        }
+        @keyframes scroll-left {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
     </style>
 </head>
@@ -713,6 +941,75 @@
         </div>
     </section>
 
+    <section class="team-section" id="team">
+        <div class="container">
+            <h2 class="section-title reveal">Meet Our Team</h2>
+            <div class="team-grid">
+                <div class="team-member-card reveal">
+                    <img src="default_pp.jpg" alt="Wisearich.vl" class="team-member-img">
+                    <h3>Wisearich.vl</h3>
+                    <p>Founder</p>
+                    <div class="team-member-socials">
+                        <a href="#" target="_blank" class="team-social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" target="_blank" class="team-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="team-member-card reveal">
+                    <img src="default_pp.jpg" alt="Nesctfox" class="team-member-img">
+                    <h3>Nesctfox</h3>
+                    <p>Community Manager</p>
+                    <div class="team-member-socials">
+                        <a href="#" target="_blank" class="team-social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" target="_blank" class="team-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="team-member-card reveal">
+                    <img src="default_pp.jpg" alt="BAGAZZ" class="team-member-img">
+                    <h3>BAGAZZ</h3>
+                    <p>Community Manager</p>
+                    <div class="team-member-socials">
+                        <a href="#" target="_blank" class="team-social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" target="_blank" class="team-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="team-member-card reveal">
+                    <img src="default_pp.jpg" alt="Belugaa" class="team-member-img">
+                    <h3>Belugaa</h3>
+                    <p>Tech Developer</p>
+                    <div class="team-member-socials">
+                        <a href="#" target="_blank" class="team-social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" target="_blank" class="team-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="partners-section" id="partners">
+        <div class="container">
+            <h2 class="section-title reveal">Our Partners</h2>
+            <div class="partners-container">
+                <div class="partners-carousel reveal" id="partnersCarousel">
+                    <div class="partner-logo">
+                        <img src="coming-soon.png" alt="Partner 1 Logo">
+                    </div>
+                    <div class="partner-logo">
+                        <img src="coming-soon.png" alt="Partner 2 Logo">
+                    </div>
+                    <div class="partner-logo">
+                        <img src="coming-soon.png" alt="Partner 3 Logo">
+                    </div>
+                    <div class="partner-logo">
+                        <img src="coming-soon.png" alt="Partner 4 Logo">
+                    </div>
+                    <div class="partner-logo">
+                        <img src="coming-soon.png" alt="Partner 5 Logo">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="community" id="community">
         <div class="container">
             <div class="community-container">
@@ -729,7 +1026,7 @@
                         <div class="social-label">Daily Active Users</div>
                     </div>
                     <div class="social-item">
-                        <div class="social-value">10+</div>
+                        <div class="social-value">10+</div> <!-- fixed closing tag -->
                         <div class="social-label">Success Stories</div>
                     </div>
                 </div>
@@ -798,6 +1095,141 @@
 
         // Trigger reveal on page load
         window.addEventListener("load", reveal);
+
+        // Consolidated Partners carousel functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const partnersContainer = document.querySelector('.partners-container');
+            if (!partnersContainer) return;
+            const carousel = partnersContainer.querySelector('#partnersCarousel');
+            if (!carousel) return;
+
+            const originalLogos = Array.from(carousel.children);
+            const count = originalLogos.length;
+
+            if (count > 0) { // Only proceed if there are partners
+                partnersContainer.classList.add('has-fades'); // Always show fades if there are items
+            }
+
+
+            if (count >= 5) {
+                // Duplicate items for seamless looping
+                originalLogos.forEach(item => {
+                    const clone = item.cloneNode(true);
+                    carousel.appendChild(clone);
+                });
+                
+                let isDown = false;
+                let startX;
+                let scrollLeftStart;
+                let velX = 0;
+                let momentumID;
+                let autoScrollSpeed = 0.5; // pixels per frame
+                let autoScrollID;
+                let isHovering = false;
+
+                function startAutoScroll() {
+                    if (isDown || isHovering) return;
+                    if (autoScrollID) clearInterval(autoScrollID);
+                    autoScrollID = setInterval(() => {
+                        if (isDown || isHovering) {
+                            clearInterval(autoScrollID);
+                            return;
+                        }
+                        carousel.scrollLeft += autoScrollSpeed;
+                        // Check if scrolled past the end of the first set of items
+                        if (carousel.scrollLeft >= carousel.scrollWidth / 2) {
+                            carousel.scrollLeft = 0; // Loop back to the beginning
+                        }
+                    }, 16); 
+                }
+
+                function stopAutoScroll() {
+                    clearInterval(autoScrollID);
+                }
+
+                carousel.addEventListener('mouseenter', () => {
+                    isHovering = true;
+                    stopAutoScroll();
+                });
+
+                carousel.addEventListener('mouseleave', () => {
+                    isHovering = false;
+                    if (!isDown) {
+                         startMomentumScroll(); 
+                    }
+                });
+                
+                const onPointerDown = (e) => {
+                    isDown = true;
+                    isHovering = true; 
+                    carousel.style.cursor = 'grabbing';
+                    startX = (e.touches ? e.touches[0].pageX : e.pageX) - carousel.offsetLeft;
+                    scrollLeftStart = carousel.scrollLeft;
+                    stopAutoScroll();
+                    clearInterval(momentumID);
+                    velX = 0; 
+                };
+
+                const onPointerUp = () => {
+                    if (!isDown) return;
+                    isDown = false;
+                    isHovering = false; 
+                    carousel.style.cursor = 'grab';
+                    startMomentumScroll();
+                };
+
+                const onPointerMove = (e) => {
+                    if (!isDown) return;
+                    e.preventDefault(); // Prevent page scroll on touch devices when dragging horizontally
+                    const x = (e.touches ? e.touches[0].pageX : e.pageX) - carousel.offsetLeft;
+                    const walk = (x - startX) * 1.5; 
+                    const newScrollLeft = scrollLeftStart - walk;
+                    velX = newScrollLeft - carousel.scrollLeft; 
+                    carousel.scrollLeft = newScrollLeft;
+                };
+
+                carousel.addEventListener('mousedown', onPointerDown);
+                document.addEventListener('mouseup', onPointerUp);
+                document.addEventListener('mousemove', onPointerMove);
+
+                carousel.addEventListener('touchstart', onPointerDown, { passive: false });
+                document.addEventListener('touchend', onPointerUp);
+                document.addEventListener('touchmove', onPointerMove, { passive: false });
+
+                function startMomentumScroll() {
+                    if (isDown) return; 
+                    stopAutoScroll(); 
+                    clearInterval(momentumID);
+                    momentumID = setInterval(() => {
+                        if (Math.abs(velX) < 0.1 && !isDown) {
+                            clearInterval(momentumID);
+                            if (!isHovering) startAutoScroll(); 
+                            return;
+                        }
+                        carousel.scrollLeft += velX;
+                        velX *= 0.92; 
+                        
+                        // Looping logic for momentum scroll
+                        const halfScrollWidth = carousel.scrollWidth / 2;
+                        if (carousel.scrollLeft >= halfScrollWidth) {
+                            carousel.scrollLeft -= halfScrollWidth; // Loop back
+                        } else if (carousel.scrollLeft < 0) {
+                            carousel.scrollLeft += halfScrollWidth; // Loop forward if scrolled too far left
+                        }
+
+                    }, 16);
+                }
+                
+                startAutoScroll();
+
+            } else if (count > 0) {
+                // Less than 5 partners: center them
+                carousel.style.justifyContent = 'center';
+            } else {
+                // No partners, hide fades
+                partnersContainer.classList.remove('has-fades');
+            }
+        });
     </script>
 </body>
 </html>
