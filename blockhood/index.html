@@ -260,7 +260,7 @@
             left: 0;
             width: 0; /* Start with no width */
             height: 100%;
-            background: linear-gradient(to bottom, var(--primary), var(--accent));
+            background: linear-gradient(to bottom, var (--primary), var (--accent));
             transition: width 0.4s ease; /* Animate width on hover */
             z-index: -1; /* Behind content */
         }
@@ -493,16 +493,9 @@
             padding: 20px 0; /* Padding for items, fades will overlay this */
             user-select: none;
             -webkit-user-select: none;
-            touch-action: pan-x; /* Allow horizontal panning */
-            cursor: grab;
-            /* justify-content will be set by JS if count < 5 */
+            overflow: hidden; /* Crucial: JS will handle all scrolling */
         }
 
-        .partners-carousel:active {
-            cursor: grabbing;
-        }
-        
-        /* Fading edges for the carousel - applied when .js-scroll-active or always if desired */
         .partners-container::before,
         .partners-container::after {
             content: '';
@@ -1096,7 +1089,7 @@
         // Trigger reveal on page load
         window.addEventListener("load", reveal);
 
-        // Consolidated Partners carousel functionality
+        // Consolidated and Refined Partners carousel functionality - DRAG DISABLED
         document.addEventListener('DOMContentLoaded', function() {
             const partnersContainer = document.querySelector('.partners-container');
             if (!partnersContainer) return;
@@ -1104,130 +1097,104 @@
             if (!carousel) return;
 
             const originalLogos = Array.from(carousel.children);
-            const count = originalLogos.length;
+            const itemCount = originalLogos.length;
 
-            if (count > 0) { // Only proceed if there are partners
-                partnersContainer.classList.add('has-fades'); // Always show fades if there are items
+            if (itemCount === 0) {
+                partnersContainer.classList.remove('has-fades');
+                return;
             }
+            
+            partnersContainer.classList.add('has-fades');
+
+            const MIN_ITEMS_FOR_AUTO_SCROLL = 1; // Auto-scroll if there's at least one item, adjust if needed
+            let canAutoScroll = itemCount >= MIN_ITEMS_FOR_AUTO_SCROLL;
 
 
-            if (count >= 5) {
-                // Duplicate items for seamless looping
-                originalLogos.forEach(item => {
+            if (itemCount >= MIN_ITEMS_FOR_AUTO_SCROLL && itemCount < 5) { // If few items but enough to scroll, duplicate to fill for smooth auto-scroll
+                 // Determine how many times to duplicate to ensure smooth scrolling
+                let currentWidth = 0;
+                originalLogos.forEach(logo => currentWidth += logo.offsetWidth + parseInt(getComputedStyle(logo).marginRight) * 2 ); // Rough estimate
+                
+                if (carousel.offsetWidth > 0 && currentWidth < carousel.offsetWidth * 1.5 && currentWidth > 0) { // Only duplicate if needed to fill more than viewport
+                    const numToDuplicate = Math.ceil((carousel.offsetWidth * 1.5) / currentWidth);
+                    for (let i = 0; i < numToDuplicate; i++) {
+                         originalLogos.forEach(item => {
+                            const clone = item.cloneNode(true);
+                            carousel.appendChild(clone);
+                        });
+                    }
+                } else if (currentWidth > 0) { // Default duplication if calculation is tricky or not enough
+                     originalLogos.forEach(item => {
+                        const clone = item.cloneNode(true);
+                        carousel.appendChild(clone);
+                    });
+                }
+                 canAutoScroll = true; // Ensure auto-scroll is enabled
+            } else if (itemCount >= 5) {
+                 originalLogos.forEach(item => {
                     const clone = item.cloneNode(true);
                     carousel.appendChild(clone);
                 });
-                
-                let isDown = false;
-                let startX;
-                let scrollLeftStart;
-                let velX = 0;
-                let momentumID;
-                let autoScrollSpeed = 0.5; // pixels per frame
-                let autoScrollID;
-                let isHovering = false;
-
-                function startAutoScroll() {
-                    if (isDown || isHovering) return;
-                    if (autoScrollID) clearInterval(autoScrollID);
-                    autoScrollID = setInterval(() => {
-                        if (isDown || isHovering) {
-                            clearInterval(autoScrollID);
-                            return;
-                        }
-                        carousel.scrollLeft += autoScrollSpeed;
-                        // Check if scrolled past the end of the first set of items
-                        if (carousel.scrollLeft >= carousel.scrollWidth / 2) {
-                            carousel.scrollLeft = 0; // Loop back to the beginning
-                        }
-                    }, 16); 
-                }
-
-                function stopAutoScroll() {
-                    clearInterval(autoScrollID);
-                }
-
-                carousel.addEventListener('mouseenter', () => {
-                    isHovering = true;
-                    stopAutoScroll();
-                });
-
-                carousel.addEventListener('mouseleave', () => {
-                    isHovering = false;
-                    if (!isDown) {
-                         startMomentumScroll(); 
-                    }
-                });
-                
-                const onPointerDown = (e) => {
-                    isDown = true;
-                    isHovering = true; 
-                    carousel.style.cursor = 'grabbing';
-                    startX = (e.touches ? e.touches[0].pageX : e.pageX) - carousel.offsetLeft;
-                    scrollLeftStart = carousel.scrollLeft;
-                    stopAutoScroll();
-                    clearInterval(momentumID);
-                    velX = 0; 
-                };
-
-                const onPointerUp = () => {
-                    if (!isDown) return;
-                    isDown = false;
-                    isHovering = false; 
-                    carousel.style.cursor = 'grab';
-                    startMomentumScroll();
-                };
-
-                const onPointerMove = (e) => {
-                    if (!isDown) return;
-                    e.preventDefault(); // Prevent page scroll on touch devices when dragging horizontally
-                    const x = (e.touches ? e.touches[0].pageX : e.pageX) - carousel.offsetLeft;
-                    const walk = (x - startX) * 1.5; 
-                    const newScrollLeft = scrollLeftStart - walk;
-                    velX = newScrollLeft - carousel.scrollLeft; 
-                    carousel.scrollLeft = newScrollLeft;
-                };
-
-                carousel.addEventListener('mousedown', onPointerDown);
-                document.addEventListener('mouseup', onPointerUp);
-                document.addEventListener('mousemove', onPointerMove);
-
-                carousel.addEventListener('touchstart', onPointerDown, { passive: false });
-                document.addEventListener('touchend', onPointerUp);
-                document.addEventListener('touchmove', onPointerMove, { passive: false });
-
-                function startMomentumScroll() {
-                    if (isDown) return; 
-                    stopAutoScroll(); 
-                    clearInterval(momentumID);
-                    momentumID = setInterval(() => {
-                        if (Math.abs(velX) < 0.1 && !isDown) {
-                            clearInterval(momentumID);
-                            if (!isHovering) startAutoScroll(); 
-                            return;
-                        }
-                        carousel.scrollLeft += velX;
-                        velX *= 0.92; 
-                        
-                        // Looping logic for momentum scroll
-                        const halfScrollWidth = carousel.scrollWidth / 2;
-                        if (carousel.scrollLeft >= halfScrollWidth) {
-                            carousel.scrollLeft -= halfScrollWidth; // Loop back
-                        } else if (carousel.scrollLeft < 0) {
-                            carousel.scrollLeft += halfScrollWidth; // Loop forward if scrolled too far left
-                        }
-
-                    }, 16);
-                }
-                
-                startAutoScroll();
-
-            } else if (count > 0) {
-                // Less than 5 partners: center them
+                canAutoScroll = true;
+            }
+            else { // Less than MIN_ITEMS_FOR_AUTO_SCROLL and also less than 5
                 carousel.style.justifyContent = 'center';
-            } else {
-                // No partners, hide fades
-                partnersContainer.classList.remove('has-fades');
+                if (carousel.scrollWidth <= carousel.clientWidth) {
+                     partnersContainer.classList.remove('has-fades');
+                }
+                canAutoScroll = false; // Explicitly disable auto-scroll
+                return; 
+            }
+            
+            let isHovering = false;
+            
+            const autoScrollSpeed = 0.5; 
+            let autoScrollIntervalId;
+
+            function stopAutoScroll() {
+                clearInterval(autoScrollIntervalId);
+                autoScrollIntervalId = null;
+            }
+
+            function startAutoScroll() {
+                stopAutoScroll(); 
+                if (!canAutoScroll) return;
+
+                autoScrollIntervalId = setInterval(() => {
+                    carousel.scrollLeft += autoScrollSpeed;
+                    const firstSetWidth = carousel.scrollWidth / (carousel.children.length / originalLogos.length); // Width of one set of original items
+                    if (carousel.scrollLeft >= firstSetWidth) {
+                        carousel.scrollLeft -= firstSetWidth;
+                    }
+                }, 16);
+            }
+            
+            function updateScrollState() {
+                if (!canAutoScroll) {
+                    stopAutoScroll();
+                    return;
+                }
+
+                if (isHovering) {
+                    stopAutoScroll();
+                } else {
+                    startAutoScroll();
+                }
+            }
+
+            carousel.addEventListener('mouseenter', () => {
+                isHovering = true;
+                updateScrollState();
+            });
+
+            carousel.addEventListener('mouseleave', () => {
+                isHovering = false;
+                updateScrollState();
+            });
+
+            // Initial state
+            if (canAutoScroll) {
+                updateScrollState();
             }
         });
     </script>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Galeri — Bevantyo Satria Pinandhita | Vibe Coder</title>
+  <meta name="description" content="Galeri dokumentasi perjalanan Vibe Coder - momen-momen penting dalam pengembangan teknologi, komunitas, dan inovasi." />
+  <meta name="keywords" content="galeri, portfolio, dokumentasi, vibe coder, teknologi, komunitas, inovasi" />
+  <meta name="theme-color" content="#0a0e13" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="assets/fonts/fonts.css" as="style">
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/gallery.css" />
+  <link rel="stylesheet" href="assets/css/gallery-fix.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  
+  <!-- Add direct testing image tags to help gallery.js detect them -->
+  <img data-gallery-hint src="img/1731736478597.jpg" style="display:none;" alt="Gallery hint" />
+  <img data-gallery-hint src="img/1731736512560.jpg" style="display:none;" alt="Gallery hint" />
+  <img data-gallery-hint src="img/1737432761763.jpg" style="display:none;" alt="Gallery hint" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten utama</a>
+  
+  <!-- Header sama seperti homepage -->
+  <header class="site-header" id="top">
+    <div class="container nav-bar">
+      <div class="brand">
+        <span class="logo-cube" aria-hidden="true"></span>
+        <a href="index.html" class="brand-name" data-i18n="brand">Vibe Coder</a>
+      </div>
+      <nav aria-label="Utama">
+        <button class="nav-toggle" aria-expanded="false" aria-label="Toggle navigation">☰</button>
+        <ul class="nav" id="nav-list">
+          <li><a href="index.html#home" data-i18n="nav.home">Beranda</a></li>
+          <li><a href="index.html#projects" data-i18n="nav.projects">Proyek</a></li>
+          <li><a href="index.html#skills" data-i18n="nav.skills">Keahlian</a></li>
+          <li><a href="index.html#experience" data-i18n="nav.experience">Pengalaman</a></li>
+          <li><a href="index.html#awards" data-i18n="nav.awards">Penghargaan</a></li>
+          <li><a href="index.html#publications" data-i18n="nav.publications">Publikasi</a></li>
+          <li><a href="index.html#community" data-i18n="nav.community">Komunitas</a></li>
+          <li><a href="gallery.html" data-i18n="nav.gallery" class="active">Galeri</a></li>
+          <li><a href="index.html#contact" data-i18n="nav.contact">Kontak</a></li>
+        </ul>
+      </nav>
+      <div class="actions">
+        <button id="lang-toggle" class="btn-ghost" aria-label="Switch language">EN</button>
+        <a href="https://www.linkedin.com/in/bevansatria/" class="btn-outline small" data-i18n="cta.linkedin" target="_blank" rel="noopener">Kunjungi LinkedIn</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- Gallery Hero -->
+    <section class="gallery-hero section">
+      <div class="container">
+        <div class="gallery-header" data-reveal>
+          <h1 class="gradient" data-i18n="gallery.title">Galeri</h1>
+          <p class="lead" data-i18n="gallery.subtitle">Koleksi visual yang menangkap momen dan inspirasi dalam perjalanan sebagai Vibe Coder — sebuah kolase modern dari pengalaman teknologi dan kreativitas.</p>
+        </div>
+        
+        <!-- Filter Controls -->
+        <div class="gallery-filters" data-reveal>
+          <button class="filter-btn active" data-filter="all" data-i18n="gallery.filter.all">Semua</button>
+          <button class="filter-btn" data-filter="visual">Visual</button>
+          <button class="filter-btn" data-filter="moments">Moments</button>
+          <button class="filter-btn" data-filter="gallery">Gallery</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Grid -->
+    <section class="gallery-section section">
+      <div class="container">
+        <div id="gallery-grid" class="gallery-grid" data-reveal style="min-height: 400px;">
+          <!-- Images will be loaded dynamically from img folder -->
+          <div class="gallery-loading">
+            <div class="loading-spinner"></div>
+            <p data-i18n="gallery.loading">Memuat galeri...</p>
+          </div>
+          
+          <!-- Direct image test (will be hidden if JS works) -->
+          <div id="direct-test" style="margin-top: 30px; padding: 20px; border: 1px dashed #666; text-align: center;">
+            <h3>Citra langsung (test fallback):</h3>
+            <img src="img/1731736478597.jpg" alt="Test Image 1" style="max-width: 200px; margin: 10px; display: inline-block;">
+            <img src="img/1731736512560.jpg" alt="Test Image 2" style="max-width: 200px; margin: 10px; display: inline-block;">
+            <img src="img/1737432761763.jpg" alt="Test Image 3" style="max-width: 200px; margin: 10px; display: inline-block;">
+            <p><small>Catatan: Bagian ini seharusnya tersembunyi jika galeri berfungsi dengan benar.</small></p>
+            <script>
+              // Hide this test section if gallery loads properly
+              setTimeout(function() {
+                if (document.querySelectorAll('.gallery-item').length > 0) {
+                  document.getElementById('direct-test').style.display = 'none';
+                }
+              }, 2000);
+            </script>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="image-modal" aria-hidden="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <button class="modal-close" aria-label="Tutup modal" onclick="closeImageModal()">&times;</button>
+        <button class="modal-prev" aria-label="Gambar sebelumnya" onclick="showPrevImage()">&#8249;</button>
+        <button class="modal-next" aria-label="Gambar selanjutnya" onclick="showNextImage()">&#8250;</button>
+        <div class="modal-image-container">
+          <img id="modal-image" src="" alt="" />
+          <div class="modal-info">
+            <h3 id="modal-title"></h3>
+            <p id="modal-description"></p>
+            <div id="modal-tags"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Manual modal script as a fallback -->
+    <script>
+      // Global variables for modal control
+      let currentImageIndex = 0;
+      let allModalImages = [];
+      
+      // Functions to control modal display
+      function openImageModal(index) {
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-image');
+        
+        // Get all images if not already loaded
+        if (allModalImages.length === 0) {
+          document.querySelectorAll('.gallery-image').forEach(img => {
+            allModalImages.push(img.src);
+          });
+        }
+        
+        // Set current index and image
+        currentImageIndex = index;
+        if (allModalImages[currentImageIndex]) {
+          modalImg.src = allModalImages[currentImageIndex];
+        }
+        
+        // Show modal
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+      
+      function closeImageModal() {
+        const modal = document.getElementById('image-modal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+      
+      function showPrevImage() {
+        currentImageIndex = (currentImageIndex - 1 + allModalImages.length) % allModalImages.length;
+        document.getElementById('modal-image').src = allModalImages[currentImageIndex];
+      }
+      
+      function showNextImage() {
+        currentImageIndex = (currentImageIndex + 1) % allModalImages.length;
+        document.getElementById('modal-image').src = allModalImages[currentImageIndex];
+      }
+      
+      // Register global openModal function to be compatible with gallery.js
+      window.openModal = openImageModal;
+      
+      // Add keyboard navigation
+      document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('image-modal');
+        if (!modal.classList.contains('active')) return;
+        
+        switch (e.key) {
+          case 'Escape':
+            closeImageModal();
+            break;
+          case 'ArrowLeft':
+            showPrevImage();
+            break;
+          case 'ArrowRight':
+            showNextImage();
+            break;
+        }
+      });
+      
+      // Close modal when clicking backdrop
+      document.querySelector('.modal-backdrop')?.addEventListener('click', closeImageModal);
+    </script>
+  </main>
+
+  <!-- Footer sama seperti homepage -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="foot-brand">
+        <span class="logo-cube" aria-hidden="true"></span>
+        <strong>Vibe Coder</strong>
+        <p>&copy; <span id="year"></span> Bevantyo Satria Pinandhita</p>
+      </div>
+      <ul class="foot-links">
+        <li><a href="index.html#projects" data-i18n="nav.projects">Proyek</a></li>
+        <li><a href="index.html#skills" data-i18n="nav.skills">Keahlian</a></li>
+        <li><a href="index.html#experience" data-i18n="nav.experience">Pengalaman</a></li>
+        <li><a href="gallery.html" data-i18n="nav.gallery">Galeri</a></li>
+        <li><a href="index.html#contact" data-i18n="nav.contact">Kontak</a></li>
+      </ul>
+      <div class="foot-social">
+        <a href="https://github.com/Vanszs" aria-label="GitHub"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.1-1.2-1.4-1.2-1.4-1-.7.1-.7.1-.7 1.1.1 1.6 1.1 1.6 1.1 1 .1.7 1.8 2.9 1.3.1-.7.4-1.1.7-1.3-2.5-.3-5.2-1.3-5.2-5.8 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.3 11.3 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.2 5.8.4.3.8.9.8 1.9v2.8c0 .3.2.7.8.6A10.9 10.9 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg></a>
+        <a href="https://www.linkedin.com/in/bevansatria/" aria-label="LinkedIn"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5.001 2.5 2.5 0 0 0 0-5ZM3 9h4v12H3V9Zm7.5 0h3.8v1.7h.1c.5-.9 1.8-1.9 3.7-1.9 4 0 4.7 2.6 4.7 6V21h-4v-5c0-1.2 0-2.8-1.7-2.8-1.7 0-2 1.3-2 2.7V21h-4V9Z"/></svg></a>
+        <a href="mailto:bevansatriaa@gmail.com" aria-label="Email">✉</a>
+      </div>
+      <div class="foot-meta">
+        <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Ensure the scripts are loaded correctly -->
+  <script>
+    // Debug script to help diagnose issues
+    console.log('Debug: Page init started');
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log('Debug: DOM loaded');
+    });
+    
+    // Pre-define the image list to ensure gallery works
+    window.GALLERY_IMAGE_LIST = ["1731736478597.jpg","1731736512560.jpg","1737432761763.jpg"];
+  </script>
+  <script src="assets/js/shared.js"></script>
+  <script src="assets/js/gallery.js"></script>
+  <script src="assets/js/gallery-fix.js"></script>
+  <script>
+    // Verify scripts loaded
+    console.log('Debug: All scripts loaded');
+    
+    // Force gallery load after a delay
+    setTimeout(function() {
+      console.log('Debug: Forcing gallery reload');
+      if (typeof loadImagesFromFolder === 'function') {
+        loadImagesFromFolder();
+      } else {
+        console.error('Debug: loadImagesFromFolder not found!');
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

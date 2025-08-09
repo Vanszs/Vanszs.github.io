@@ -1,0 +1,216 @@
+PORTFOLIO BUILD CONTEXT — AI AGENT BRIEF
+Owner: Bevantyo Satria Pinandhita
+Primary Brand: “Vibe Coder” — creative builder with strong technical fundamentals
+Primary Language: Indonesian (default) | Secondary: English (optional switch)
+Location: Surabaya, East Java, Indonesia
+Primary Email: bevansatriaa@gmail.com
+Alternate Email: bevansatria@gmail.com
+Phone/WA: +62 853-8156-8989
+LinkedIn: https://www.linkedin.com/in/bevansatria/
+GitHub:  https://github.com/Vanszs
+
+GOAL
+Build a modern, fast, accessible personal portfolio website that positions Bevantyo as:
+1) AI/ML & IoT practitioner, 2) Blockchain/Smart-Contract developer, 3) Flutter/Full-Stack engineer,
+4) Web3 community builder. Emphasize “Vibe Coder”: creativity + strong technical fundamentals.
+Outcome: convince recruiters/clients to contact, download CV, and view 3–6 best projects.
+
+AUDIENCE
+• Tech recruiters (AI/ML, Mobile/Full-Stack, Blockchain) • Startup founders/CTOs • Web3 communities • Academia
+
+CORE BRAND & VOICE
+• Tagline: “Vibe Coder | AI & Blockchain Innovator | IoT Engineer | Web3 Community Builder — with strong technical fundamentals.”
+• Voice: confident, helpful, impact-driven, jargon seperlunya, fokus pada hasil dan fundamental.
+• Differentiator: mampu membangun dari konsep (algoritma, arsitektur, keamanan) sampai produk (UI/UX, devops, komunitas).
+
+DESIGN & TECH REQUIREMENTS
+• Stack (preferred): Next.js (App Router) + React + TypeScript + Tailwind CSS + shadcn/ui + Framer Motion.
+• Quality: Lighthouse ≥ 95 Performance/SEO/Accessibility/Best Practices.
+• Accessibility: WCAG 2.1 AA; semantic HTML; keyboard-navigable; aria-labels; color-contrast OK.
+• Performance: Image optimization, font optimization, code-splitting, lazy-loading, prefetching routes.
+• SEO: metadata, JSON-LD (Person, Article/Project), sitemap.xml, robots.txt, OpenGraph/Twitter cards.
+• i18n: ID default, EN optional (simple toggle). If time-limited, ship ID first; EN later.
+• Deploy Target: Vercel (preferred). Add analytics (Vercel Analytics or Umami) without cookies if possible.
+• Forms: Contact form → email (Formspree / Resend). Include spam protection (honeypot or basic challenge).
+
+SITE MAP & NAV
+/ (Home) | /about | /skills | /projects | /experience | /awards | /publications | /community (optional) | /contact
+Footer: social links, email, GitHub, LinkedIn, CV download (PDF), small legal links (Privacy, Terms).
+
+HOME (HERO)
+• Headline: “Vibe Coder dengan fundamental teknis yang kuat.”
+• Subheadline (2–3 kalimat): AI/ML, Blockchain, IoT, Flutter/Full-Stack; from concept to production; community-minded.
+• Primary CTAs: “Lihat Proyek”, “Unduh CV”, “Hubungi Saya”.
+• Trust signals: logos kecil (UPN Veteran Jatim, Bangkit Academy, Surabaya Gov, Seeds Finance, CARV, Venimee, Blockhood).
+
+ABOUT
+• Short bio (ID): Bevantyo Satria Pinandhita adalah Vibe Coder — developer yang menggabungkan kreativitas, disiplin teknik, dan rasa ingin tahu. Berpengalaman membangun solusi AI/ML (computer vision, optimization), blockchain (smart contracts), dan IoT (LEWS), serta menggerakkan komunitas Web3. Kuat di fundamental (algoritma & struktur data, arsitektur sistem, keamanan API), hingga implementasi penuh (Flutter/Next.js, DevOps, observability).
+
+SKILLS (grouped to show fundamentals first)
+• Fundamentals: Algoritma & Struktur Data; Sistem Terdistribusi; Arsitektur IoT; API Security (JWT, HMAC-SHA256); CI/CD.
+• AI/ML & Data: TensorFlow, YOLOv5, Evolutionary Strategies, CV/NLP basics, Jetson Nano, TFLite.
+• Blockchain: Solidity, Smart Contracts, Diamante SDK; Rust (Solana migration); dApps.
+• Development: Flutter, Next.js, React, Node.js/Express, REST, Mapbox, Chart.js, Docker, GitHub Actions.
+• Mobile: Flutter (Provider, BLoC, Riverpod).
+• Web: Next.js/React, Tailwind, shadcn/ui, Vercel, MySQL.
+• Community & Leadership: Discord/Telegram moderation, AMA, event mgmt, partnership building.
+Optional UI: skill badges, grouping, and mini-proof items (e.g., “CI/CD: GitHub Actions”).
+
+EXPERIENCE (HAMS bullets; avoid duplication; dates are Month/Year range)
+1) Solo Flutter & Full-Stack Developer — Pemerintah Kota Surabaya (07/2025)
+   - Built 2 Flutter apps in 14 days using AI pair (ChatGPT, Copilot); accelerated release by 60%.
+   - Next.js admin dashboard with secure REST APIs & RBAC; ensured correct role-based access.
+   - Real-time sync improved data latency by ~60%; GitHub Actions cut deploy time by ~40%; zero post-release crashes.
+   Stack: Flutter, Next.js, REST, RBAC, GitHub Actions.
+
+2) Flutter Developer & IoT Intern — PT IGS Indonesia Group (01/2025–07/2025)
+   - Landslide Early Warning System (LEWS) for BPBD Jombang: Flutter app integrated with IoT sensors.
+   - Built React/Next.js dashboard (JWT auth, Mapbox, Chart.js), enabling real-time monitoring of field sensors.
+   - Designed cost-aware IoT architecture (< Rp10 juta) with rain gauge, soil moisture, MPU-9250, LILYGO LoRa32, GSM SIM800L, solar 20Wp.
+   - Implemented Node.js/Express backend with HMAC-SHA256 + JWT; specified functional/non-functional/system requirements.
+   Stack: Flutter, Next.js/React, Node/Express, Mapbox, Chart.js, JWT, HMAC, LoRa, GSM, Solar.
+
+3) Blockchain Developer — Arcalis AI (12/2024–05/2025)
+   - Delivered Solidity smart contracts; led end-to-end technical execution to deployment.
+   - Designed Rust-based Solana migration contracts to improve scalability/performance.
+   Stack: Solidity, Rust, Solana, dApp patterns.
+
+4) Blockchain Developer Intern — Seeds Finance (12/2024–04/2025)
+   - Built decentralized marketplace on Diamante: NFT minting, listing, buying/selling.
+   - Contract testing and optimization for secure, efficient flows.
+   Stack: Diamante SDK, Solidity/Go/JS (as applicable).
+
+5) Blockchain Developer — Seeds Finance (12/2024–Present)
+   - NFT solutions integrated with front-end; performance analysis and debugging for high-volume tx.
+   - Code optimizations reduced latency (approx. 15%).
+
+6) Community Manager & Developer Mentor — Blockhood (04/2025–Present)
+   - Moderation, mentorship, AMA/workshops; clarified learning paths for newcomers; reduced need for core dev involvement.
+
+7) Head Moderator — Venimee Discord/YouTube (04/2024–Present)
+   - Led moderation team; bots & guidelines; partnerships/events; streamlined internal comms.
+   - For metrics not confirmed, use placeholders (e.g., “↑ engagement by X%”).
+
+8) Community Lead — Seeds Finance (12/2024–04/2025)
+   - Partnerships with Web3 communities (rev-share); multilingual content; community AMAs; mentor junior moderators.
+
+9) Community Moderator — CARV (12/2023–Present)
+   - Weekly events & competitions; increased participation/retention (CV states +40% Discord, +25% MoM interactions); handled ~100 support tickets/month.
+
+10) President — Autonomous Team, Robotics Community UPN Veteran Jatim (11/2022–11/2024)
+   - Led ASV projects; 2nd place at KKCTBN 2023 & KKI 2024.
+   - Navigation improvements (sensors: LIDAR/GPS/camera if appropriate) and reliability ↑ ~25% (use cautious, non-fabricated wording).
+   - Managed cross-discipline team; iterative field tests; documentation.
+
+11) Event Coordinator Program Kerja & Research Staff — BEM Fasilkom UPNVJT (2023–Apr 2024)
+   - EO Chairman “Fasilkom Talk #4” (offline, AI & Data Science): curated speakers, ran logistics, fostered learning outcomes.
+   - Vice Event Coordinator “Loka Karya” (Python & Machine Learning): ensured seamless flow and engagement.
+   - EO Chairman “Fasilkom Talk #3” (online): coordinated end-to-end, facilitated insightful discussions.
+   Skills used: project management, communication, event planning, technical knowledge (AI/DS).
+
+EDUCATION
+• UPN “Veteran” Jawa Timur — B.Comp.Sc., Computer Science (2022–2026)
+• Universitas Terbuka — B.Management (07/2024–Present)
+
+CERTIFICATIONS
+• IT Specialist — Artificial Intelligence, Certiport (Credential ID: 7768.23-TCC-BONE)
+
+AWARDS
+• 2nd Place — Robotics National Competition KKCTBN 2023 (ASV)
+• 2nd Place — Robotics National Competition KKI 2024 (ASV)
+
+PUBLICATIONS (with links)
+• 2024 — Exploring the Potential of Hybrid Whale Optimization Algorithm: A Literature Review — IEEE
+  https://ieeexplore.ieee.org/abstract/document/10845319
+• 2023 — Food Optimizing for Patients with Kidney Failure Using Evolution Strategies Algorithm — IEEE
+  https://ieeexplore.ieee.org/document/10420404/
+• 2023 — Optimizing Chicken Feed Using Evolution Strategies (ES) Algorithm — ITT Purwokerto
+  https://journal.ittelkom-pwt.ac.id/index.php/ledger/article/view/1280
+
+PROJECTS (write each as a case study with Problem → Action → Metrics → Stack → Links)
+1) LEWS — Landslide Early Warning System (PT IGS Indonesia Group, 2025)
+   Problem: early warning & monitoring in low-signal areas; budget constraints.
+   Action: Flutter app; React/Next.js dashboard (Mapbox/Chart.js, JWT); Node/Express backend (HMAC+JWT); IoT (rain gauge, soil moisture, MPU-9250), LoRa/GSM, solar power; requirement analysis docs.
+   Metrics: mention real-time monitoring; budget < Rp10 juta; reliability in field tests (avoid making up numbers).
+   Stack: Flutter, Next.js, Node, JWT/HMAC, LoRa, GSM, Solar.
+
+2) IoT-based Computer Vision for SMEs (Bangkit Capstone, 2024)
+   Problem: manual quality control and counting inefficiencies.
+   Action: Jetson Nano, TensorFlow Lite, YOLOv5; low-end optimized CV pipeline; dashboard monitoring integration.
+   Metrics: CV states “improve operational efficiency”; if numbers not verified, keep generic.
+   Stack: Jetson Nano, TFLite, YOLOv5, Python.
+
+3) Decentralized NFT Marketplace (Seeds Finance, 2024–2025)
+   Problem: need secure, efficient NFT mint/list/trade on Diamante.
+   Action: contracts + integration; testing & gas/latency optimizations (only state what’s in CV).
+   Metrics: qualitative outcomes; avoid novel numbers.
+   Stack: Diamante SDK, Solidity/Go/JS (as applicable).
+
+4) Autonomous Surface Vessel — Robotics (UPNVJT, 2023–2024)
+   Problem: robust autonomous navigation & obstacle avoidance for competition missions.
+   Action: system integration (mechanical/electrical/software), navigation tuning; iterative testing; documentation.
+   Metrics: 2nd place KKCTBN 2023 & KKI 2024.
+   Stack: C++/Python (as applicable), embedded systems, sensors.
+
+5) Government Apps + Admin Dashboard (Pemkot Surabaya, 2025)
+   Problem: fast rollout of mobile services and secure admin operations.
+   Action: 2 Flutter apps in 14 days; Next.js dashboard with RBAC; CI/CD with GitHub Actions.
+   Metrics: 4.8/5 user rating; +60% sync speed; -40% deployment time; zero crashes.
+   Stack: Flutter, Next.js, REST/RBAC, GitHub Actions.
+
+6) Community Growth & Automation (Venimee/CARV/Blockhood, 2023–Present)
+   Problem: scale engagement, moderation efficiency, education.
+   Action: SOPs for mods, content calendar, AMAs/workshops, bot configs.
+   Metrics: use CARV-provided figures (+40% retention, +25% MoM interactions, ~100 tickets/month). For others: placeholders if unknown.
+   Stack: Discord/Telegram tools, dashboards, content ops.
+
+COPYWRITING SNIPPETS (ID)
+• Hero: “Saya Bevantyo, Vibe Coder dengan fundamental teknis yang kuat. Saya membangun solusi AI/ML, blockchain, dan IoT — dari konsep sampai produksi — serta menggerakkan komunitas Web3.”
+• CTA: “Lihat Proyek”, “Unduh CV”, “Hubungi Saya”
+• Contact Tagline: “Mari membangun sesuatu dari dasar — dengan rapi, cepat, dan berdampak.”
+
+SEO METADATA
+• Site Title: “Bevantyo Satria Pinandhita — Vibe Coder | AI • Blockchain • IoT”
+• Meta Description: “Vibe Coder dengan fundamental teknis kuat. Portofolio AI/ML, Blockchain/Smart Contract, IoT, Flutter/Full-Stack, dan Community Building.”
+• Keywords: vibe coder, AI engineer, machine learning, computer vision, blockchain developer, smart contract, flutter developer, next.js developer, iot engineer, web3 community.
+
+VISUAL DIRECTION (suggested)
+• Colors: Neutral base (zinc/stone) + Accent electric blue or emerald; high contrast for accessibility.
+• Typography: Headings — Inter/Plus Jakarta Sans; Body — Inter/General Sans; Monospace — JetBrains Mono.
+• Motion: subtle micro-interactions (Framer Motion), reduced-motion respect for a11y.
+
+COMPONENTS TO INCLUDE
+• Hero with gradient/mesh, Project Cards, Experience Timeline, Skills Grid, Publication List, Award Badges, Testimonial Carousel (optional), Contact Form, Footer with social.
+• Project page template with problem/action/metrics/stack/links gallery.
+
+DATA MODEL (optional JSON/YAML structure if agent wants CMS-less content)
+person.json:
+{
+  "name":"Bevantyo Satria Pinandhita",
+  "tagline":"Vibe Coder with strong technical fundamentals",
+  "location":"Surabaya, Indonesia",
+  "email_primary":"bevansatriaa@gmail.com",
+  "email_alt":"bevansatria@gmail.com",
+  "phone":"+6285381568989",
+  "links":{"linkedin":"https://linkedin.com/in/bevansatria","github":"https://github.com/Vanszs"}
+}
+projects.json: [ { "slug":"lews-igs-2025", "title":"Landslide Early Warning System", "role":"Flutter Dev & IoT Intern", "org":"PT IGS Indonesia Group", "year":"2025", "problem":"...", "action":"...", "metrics":"...", "stack":["Flutter","Next.js","Node","JWT","HMAC","LoRa","GSM","Solar"], "links":{} }, ... ]
+
+ANALYTICS & TELEMETRY
+• Use privacy-friendly analytics (no cookies where possible). Provide opt-out per privacy policy.
+• Track clicks on CTAs, project views, CV downloads.
+
+LEGAL
+• Simple Privacy Policy (no tracking beyond anonymous analytics) and Terms (informational site).
+
+DELIVERABLES
+1) Production-ready Next.js project (TypeScript + Tailwind + shadcn/ui).
+2) Content filled from this brief; placeholders where metrics are not verified.
+3) i18n ready (ID primary); SEO + a11y checks passed.
+4) Deployment config for Vercel; README with run/build steps.
+5) Export static as fallback (optional).
+
+NOTES / CONSTRAINTS
+• Do NOT fabricate metrics. Use only what’s stated above; where unsure, leave “[TBD]” placeholders.
+• Avoid mentioning sponsorship/funding unless confirmed. (User clarified: no sponsor for robotics.)
+• Keep “Vibe Coder” & “strong technical fundamentals” as repeating theme across pages.
