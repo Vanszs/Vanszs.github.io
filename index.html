@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -21,25 +21,25 @@
     <div class="container nav-bar">
       <div class="brand">
         <span class="logo-cube" aria-hidden="true"></span>
-        <a href="#home" class="brand-name" data-i18n="brand">Vibe Coder</a>
+  <a href="#home" class="brand-name" data-i18n="brand"></a>
       </div>
       <nav aria-label="Utama">
         <button class="nav-toggle" aria-expanded="false" aria-label="Toggle navigation">☰</button>
         <ul class="nav" id="nav-list">
-          <li><a href="#home" data-i18n="nav.home">Beranda</a></li>
-          <li><a href="#projects" data-i18n="nav.projects">Proyek</a></li>
-          <li><a href="#skills" data-i18n="nav.skills">Keahlian</a></li>
-          <li><a href="#experience" data-i18n="nav.experience">Pengalaman</a></li>
-          <li><a href="#awards" data-i18n="nav.awards">Penghargaan</a></li>
-          <li><a href="#publications" data-i18n="nav.publications">Publikasi</a></li>
-          <li><a href="#community" data-i18n="nav.community">Komunitas</a></li>
-          <li><a href="gallery.html" data-i18n="nav.gallery">Galeri</a></li>
-          <li><a href="#contact" data-i18n="nav.contact">Kontak</a></li>
+          <li><a href="#home" data-i18n="nav.home">Home</a></li>
+          <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
+          <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
+          <li><a href="#experience" data-i18n="nav.experience">Experience</a></li>
+          <li><a href="#awards" data-i18n="nav.awards">Awards</a></li>
+          <li><a href="#publications" data-i18n="nav.publications">Publications</a></li>
+          <li><a href="#community" data-i18n="nav.community">Community</a></li>
+          <li><a href="gallery.html" data-i18n="nav.gallery">Gallery</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
       </nav>
       <div class="actions">
-        <button id="lang-toggle" class="btn-ghost" aria-label="Switch language">EN</button>
-        <a href="https://www.linkedin.com/in/bevansatria/" class="btn-outline small" data-i18n="cta.linkedin" target="_blank" rel="noopener">Kunjungi LinkedIn</a>
+  <!-- Language toggle removed per request (default English only) -->
+        <a href="https://www.linkedin.com/in/bevansatria/" class="btn-outline small" data-i18n="cta.linkedin" target="_blank" rel="noopener">Visit LinkedIn</a>
       </div>
     </div>
   </header>
@@ -48,26 +48,74 @@
     <!-- HERO -->
     <section id="home" class="hero section">
       <div class="container hero-grid">
-        <div class="hero-text">
-          <h1 class="gradient" data-i18n="hero.title">Saya Bevantyo, Vibe Coder dengan fundamental teknis yang kuat.</h1>
-          <p class="lead" data-i18n="hero.subtitle">Saya membangun solusi AI/ML, blockchain, dan IoT — dari konsep sampai produksi — serta menggerakkan komunitas Web3.</p>
-          <div class="hero-cta">
-            <a href="#projects" class="btn-primary" data-i18n="cta.projects">Lihat Proyek</a>
-            <a href="#contact" class="btn-secondary" data-i18n="cta.contact">Hubungi Saya</a>
-            <a href="https://www.linkedin.com/in/bevansatria/" class="btn-ghost" data-i18n="cta.linkedin" target="_blank" rel="noopener">Kunjungi LinkedIn</a>
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="status-dot"></span>
+            Available for collaborations
           </div>
-          <ul class="trust-logos" aria-label="Kepercayaan / kolaborasi">
-            <li title="UPN Veteran Jatim">UPN</li>
-            <li>Bangkit</li>
-            <li>Surabaya</li>
-            <li>Seeds</li>
-            <li>CARV</li>
-            <li>Venimee</li>
-            <li>Blockhood</li>
-          </ul>
+          <h1 class="gradient" data-i18n="hero.title">Bevantyo Satria</h1>
+          <p class="hero-role">Vibe Coder • Technical Innovator</p>
+          <p class="lead" data-i18n="hero.subtitle">Specializing in AI/ML, Blockchain Smart Contracts, Flutter & Next.js Development, IoT Systems, Penetration Testing, and Web3 Community Leadership.</p>
+          
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-number">15+</span>
+              <span class="stat-label">Projects</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">5+</span>
+              <span class="stat-label">Tech Stacks</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">3</span>
+              <span class="stat-label">Publications</span>
+            </div>
+          </div>
+          
+          <div class="hero-cta">
+            <a href="#projects" class="btn-primary" data-i18n="cta.projects">
+              <span>Explore Projects</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m9 18 6-6-6-6"/>
+              </svg>
+            </a>
+            <a href="#contact" class="btn-secondary" data-i18n="cta.contact">Get In Touch</a>
+          </div>
+          
+          <div class="hero-social">
+            <a href="https://github.com/Vanszs" aria-label="GitHub" class="social-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.1-1.2-1.4-1.2-1.4-1-.7.1-.7.1-.7 1.1.1 1.6 1.1 1.6 1.1 1 .1.7 1.8 2.9 1.3.1-.7.4-1.1.7-1.3-2.5-.3-5.2-1.3-5.2-5.8 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.3 11.3 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.2 5.8.4.3.8.9.8 1.9v2.8c0 .3.2.7.8.6A10.9 10.9 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
+              </svg>
+            </a>
+            <a href="https://www.linkedin.com/in/bevansatria/" aria-label="LinkedIn" class="social-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4.98 3.5a2.5 2.5 0 1 0 0 5.001 2.5 2.5 0 0 0 0-5ZM3 9h4v12H3V9Zm7.5 0h3.8v1.7h.1c.5-.9 1.8-1.9 3.7-1.9 4 0 4.7 2.6 4.7 6V21h-4v-5c0-1.2 0-2.8-1.7-2.8-1.7 0-2 1.3-2 2.7V21h-4V9Z"/>
+              </svg>
+            </a>
+            <a href="mailto:bevansatriaa@gmail.com" aria-label="Email" class="social-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </a>
+          </div>
         </div>
-        <div class="hero-art">
-          <canvas id="orb-canvas" aria-hidden="true"></canvas>
+        
+        <div class="hero-visual">
+          <div class="hero-image-card">
+            <div class="tech-orbit">
+              <div class="orbit-item orbit-1">AI</div>
+              <div class="orbit-item orbit-2">Blockchain</div>
+              <div class="orbit-item orbit-3">Flutter</div>
+              <div class="orbit-item orbit-4">IoT</div>
+              <div class="orbit-item orbit-5">PenTest</div>
+            </div>
+            <div class="center-avatar">
+              <div class="avatar-ring"></div>
+              <div class="avatar-content">BC</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -75,8 +123,8 @@
     <!-- PROJECTS -->
     <section id="projects" class="section" data-section>
       <div class="container section-head">
-        <h2 data-i18n="section.projects">Proyek Terpilih</h2>
-        <p class="section-sub" data-i18n="section.projects.desc">Studi kasus dengan fokus pada Problem → Action → Metrics → Stack.</p>
+  <h2 data-i18n="section.projects">Selected Projects</h2>
+  <p class="section-sub" data-i18n="section.projects.desc">Case studies focused on Problem → Action → Metrics → Stack.</p>
       </div>
       <div id="projects-grid" class="cards-grid" aria-live="polite"></div>
     </section>
@@ -84,8 +132,8 @@
     <!-- SKILLS -->
     <section id="skills" class="section" data-section>
       <div class="container section-head">
-        <h2 data-i18n="section.skills">Keahlian & Fundamental</h2>
-        <p class="section-sub" data-i18n="section.skills.desc">Menekankan fundamental kuat & breadth lintas stack.</p>
+  <h2 data-i18n="section.skills">Skills & Fundamentals</h2>
+  <p class="section-sub" data-i18n="section.skills.desc">Emphasizing strong fundamentals & breadth across the stack.</p>
       </div>
       <div id="skills-grid" class="skill-groups"></div>
     </section>
@@ -93,8 +141,8 @@
     <!-- EXPERIENCE -->
     <section id="experience" class="section" data-section>
       <div class="container section-head">
-        <h2 data-i18n="section.experience">Pengalaman</h2>
-        <p class="section-sub" data-i18n="section.experience.desc">Ringkas (HAMS): Highlight, Action, Metrics, Stack.</p>
+  <h2 data-i18n="section.experience">Experience</h2>
+  <p class="section-sub" data-i18n="section.experience.desc">Concise (HAMS): Highlight, Action, Metrics, Stack.</p>
       </div>
       <div class="timeline" id="experience-timeline" aria-live="polite"></div>
     </section>
@@ -102,7 +150,7 @@
     <!-- AWARDS -->
     <section id="awards" class="section" data-section>
       <div class="container section-head">
-        <h2 data-i18n="section.awards">Penghargaan</h2>
+  <h2 data-i18n="section.awards">Awards</h2>
       </div>
       <ul id="awards-list" class="badge-list"></ul>
     </section>
@@ -110,7 +158,7 @@
     <!-- PUBLICATIONS -->
     <section id="publications" class="section" data-section>
       <div class="container section-head">
-        <h2 data-i18n="section.publications">Publikasi</h2>
+  <h2 data-i18n="section.publications">Publications</h2>
       </div>
       <ol id="pub-list" class="pub-list"></ol>
     </section>
@@ -118,7 +166,7 @@
     <!-- COMMUNITY -->
     <section id="community" class="section" data-section>
       <div class="container section-head">
-        <h2 data-i18n="section.community">Komunitas & Kepemimpinan</h2>
+  <h2 data-i18n="section.community">Community & Leadership</h2>
       </div>
       <div id="community-cards" class="cards-grid"></div>
     </section>
@@ -126,45 +174,36 @@
     <!-- CONTACT -->
     <section id="contact" class="section" data-section>
       <div class="container section-head">
-        <h2 data-i18n="section.contact">Kontak</h2>
-        <p class="section-sub" data-i18n="contact.tagline">Mari membangun sesuatu dari dasar — dengan rapi, cepat, dan berdampak.</p>
+  <h2 data-i18n="section.contact">Contact</h2>
+  <p class="section-sub" data-i18n="contact.tagline">Let's build from first principles—clean, fast, and impactful.</p>
       </div>
-      <div class="container contact-grid">
-        <form id="contact-form" class="contact-form" action="https://formspree.io/f/your-id" method="POST" novalidate>
-          <div class="field">
-            <label for="name" data-i18n="form.name">Nama</label>
-            <input id="name" name="name" type="text" required placeholder="Nama Anda" />
+      <div class="container contact-grid contact-list">
+        <div class="contact-card hero-contact" data-reveal>
+          <h3>Get in Touch</h3>
+          <p class="contact-intro">Open to impactful collaborations in AI, Blockchain / Smart Contracts, Flutter & Next.js, IoT / CV, and security assessments (PenTest). Prefer concise, action‑oriented communication.</p>
+          <div class="contact-pill-group">
+            <a class="contact-pill" href="mailto:bevansatriaa@gmail.com" aria-label="Primary email">bevansatriaa@gmail.com</a>
+            <a class="contact-pill" href="mailto:bevansatria@gmail.com" aria-label="Alternate email">bevansatria@gmail.com</a>
+            <a class="contact-pill" href="https://www.linkedin.com/in/bevansatria/" target="_blank" rel="noopener" aria-label="LinkedIn profile">LinkedIn</a>
+            <a class="contact-pill" href="https://github.com/Vanszs" target="_blank" rel="noopener" aria-label="GitHub profile">GitHub</a>
+            <a class="contact-pill" href="https://wa.me/6285381568989" target="_blank" rel="noopener" aria-label="WhatsApp chat">WhatsApp</a>
           </div>
-          <div class="field">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" required placeholder="email@domain.com" />
-          </div>
-          <div class="field honeypot" aria-hidden="true">
-            <label for="hp">Jangan diisi</label>
-            <input id="hp" name="_gotcha" tabindex="-1" autocomplete="off" />
-          </div>
-          <div class="field">
-            <label for="message" data-i18n="form.message">Pesan</label>
-            <textarea id="message" name="message" rows="5" required placeholder="Tulis pesan Anda..."></textarea>
-          </div>
-          <button class="btn-primary" type="submit" data-i18n="form.send">Kirim</button>
-          <p id="form-status" role="status" class="form-status" aria-live="polite"></p>
-        </form>
-        <div class="contact-side">
-          <div class="contact-card">
+        </div>
+        <div class="contact-cards">
+          <div class="contact-card" data-reveal>
             <h3>Email</h3>
             <a href="mailto:bevansatriaa@gmail.com">bevansatriaa@gmail.com</a><br />
             <a href="mailto:bevansatria@gmail.com">bevansatria@gmail.com</a>
           </div>
-          <div class="contact-card">
+          <div class="contact-card" data-reveal>
             <h3>LinkedIn</h3>
             <a href="https://www.linkedin.com/in/bevansatria/" target="_blank" rel="noopener">linkedin.com/in/bevansatria</a>
           </div>
-          <div class="contact-card">
+          <div class="contact-card" data-reveal>
             <h3>GitHub</h3>
             <a href="https://github.com/Vanszs" target="_blank" rel="noopener">github.com/Vanszs</a>
           </div>
-          <div class="contact-card">
+          <div class="contact-card whatsapp" data-reveal>
             <h3>WhatsApp</h3>
             <a href="https://wa.me/6285381568989" target="_blank" rel="noopener">+62 853-8156-8989</a>
           </div>
@@ -181,11 +220,11 @@
         <p>&copy; <span id="year"></span> Bevantyo Satria Pinandhita</p>
       </div>
       <ul class="foot-links">
-        <li><a href="#projects" data-i18n="nav.projects">Proyek</a></li>
-        <li><a href="#skills" data-i18n="nav.skills">Keahlian</a></li>
-        <li><a href="#experience" data-i18n="nav.experience">Pengalaman</a></li>
-        <li><a href="gallery.html" data-i18n="nav.gallery">Galeri</a></li>
-        <li><a href="#contact" data-i18n="nav.contact">Kontak</a></li>
+  <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
+  <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
+  <li><a href="#experience" data-i18n="nav.experience">Experience</a></li>
+  <li><a href="gallery.html" data-i18n="nav.gallery">Gallery</a></li>
+  <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
       </ul>
       <div class="foot-social">
         <a href="https://github.com/Vanszs" aria-label="GitHub"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.1-1.2-1.4-1.2-1.4-1-.7.1-.7.1-.7 1.1.1 1.6 1.1 1.6 1.1 1 .1.7 1.8 2.9 1.3.1-.7.4-1.1.7-1.3-2.5-.3-5.2-1.3-5.2-5.8 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.3 11.3 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.2 5.8.4.3.8.9.8 1.9v2.8c0 .3.2.7.8.6A10.9 10.9 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg></a>

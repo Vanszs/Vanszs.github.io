@@ -15,19 +15,19 @@ const projects = [
     title: 'Landslide Early Warning System',
     org: 'PT IGS Indonesia Group',
     role: 'Flutter Dev & IoT Intern',
-    problem: 'Early warning & monitoring di area sinyal rendah + constraint biaya.',
-    action: 'Flutter app; dashboard Next.js (Mapbox/Chart.js, JWT); backend Node/Express (HMAC+JWT); IoT sensor (rain gauge, soil moisture, MPU-9250), LoRa/GSM, solar.',
-    metrics: 'Monitoring real-time; budget < Rp10 juta; reliability teruji (placeholder).',
+    problem: 'Low-signal area monitoring & early warning under budget constraints.',
+    action: 'Flutter app; Next.js dashboard (Mapbox/Chart.js, JWT); Node/Express API (HMAC+JWT); multi-sensor IoT (rain gauge, soil moisture, MPU-9250), LoRa/GSM, solar.',
+    metrics: 'Real-time telemetry; budget < Rp10M; field reliability (in progress).',
     stack: ['Flutter','Next.js','Node','JWT','HMAC','LoRa','GSM','Solar']
   },
   {
     slug: 'gov-apps-dashboard',
     title: 'Government Apps & Admin Dashboard',
-    org: 'Pemerintah Kota Surabaya',
+    org: 'Surabaya City Government',
     role: 'Solo Flutter & Full-Stack Developer',
-    problem: 'Perlu rilis cepat layanan mobile & operasi admin yang aman.',
-    action: 'Bangun 2 aplikasi Flutter dalam 14 hari + dashboard admin Next.js (RBAC, REST, real-time sync) + CI/CD GitHub Actions.',
-    metrics: 'Percepatan rilis ~60%, deployment time -40%, zero crash pasca rilis.',
+    problem: 'Need rapid delivery of mobile services & secure admin operations.',
+    action: 'Built 2 Flutter apps in 14 days + Next.js admin (RBAC, REST, real-time sync) + GitHub Actions CI/CD.',
+    metrics: '~60% faster release, -40% deployment time, zero post‑launch crashes.',
     stack: ['Flutter','Next.js','REST','RBAC','GitHub Actions']
   },
   {
@@ -35,9 +35,9 @@ const projects = [
     title: 'IoT-based Computer Vision for SMEs',
     org: 'Bangkit Capstone',
     role: 'ML & Embedded',
-    problem: 'Quality control manual lambat / tidak efisien.',
-    action: 'Jetson Nano + YOLOv5 + TFLite; pipeline CV ringan; integrasi dashboard monitoring.',
-    metrics: 'Efisiensi operasional meningkat (qualitative).',
+    problem: 'Manual quality control slow & inefficient.',
+    action: 'Jetson Nano + YOLOv5 + TFLite lightweight CV pipeline; dashboard integration.',
+    metrics: 'Operational efficiency improvement (qualitative).',
     stack: ['Jetson Nano','YOLOv5','TFLite','Python']
   },
   {
@@ -45,9 +45,9 @@ const projects = [
     title: 'Decentralized NFT Marketplace',
     org: 'Seeds Finance',
     role: 'Blockchain Dev',
-    problem: 'Kebutuhan mint/list/trade NFT aman & efisien di Diamante.',
-    action: 'Smart contract + integrasi; testing & optimisasi gas/latensi.',
-    metrics: 'Outcome kualitatif (tanpa angka baru).',
+    problem: 'Need secure & efficient NFT mint/list/trade flows on Diamante.',
+    action: 'Smart contracts + integration; gas/latency optimization; extensive testing.',
+    metrics: 'Qualitative adoption (metrics forthcoming).',
     stack: ['Diamante SDK','Solidity','JavaScript']
   },
   {
@@ -55,9 +55,9 @@ const projects = [
     title: 'Arcalis AI Hackathon dApp',
     org: 'Arcalis AI',
     role: 'Blockchain Developer',
-    problem: 'Membangun prototipe dApp dengan smart contract Solidity terintegrasi penuh dalam waktu terbatas (hackathon).',
-    action: 'Rancang & implementasi kontrak; integrasi front-end Web3 (wallet connect, transaksi); desain arah migrasi Solana (Rust).',
-    metrics: 'Prototipe Web3 end-to-end berfungsi; integrasi penuh meski tidak menang hackathon.',
+    problem: 'Deliver end‑to‑end dApp prototype with full smart contract integration in limited hackathon time.',
+    action: 'Designed & implemented Solidity contracts; Web3 front-end integration (wallet connect, tx); outlined Solana (Rust) migration.',
+    metrics: 'Functional end‑to‑end prototype delivered within deadline.',
     stack: ['Solidity','Web3.js','Rust (Solana)','dApp']
   },
   {
@@ -65,69 +65,101 @@ const projects = [
     title: 'Autonomous Surface Vessel',
     org: 'Robotics UPNVJT',
     role: 'Team Lead',
-    problem: 'Navigasi otonom & obstacle avoidance untuk kompetisi.',
-    action: 'Integrasi sistem; tuning navigasi; iterasi pengujian; dokumentasi.',
+    problem: 'Autonomous navigation & obstacle avoidance for competition.',
+    action: 'System integration; navigation tuning; iterative testing & documentation.',
     metrics: '2nd place KKCTBN 2023 & KKI 2024.',
     stack: ['C++','Python','Embedded','Sensors']
   }
 ];
 
 const skills = [
-  { group: 'Fundamental', items: ['Algoritma & Struktur Data','Sistem Terdistribusi','Arsitektur IoT','API Security (JWT, HMAC)','CI/CD'] },
+  { group: 'Fundamentals', items: ['Algorithms & Data Structures','Distributed Systems','IoT Architecture','API Security (JWT, HMAC)','CI/CD'] },
   { group: 'AI / ML & Data', items: ['TensorFlow','YOLOv5','Evolutionary Strategies','Computer Vision','Jetson Nano','TFLite'] },
   { group: 'Blockchain', items: ['Solidity','Smart Contracts','Diamante SDK','Rust (Solana)','dApps'] },
   { group: 'Development', items: ['Flutter','Next.js','React','Node.js','Express','REST','Docker','GitHub Actions'] },
   { group: 'Mobile / Web', items: ['Flutter (Provider/BLoC/Riverpod)','Tailwind','MySQL','Mapbox','Chart.js'] },
-  { group: 'Community', items: ['Moderation','AMA','Workshops','Partnership Building'] }
+  { group: 'Community & Leadership', items: ['Event Management (Fasilkom Talk #3 & #4)','Workshop Coordination (Loka Karya Python/ML)','Team Leadership (ASV 2 Years)','Community Moderation','AMAs & Partnerships'] },
+  // Penetration Testing moved to bottom and will be centered
+  { group: 'Penetration Testing', items: ['Nmap','SQLMap','Burp Suite','Nuclei','HTTPx','Metasploit','FFuf','OWASP ZAP'] }
 ];
 
 const experience = [
-  { role: 'Solo Flutter & Full-Stack Developer', org: 'Pemerintah Kota Surabaya', date: '07/2025', stack: 'Flutter, Next.js, REST, RBAC, GitHub Actions', bullets: [
-    'Bangun 2 app Flutter dalam 14 hari (pair dengan AI); percepat rilis ~60%.',
-    'Dashboard admin Next.js (RBAC, REST APIs) + real-time sync.',
-    'CI/CD (GitHub Actions) turunkan waktu deploy ~40%; zero crash pasca rilis.'
+  { role: 'Solo Flutter Developer', org: 'Surabaya City Government', date: '07/2025', stack: 'Flutter, Riverpod, REST, FCM', bullets: [
+    'Built two production Flutter apps in 14 days leveraging AI pair tools (Copilot / ChatGPT).',
+    'Implemented Material Design 3 dark/light theming + Lottie; achieved 4.8/5 pilot rating.',
+    'Offline‑first architecture (Riverpod + local cache) for resilience under weak connectivity.',
+    'Real‑time sync (REST + Socket.IO) cutting perceived data latency ~60%.',
+    'Push notifications (FCM) and QA checklist delivered zero‑crash initial release.'
   ]},
-  { role: 'Flutter Developer & IoT Intern', org: 'PT IGS Indonesia Group', date: '01/2025–07/2025', stack: 'Flutter, Next.js, Node, Mapbox, Chart.js, JWT, HMAC, LoRa, GSM, Solar', bullets: [
-    'LEWS: Integrasi sensor (rain gauge, soil moisture, MPU-9250) + LoRa/GSM + solar 20Wp.',
-    'Dashboard Web (Mapbox, Chart.js) realtime; backend Node/Express (HMAC + JWT).',
-    'Rancang arsitektur IoT biaya < Rp10 juta.'
+  { role: 'Solo Full‑Stack Web Developer', org: 'Surabaya City Government', date: '07/2025', stack: 'Next.js, TypeScript, MySQL, CI/CD', bullets: [
+    'Shipped full admin dashboard (Next.js App Router + TS) solo in 2 weeks.',
+    'Designed secure REST APIs (MySQL + bcrypt + HMAC-signed sessions).',
+    'Implemented RBAC (4 roles) + audit logging for governance & traceability.',
+    'Added real‑time stats refresh + FCM notifications for operational visibility.',
+    'Automated build/test/deploy via GitHub Actions reducing release time ~40%.'
   ]},
-  { role: 'Blockchain Developer', org: 'Arcalis AI', date: '12/2024–05/2025', stack: 'Solidity, Rust, Solana, dApp patterns', bullets: [
-    'Hackathon: deliver smart contracts & integrasi Web3 end-to-end (wallet connect, tx).',
-    'Desain migrasi Solana (Rust) sebagai opsi skalabilitas; prototipe siap iterasi.'
+  { role: 'Flutter Developer & IoT Intern', org: 'PT IGS Indonesia Group', date: '01/2025–Present', stack: 'Flutter, Next.js, Node, LoRa, GSM', bullets: [
+    'Developed landslide early warning mobile app with real‑time sensor visualization.',
+    'Integrated multi‑sensor LEWS stack (rain gauge, soil moisture, MPU‑9250) via secure API.',
+    'Built dashboard (Mapbox + Chart.js) & Node/Express backend (HMAC + JWT).',
+    'Designed cost‑efficient solar + LoRa/GSM architecture (< Rp10M constraint).'
   ]},
-  { role: 'Blockchain Developer Intern', org: 'Seeds Finance', date: '12/2024–04/2025', stack: 'Diamante SDK, Solidity/Go/JS', bullets: [
-    'Marketplace NFT: mint, listing, jual/beli.',
-    'Testing & optimisasi kontrak.'
+  { role: 'AI Engineer', org: 'Arcalis AI', date: '01/2025–05/2025', stack: 'GPT, DeepSeek, OpenAI APIs', bullets: [
+    'Integrated and orchestrated GPT / DeepSeek models for product features.',
+    'Fine‑tuned / parameter‑optimized models improving relevance & latency.',
+    'Unified OpenAI & OpenRouter API flows for maintainable inference pipeline.'
   ]},
-  { role: 'Blockchain Developer', org: 'Seeds Finance', date: '12/2024–Present', stack: 'Solidity, Integrations', bullets: [
-    'Integrasi NFT + front-end; optimisasi performa (latency -15%).'
+  { role: 'Blockchain Developer (Hackathon)', org: 'Arcalis AI', date: '12/2024–05/2025', stack: 'Solidity, Web3.js, Rust (Solana)', bullets: [
+    'Authored Solidity contracts (core logic, events, access control) from scratch.',
+    'Delivered end‑to‑end dApp prototype (wallet connect + tx flow) within hackathon window.',
+    'Outlined Solana (Rust) migration path for scalability considerations.'
   ]},
-  { role: 'Community Manager & Developer Mentor', org: 'Blockhood', date: '04/2025–Present', stack: 'Moderation, Mentorship', bullets: [
-    'Moderasi, mentorship, AMA/workshops; perjelas learning path; kurangi beban core dev.'
+  { role: 'Blockchain Developer Intern', org: 'Seeds Finance', date: '12/2024–02/2025', stack: 'Diamante SDK, Solidity, NFT', bullets: [
+    'Implemented NFT marketplace primitives: mint, list, trade with thorough tests.',
+    'Optimized gas & latency on critical execution paths.',
+    'Integrated contract modules with front‑end for improved UX performance.'
   ]},
-  { role: 'Head Moderator', org: 'Venimee Discord/YouTube', date: '04/2024–Present', stack: 'Community Ops', bullets: [
-    'Pimpin tim moderator; bot & guideline; partnership & event.',
-    '↑ engagement (placeholder X%).'
+  { role: 'Community Lead', org: 'Seeds Finance', date: '12/2024–04/2025', stack: 'Discord, Telegram, Partnerships', bullets: [
+    'Established revenue‑sharing partnerships across Web3 communities.',
+    'Published consistent multilingual updates driving engagement.',
+    'Facilitated discussions to build trust & collaborative culture.'
   ]},
-  { role: 'Community Moderator', org: 'CARV', date: '12/2023–Present', stack: 'Community Ops', bullets: [
-    'Weekly event & kompetisi; +40% retention Discord, +25% MoM interaction.',
-    '~100 tiket support/bulan.'
+  { role: 'Digital Marketing Specialist', org: 'Seeds Finance', date: '12/2024–04/2025', stack: 'Content Ops, Market Research', bullets: [
+    'Maintained question bank ensuring accuracy & zero critical errors.',
+    'Produced bi‑weekly English & Indonesian market insight articles.',
+    'Supported awareness campaigns with timely market / stock updates.'
   ]},
-  { role: 'President', org: 'Autonomous Team Robotics UPN Veteran Jatim', date: '11/2022–11/2024', stack: 'Robotics, Navigation', bullets: [
-    'Lead ASV projects; 2nd place KKCTBN 2023 & KKI 2024.',
-    'Peningkatan reliability ~25% (frasa hati-hati).'  
+  { role: 'Head Moderator', org: 'Venimee (Discord / YouTube)', date: '06/2024–Present', stack: 'Community Ops, Team Leadership', bullets: [
+    'Scaled community from zero with structured engagement workflows.',
+    'Recruited & trained moderator team; defined clear operational roles.',
+    'Negotiated partnership opportunities aligned to growth goals.',
+    'Owned governance: structure, culture, daily operational decisions.'
   ]},
-  { role: 'Event Coordinator & Research Staff', org: 'BEM Fasilkom UPNVJT', date: '2023–04/2024', stack: 'Event, AI/DS', bullets: [
-    'EO “Fasilkom Talk #4” (offline AI & DS); kurasi speaker & logistik.',
-    'Vice “Loka Karya” (Python & ML).',
-    'EO “Fasilkom Talk #3” (online) end-to-end.'
+  { role: 'Community Moderator', org: 'CARV', date: '12/2023–05/2025', stack: 'Events, Support, Moderation', bullets: [
+    'Hosted events & competitions increasing interaction (internal metrics).',
+    'Resolved ~100 monthly support tickets ensuring user continuity.',
+    'Collaborated cross‑team to elevate engagement & retention.'
+  ]},
+  { role: 'Machine Learning Cohort', org: 'Bangkit Academy', date: '08/2024–12/2024', stack: 'Python, TensorFlow, CV, IoT', bullets: [
+    'Completed intensive curriculum (Python, TensorFlow, Generative AI, GANs).',
+    'Deployed IoT‑based CV system (qualitative accuracy improvement).',
+    'Contributed to data collection, model optimization & embedded integration.'
+  ]},
+  { role: 'Autonomous Team President', org: 'Robotics Community UPN Veteran Jatim', date: '11/2022–11/2024', stack: 'Robotics, Navigation', bullets: [
+    'Led ASV team to 2nd place KKCTBN 2023 & KKI 2024.',
+    'Coordinated cross‑discipline integration & iterative field testing.',
+    'Documented processes improving reliability & knowledge transfer.'
+  ]},
+  { role: 'Research & Event Leadership', org: 'BEM Fasilkom UPNVJT', date: '2023–04/2024', stack: 'Event Mgmt, Education', bullets: [
+    'Chaired Fasilkom Talk #4 (AI & DS) & #3 (online) end‑to‑end.',
+    'Vice coordinator for "Loka Karya" Python & ML workshop.',
+    'Consolidated research/event planning workflows for repeatability.'
   ]}
 ];
 
 const awards = [
-  '2nd Place KKCTBN 2023 (ASV)',
-  '2nd Place KKI 2024 (ASV)'
+  '2nd Place KKCTBN 2023 (ASV) — Team Lead',
+  '2nd Place KKI 2024 (ASV) — Team Lead'
 ];
 
 const publications = [
@@ -137,9 +169,13 @@ const publications = [
 ];
 
 const community = [
-  { title: 'Seeds Finance Community Lead', desc: 'Partnership Web3, konten multibahasa, AMA, mentoring moderator junior.' },
-  { title: 'Venimee Head Moderator', desc: 'Optimasi moderation, event, partnership, content calendar.' },
-  { title: 'Blockhood Mentor', desc: 'Mentorship developer, AMA, workshop technical.' }
+  { title: 'Seeds Finance Community Lead', desc: 'Structured partnerships & multilingual updates; drove engagement & mentor support.' },
+  { title: 'Seeds Finance Digital Marketing', desc: 'Maintained question bank & bi‑weekly insight posts supporting awareness growth.' },
+  { title: 'Venimee Head Moderator', desc: 'Built & led moderation team; events, partnerships, governance & daily ops.' },
+  { title: 'CARV Community Moderator', desc: 'Handled events, competitions & ~100 monthly support inquiries (continuity & retention).' },
+  { title: 'Blockhood Mentor', desc: 'Guided dev learning, AMAs & technical workshop facilitation.' },
+  { title: 'Autonomous Team President (Robotics)', desc: 'Led ASV team to multiple podiums; coordinated cross‑discipline integration.' },
+  { title: 'Research & Events (BEM Fasilkom)', desc: 'Chaired tech talks & workshops; standardized planning workflows.' }
 ];
 
 // Render helpers
@@ -152,23 +188,35 @@ const pubList = qSel('#pub-list');
 const communityCards = qSel('#community-cards');
 
 function renderProjects(){
-  projectsGrid.innerHTML = projects.map(p=>`<article class="card" data-reveal>
-    <h3>${p.title}</h3>
-    <p><strong>${p.org}</strong> • ${p.role}</p>
-    <p>${p.problem}</p>
-    <p><em>Aksi:</em> ${p.action}</p>
-    <p><em>Hasil:</em> ${p.metrics}</p>
-    <div class="stack">${p.stack.map(s=>`<span class="badge">${s}</span>`).join('')}</div>
-  </article>`).join('');
+  // Switch layout to subcard style similar to experience
+  projectsGrid.classList.remove('cards-grid');
+  projectsGrid.classList.add('exp-grid');
+  projectsGrid.innerHTML = projects.map(p=>`<div class="subcard" data-reveal>
+    <div class="role">${p.title}</div>
+    <div class="meta">${p.org} • ${p.role}</div>
+    <ul class="kvs">
+      <li>${p.problem}</li>
+      <li>${p.action}</li>
+      <li>${p.metrics}</li>
+    </ul>
+    <div class="stack" style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.4rem;">${p.stack.map(s=>`<span class="badge">${s}</span>`).join('')}</div>
+  </div>`).join('');
 }
 function renderSkills(){
-  skillsGrid.innerHTML = skills.map(g=>`<div class="skill-group" data-reveal><h3>${g.group}</h3><div class="skill-tags">${g.items.map(i=>`<span class="tag">${i}</span>`).join('')}</div></div>`).join('');
+  // Penetration Testing now same size; just keep order with it last
+  skillsGrid.innerHTML = skills.map(g=>
+    `<div class="skill-group" data-reveal><h3>${g.group}</h3><div class="skill-tags">${g.items.map(i=>`<span class="tag">${i}</span>`).join('')}</div></div>`
+  ).join('');
 }
 function renderExperience(){
-  timelineEl.innerHTML = experience.map(item=>`<div class="timeline-item" data-reveal>
-    <h3>${item.role} — <span style="color:#60a5fa">${item.org}</span></h3>
-    <div class="meta">${item.date} · ${item.stack}</div>
-    <ul>${item.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+  // Replace timeline styling with grid subcards
+  timelineEl.classList.remove('timeline');
+  timelineEl.classList.add('exp-grid');
+  timelineEl.innerHTML = experience.map(item=>`<div class="subcard" data-reveal>
+    <div class="role">${item.role}</div>
+    <div class="meta">${item.org} • ${item.date}</div>
+    <ul class="kvs">${item.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+    <div style="margin-top:4px;font-size:0.65rem;letter-spacing:0.05em;color:var(--text-muted);">${item.stack}</div>
   </div>`).join('');
 }
 function renderAwards(){
@@ -280,58 +328,54 @@ if (form) {
   });
 }
 
-// Enhanced language toggle with smooth transitions
-const langToggle = qSel('#lang-toggle');
-let currentLang = 'id';
+// Language fixed to English
+let currentLang = 'en';
 
 // Simple i18n dictionary (can be expanded)
 const translations = {
-  id: {
-    'brand': 'Vibe Coder',
-    'hero.title': 'Saya Bevantyo, Vibe Coder dengan fundamental teknis yang kuat.',
-    'hero.subtitle': 'Saya membangun solusi AI/ML, blockchain, dan IoT — dari konsep sampai produksi — serta menggerakkan komunitas Web3.',
-    'cta.projects': 'Lihat Proyek',
-    'cta.contact': 'Hubungi Saya',
-    'cta.cv': 'Unduh CV'
-  },
   en: {
     'brand': 'Vibe Coder',
+    'nav.home': 'Home',
+    'nav.projects': 'Projects',
+    'nav.skills': 'Skills',
+    'nav.experience': 'Experience',
+    'nav.awards': 'Awards',
+    'nav.publications': 'Publications',
+    'nav.community': 'Community',
+    'nav.gallery': 'Gallery',
+    'nav.contact': 'Contact',
     'hero.title': 'I\'m Bevantyo, Vibe Coder with strong technical fundamentals.',
-    'hero.subtitle': 'I build AI/ML, blockchain, and IoT solutions — from concept to production — while fostering Web3 communities.',
+  'hero.subtitle': 'AI & Blockchain Engineer • Smart Contracts & PenTest • Flutter & Next.js Full-Stack • IoT & Computer Vision • Web3 Community Builder.',
     'cta.projects': 'View Projects',
     'cta.contact': 'Contact Me',
-    'cta.cv': 'Download CV'
+    'cta.cv': 'Download CV',
+    'cta.linkedin': 'Visit LinkedIn',
+    'section.projects': 'Selected Projects',
+    'section.projects.desc': 'Case studies focused on Problem → Action → Metrics → Stack.',
+    'section.skills': 'Skills & Fundamentals',
+    'section.skills.desc': 'Emphasizing strong fundamentals & breadth across the stack.',
+    'section.experience': 'Experience',
+    'section.experience.desc': 'Concise (HAMS): Highlight, Action, Metrics, Stack.',
+    'section.awards': 'Awards',
+    'section.publications': 'Publications',
+    'section.community': 'Community & Leadership',
+    'section.contact': 'Contact',
+    'contact.tagline': "Let's build from first principles—clean, fast, and impactful.",
+    'form.name': 'Name',
+    'form.message': 'Message',
+    'form.send': 'Send'
   }
 };
 
-function updateLanguage(lang) {
+function updateLanguage() {
   const elements = document.querySelectorAll('[data-i18n]');
   elements.forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (translations[lang] && translations[lang][key]) {
-      el.textContent = translations[lang][key];
-    }
+    if (translations.en[key]) el.textContent = translations.en[key];
   });
+  document.documentElement.lang = 'en';
 }
-
-langToggle?.addEventListener('click', () => {
-  currentLang = currentLang === 'id' ? 'en' : 'id';
-  langToggle.textContent = currentLang === 'id' ? 'EN' : 'ID';
-  document.documentElement.lang = currentLang;
-  updateLanguage(currentLang);
-  
-  // Save preference
-  localStorage.setItem('preferred-language', currentLang);
-});
-
-// Load saved language preference
-const savedLang = localStorage.getItem('preferred-language');
-if (savedLang && savedLang !== currentLang) {
-  currentLang = savedLang;
-  langToggle.textContent = currentLang === 'id' ? 'EN' : 'ID';
-  document.documentElement.lang = currentLang;
-  updateLanguage(currentLang);
-}
+updateLanguage();
 
 // Enhanced Canvas animation with better performance
 function initOrb(){

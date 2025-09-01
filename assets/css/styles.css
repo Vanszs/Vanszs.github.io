@@ -34,6 +34,22 @@
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --font-heading: "Plus Jakarta Sans", var(--font-sans);
+  /* Spacing scale */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  /* Layout tokens */
+  --space-section-y: clamp(3.5rem, 8vh, 6.5rem);
+  --space-section-y-sm: clamp(2.5rem, 6vh, 4.5rem);
+  --space-hero-min: calc(100vh - 72px);
+  --space-card: clamp(1.25rem, 1.5vw, 2rem);
+  --space-card-tight: clamp(1rem, 1vw, 1.25rem);
+  --space-form: clamp(1.75rem, 2.5vw, 2.5rem);
 }
 
 * { 
@@ -121,15 +137,17 @@ button {
 }
 
 /* Layout utilities */
-.section { 
-  padding: clamp(4rem, 8vh, 8rem) 0; 
+.section {
+  padding: var(--space-section-y) 0;
   position: relative;
 }
 
-.container { 
-  width: min(1280px, 95%); 
-  margin: 0 auto; 
-  padding: 0 1rem;
+.container {
+  /* Centered fluid container with gentle max width and balanced side gutters */
+  width: 100%;
+  max-width: 1220px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 3.5rem);
 }
 
 /* Enhanced Navigation */
@@ -368,9 +386,12 @@ button {
 }
 
 /* Enhanced Hero Section */
-.hero { 
-  min-height: calc(100vh - 72px); 
-  display: flex; 
+.hero {
+  /* Allow hero to breathe a bit while aligning with section rhythm */
+  min-height: var(--space-hero-min);
+  padding-top: calc(var(--space-section-y) / 2);
+  padding-bottom: calc(var(--space-section-y) / 2);
+  display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
@@ -530,11 +551,85 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 }
 
-.card { 
+/* New experience / project compact grid (inspired by reference layout) */
+.exp-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 860px) {
+  .exp-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.subcard {
+  background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-card-tight);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  transition: var(--transition-base);
+}
+
+.subcard:hover {
+  border-color: var(--border-glow);
+  background: linear-gradient(145deg, var(--bg-soft), var(--bg-card));
+  box-shadow: var(--shadow);
+}
+
+.subcard .role, .subcard h3 {
+  font-size: 0.975rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.subcard .meta { 
+  color: var(--text-muted); 
+  font-size: 0.7rem; 
+  letter-spacing: 0.05em; 
+  text-transform: uppercase; 
+  font-weight: 500; 
+  margin: 0 0 0.25rem;
+}
+
+.kvs, .subcard ul { /* key value style list */
+  margin: 0.25rem 0 0 1.05rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.kvs li, .subcard li {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+  position: relative;
+}
+
+.kvs li::marker, .subcard li::marker { color: var(--accent-light); }
+
+/* Constrain inner section content to improve side breathing space */
+#projects-grid,
+#experience-timeline,
+#skills-grid,
+#awards-list,
+#pub-list,
+#community-cards,
+.contact-grid { 
+  max-width: 1100px; 
+  margin-inline: auto;
+}
+
+.card {
   background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 2rem;
+  padding: var(--space-card);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -624,11 +719,11 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 }
 
-.skill-group { 
+.skill-group {
   background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-card-tight);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -711,13 +806,13 @@ button {
   border-radius: 1px;
 }
 
-.timeline-item { 
-  list-style: none; 
+.timeline-item {
+  list-style: none;
   position: relative;
   background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem 1.5rem 1.5rem 2.5rem;
+  padding: var(--space-card-tight) var(--space-card-tight) var(--space-card-tight) calc(var(--space-card-tight) + 1rem);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -841,6 +936,7 @@ button {
   gap: 1.5rem;
   max-width: 800px;
   margin: 0 auto;
+  list-style: none; /* hide default ol numbering to avoid double numbers */
 }
 
 .pub-list li { 
@@ -899,11 +995,90 @@ button {
   align-items: start;
 }
 
-.contact-form { 
+/* Unified contact layout - all cards same size and consistent positioning */
+.contact-list { 
+  display: grid; 
+  gap: 1.5rem; 
+  grid-template-columns: 1fr;
+}
+
+/* Hero contact card spans full width on mobile, integrates into grid on desktop */
+.hero-contact { grid-column: 1 / -1; }
+.contact-intro { font-size: 0.85rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 1rem; }
+
+.contact-pill-group { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.contact-pill {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 0.55rem 0.9rem;
+  border-radius: 1000px;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--transition-base);
+}
+.contact-pill:hover { background: var(--bg-soft); border-color: var(--border-glow); color: var(--text-dim); transform: translateY(-2px); }
+
+/* Unified contact cards grid - ensures all cards have consistent sizing */
+.contact-cards { 
+  display: grid; 
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 880px) {
+  .contact-list {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+  }
+  
+  /* Hero contact spans top row */
+  .hero-contact { 
+    grid-column: 1 / -1; 
+    grid-row: 1;
+  }
+  
+  /* Contact cards grid in unified layout */
+  .contact-cards { 
+    grid-column: 1 / -1;
+    grid-row: 2;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 0;
+  }
+  
+  .contact-cards .contact-card.whatsapp { 
+    grid-column: 2; 
+  }
+}
+
+/* Skills layout: center Penetration Testing below Mobile/Web */
+@media (min-width: 1000px) {
+  .skill-groups { 
+    grid-template-columns: repeat(3, 1fr); 
+  }
+  .skill-group:nth-child(7) { /* Penetration Testing (7th item) */
+    grid-column: 2; 
+    grid-row: 3;
+  }
+}
+
+@media (max-width: 879px) {
+  .contact-list { 
+    grid-template-columns: 1fr; 
+  }
+  
+  .contact-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-form {
   background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 2.5rem;
+  padding: var(--space-form);
   display: grid;
   gap: 1.5rem;
   position: relative;
@@ -977,14 +1152,18 @@ button {
   align-content: start;
 }
 
-.contact-card { 
+.contact-card {
   background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-card-tight);
   transition: var(--transition-base);
   position: relative;
   overflow: hidden;
+  min-height: 120px; /* Ensures consistent card heights */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .contact-card::before {
@@ -1026,10 +1205,10 @@ button {
 }
 
 /* Enhanced Footer */
-.site-footer { 
+.site-footer {
   border-top: 1px solid var(--border);
   background: linear-gradient(145deg, var(--bg), var(--bg-alt));
-  padding: 3rem 0 3.5rem;
+  padding: var(--space-2xl) 0 calc(var(--space-2xl) + 0.5rem);
   font-size: 0.875rem;
   color: var(--text-muted);
   position: relative;
@@ -1162,11 +1341,11 @@ button {
 
 @media (max-width: 768px) {
   .container {
-    width: min(1280px, 90%);
+  padding-inline: clamp(1rem, 5vw, 2rem);
   }
   
   .section {
-    padding: clamp(2.5rem, 5vh, 4rem) 0;
+    padding: var(--space-section-y-sm) 0;
   }
   
   .nav { 
@@ -1249,7 +1428,7 @@ button {
   }
   
   .container {
-    padding: 0 0.75rem;
+  padding-inline: clamp(0.75rem, 6vw, 1.25rem);
   }
   
   .hero-text h1 {
@@ -1264,8 +1443,9 @@ button {
   .skill-group,
   .contact-form,
   .contact-card {
-    padding: 1.25rem;
+    padding: var(--space-card-tight);
   }
+  .subcard { padding: var(--space-card-tight); }
   
   .timeline-item {
     margin-left: 1.5rem;
