@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blackjack Probability Coach</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121931;
+      --muted: #95a1c3;
+      --text: #eaf0ff;
+      --accent: #7c9cff;
+      --accent-2: #4ee0c1;
+      --danger: #ff6b6b;
+      --warn: #ffd166;
+      --ok: #4cd97b;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 10% -10%, #1b2250 0%, var(--bg) 45%),
+                  radial-gradient(1000px 600px at 110% 10%, #092031 0%, transparent 60%);
+      color: var(--text);
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 28px 18px 64px; }
+    header { display:flex; gap:16px; align-items:center; margin-bottom: 18px; }
+    .logo {
+      width:48px; height:48px; border-radius:14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow);
+    }
+    h1 { font-size: clamp(20px, 3.6vw, 34px); margin:0; letter-spacing:.3px; }
+    .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+    .grid { display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.05));
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: var(--radius);
+            padding: 16px; box-shadow: var(--shadow); backdrop-filter: blur(6px); }
+    .card h2 { font-size: 16px; margin: 0 0 10px; letter-spacing:.2px; color:#dfe7ff; }
+
+    .row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+    .row > * { flex: 1 1 auto; }
+
+    .pill { display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius: 14px; border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.04); color:#e8eeff; font-size: 13px; }
+    .pill .small { color: var(--muted); font-size: 12px; }
+
+    .control { display:flex; flex-direction:column; gap:6px; min-width: 120px; }
+    label { font-size: 12px; color: var(--muted); }
+    select, input[type="number"], input[type="text"] {
+      width:100%; padding: 10px 12px; border-radius: 12px; border:1px solid rgba(255,255,255,.12);
+      background: rgba(9, 14, 30, .55); color: var(--text); outline:none; transition: .2s border;
+    }
+    select:focus, input:focus { border-color: var(--accent); }
+
+    .switch { display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+    .switch input { display:none; }
+    .knob { width:46px; height:26px; background: #0e1733; border-radius:99px; border:1px solid rgba(255,255,255,.14); position:relative; transition:.2s background, .2s border-color; }
+    .knob::after { content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#c7d3ff; transition:.25s left, .25s background; }
+    .switch input:checked + .knob { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; }
+    .switch input:checked + .knob::after { left:25px; background:white; }
+
+    .chips { display:flex; flex-wrap: wrap; gap:8px; }
+    .chip { padding: 10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); cursor: pointer; user-select:none; transition:.2s transform, .2s background;
+      font-weight:600; min-width:42px; text-align:center; }
+    .chip:hover { transform: translateY(-1px); background: rgba(255,255,255,.07); }
+    .chip.primary { background: linear-gradient(180deg, rgba(124,156,255,.2), rgba(78,224,193,.15)); border-color: transparent; }
+
+    .tag { padding:2px 8px; border-radius: 999px; font-size: 12px; color:#081020; font-weight:700; display:inline-block; }
+    .tag.ok { background: var(--accent-2); }
+    .tag.warn { background: var(--warn); }
+    .tag.bad { background: var(--danger); }
+
+    .section { margin-top: 16px; }
+
+    .hand { display:flex; gap:8px; align-items:center; flex-wrap: wrap; }
+    .cardui { width:46px; height:64px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(160deg, #16224a, #0f1936); display:grid; place-items:center; box-shadow: var(--shadow);
+      font-weight: 700; font-size: 18px; }
+
+    .kpi { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+    @media (max-width: 720px) { .kpi { grid-template-columns:1fr; } }
+    .kpi .item { background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 12px; }
+    .kpi .item .val { font-size: 20px; font-weight: 800; margin-top: 2px; }
+    .muted { color: var(--muted); }
+
+    .bars { display:flex; flex-direction:column; gap:8px; }
+    .bar { width:100%; height:14px; background: rgba(255,255,255,.06); border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,.1); }
+    .bar > span { display:block; height:100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width:0%; transition: width .6s cubic-bezier(.2,.7,.1,1); }
+
+    .ev-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+    @media (max-width: 980px) { .ev-grid { grid-template-columns: 1fr; } }
+    .ev { background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 12px; }
+    .ev h3 { margin:0 0 4px; font-size: 14px; color:#dfe7ff; display:flex; align-items:center; justify-content: space-between; }
+    .ev .evv { font-size: 22px; font-weight: 800; }
+
+    .btn { padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color: var(--text); cursor:pointer; transition:.2s transform, .2s background; }
+    .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.1); }
+    .btn.ghost { background: transparent; }
+    .btn.accent { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color:#081020; font-weight:800; }
+
+    .footer { margin-top:18px; color: var(--muted); font-size: 12px; text-align:center; }
+
+    .fadein { animation: fade .5s ease both; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo"></div>
+      <div>
+        <h1>Blackjack Probability Coach</h1>
+        <div class="sub">Single‑file tool to compute EVs, bust chances, dealer distributions & smart advice. Educational use only.</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Left Column: Controls and Hand Builder -->
+      <section class="card fadein">
+        <h2>Game Settings</h2>
+        <div class="row">
+          <div class="control">
+            <label>Decks</label>
+            <select id="decks">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8" selected>8</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Blackjack Payout</label>
+            <select id="bjpayout">
+              <option value="1.5" selected>3:2</option>
+              <option value="1.2">6:5</option>
+            </select>
+          </div>
+          <div class="control">
+            <label class="switch"> <input type="checkbox" id="h17" /> <span class="knob"></span> Dealer hits soft 17 (H17)</label>
+          </div>
+          <div class="control">
+            <label class="switch"> <input type="checkbox" id="das"/> <span class="knob"></span> Double after split (DAS)</label>
+          </div>
+          <div class="control">
+            <label class="switch"> <input type="checkbox" id="surrender"/> <span class="knob"></span> Late surrender allowed</label>
+          </div>
+          <div class="control">
+            <label class="switch"> <input type="checkbox" id="peek" checked/> <span class="knob"></span> Dealer peek only on Ace</label>
+          </div>
+          <div class="control">
+            <label class="switch"> <input type="checkbox" id="finite" /> <span class="knob"></span> Finite shoe (composition dependent)</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Shoe Composition <span class="muted">(used when Finite shoe is ON)</span></h2>
+          <div class="row" id="shoeRow"></div>
+          <div class="row" style="margin-top:8px; gap:8px;">
+            <button class="btn" id="fresh">Reset to fresh shoe</button>
+            <button class="btn ghost" id="clearshoe">Clear shoe</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Build Hands</h2>
+          <div class="row">
+            <div class="control" style="min-width:220px;">
+              <label>Dealer upcard</label>
+              <div class="chips" id="dealerChips"></div>
+              <div class="hand" id="dealerHand"></div>
+            </div>
+            <div class="control" style="min-width:220px;">
+              <label>Player hand</label>
+              <div class="chips" id="playerChips"></div>
+              <div class="hand" id="playerHand"></div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px; gap:8px;">
+            <button class="btn" id="undo">Undo</button>
+            <button class="btn ghost" id="reset">Reset hands</button>
+            <button class="btn accent" id="analyze">Analyze</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Results -->
+      <section class="card fadein">
+        <h2>Results & Advice</h2>
+        <div class="kpi">
+          <div class="item">
+            <div class="muted">Player total</div>
+            <div class="val" id="ptotal">—</div>
+          </div>
+          <div class="item">
+            <div class="muted">Bust chance if Hit</div>
+            <div class="val" id="bust">—</div>
+          </div>
+          <div class="item">
+            <div class="muted">Dealer bust chance</div>
+            <div class="val" id="dbust">—</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="ev-grid">
+            <div class="ev">
+              <h3>Recommendation <span id="recBadge" class="tag">—</span></h3>
+              <div id="recText" class="sub" style="margin-top:6px;">Add cards & press Analyze.</div>
+            </div>
+            <div class="ev">
+              <h3>Dealer total distribution</h3>
+              <div class="bars" id="dealerBars"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="ev-grid">
+            <div class="ev">
+              <h3>Action EVs (per 1 unit bet)</h3>
+              <div id="evList"></div>
+            </div>
+            <div class="ev">
+              <h3>Next-card outcomes on Hit</h3>
+              <div id="nextOutcomes"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">This tool is for education only. Gambling involves risk; the house has an edge. Follow local laws. © 2025</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Utilities ----------
+    const RANKS = [2,3,4,5,6,7,8,9,10,'A'];
+    const LABEL = r => r === 'A' ? 'A' : String(r);
+
+    function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
+    function fmtPct(x){ if(isNaN(x)) return '—'; return (x*100).toFixed(2) + '%'; }
+    function fmtEV(x){ if(x === null || isNaN(x)) return '—'; return (x>=0?'+':'') + x.toFixed(4); }
+
+    function handTotals(cards){
+      // returns { totals: Set<number up to 21>, best: number, soft: boolean }
+      let sum = 0, aces = 0;
+      for(const c of cards){
+        if(c==='A'){ aces++; } else { sum += c; }
+      }
+      let totals = new Set();
+      // count aces as 1 or 11
+      for(let elevens=0; elevens<=aces; elevens++){
+        let t = sum + aces + 10*elevens; // aces as 1 + 10 for each eleven
+        totals.add(t);
+      }
+      // filter <= 21 for 'safe' totals
+      const safe = [...totals].filter(t=>t<=21);
+      let best = safe.length? Math.max(...safe) : Math.min(...totals);
+      let soft = safe.includes(best) && aces>0 && best-10>=sum+aces-aces; // has an 11-counted ace
+      return { totals: new Set(safe.length?safe:totals), best, soft };
+    }
+
+    function isPair(cards){ return cards.length===2 && (cards[0]===cards[1]); }
+    function isBlackjack(cards){ return cards.length===2 && ((cards.includes('A') && cards.some(c=>c!== 'A' && c>=10))); }
+
+    // ---------- Shoe Model ----------
+    function freshShoe(decks){
+      // Counts for ranks: 2..9 = 4*decks each; tens = 16*decks; aces = 4*decks
+      const shoe = {2:4*decks,3:4*decks,4:4*decks,5:4*decks,6:4*decks,7:4*decks,8:4*decks,9:4*decks,10:16*decks,'A':4*decks};
+      return shoe;
+    }
+    function shoeTotal(sh){ return Object.values(sh).reduce((a,b)=>a+b,0); }
+
+    function drawProb(sh, rank){ const tot = shoeTotal(sh); return sh[rank]/tot; }
+
+    function removeCard(sh, rank, count=1){
+      const ns = deepClone(sh);
+      ns[rank] = Math.max(0, ns[rank]-count);
+      return ns;
+    }
+
+    // Infinite deck probabilities (by rank)
+    const INF_P = {2:1/13,3:1/13,4:1/13,5:1/13,6:1/13,7:1/13,8:1/13,9:1/13,10:4/13,'A':1/13};
+
+    function eachRankProb(sh, finite){
+      const probs = {};
+      if(finite){
+        const tot = shoeTotal(sh);
+        for(const r of RANKS){ probs[r] = (sh[r]||0)/tot; }
+      } else {
+        for(const r of RANKS){ probs[r] = INF_P[r]; }
+      }
+      return probs;
+    }
+
+    // ---------- Dealer outcome distribution ----------
+    // Returns map: {17: p, 18: p, 19: p, 20: p, 21: p, bust: p}
+    function dealerDistribution(upcard, opts, shoe, finite){
+      const memo = new Map();
+      function key(total, soft, sh){ return finite ? `D|${total}|${soft}|${Object.values(sh).join(',')}` : `D|${total}|${soft}`; }
+
+      function standSoft17(total, soft){
+        return opts.h17 ? (total>17 || (total===17 && !soft)) : (total>=17);
+      }
+
+      function nextDist(total, soft, sh){
+        const k = key(total, soft, sh);
+        if(memo.has(k)) return memo.get(k);
+        let res = {17:0,18:0,19:0,20:0,21:0,bust:0};
+        if(total>21){ res.bust = 1; memo.set(k,res); return res; }
+        if(standSoft17(total, soft)){
+          if(total<17){ /* shouldn't happen */ }
+          else if(total>=17 && total<=21){ res[total]=1; memo.set(k,res); return res; }
+        }
+        // must hit
+        const probs = eachRankProb(sh, finite);
+        for(const r of RANKS){
+          if(finite && sh[r]===0) continue;
+          const p = probs[r]; if(p<=0) continue;
+          const nsoft = soft || r==='A';
+          let ntotal = total + (r==='A'?1: r);
+          // handle ace as 11 when it helps
+          if(nsoft && ntotal+10<=21) ntotal += 10;
+          const nsh = finite ? removeCard(sh, r, 1) : sh;
+          const child = nextDist(ntotal, nsoft && ntotal-10>=17? false : nsoft, nsh);
+          for(const k2 in child){ res[k2] += p*child[k2]; }
+        }
+        memo.set(k,res); return res;
+      }
+
+      // Start from upcard, then draw hole card
+      const startTotals = [];
+      for(const r of RANKS){
+        if(finite && shoe[r]===0) continue;
+        const p = finite? drawProb(shoe, r) : INF_P[r];
+        const sh2 = finite? removeCard(removeCard(shoe, upcard,1), r,1) : shoe;
+        let total = (upcard==='A'?11:upcard) + (r==='A'?11:r);
+        let soft = upcard==='A' || r==='A';
+        // adjust for bust >21 with aces
+        while(total>21 && soft){ total -= 10; soft = ( (upcard==='A') + (r==='A') - 1 ) >= 1; /* still soft if >=2 aces */ }
+        const dist = nextDist(total, soft && total<=21 && (upcard==='A' || r==='A'), sh2);
+        startTotals.push({p, dist});
+      }
+      const final = {17:0,18:0,19:0,20:0,21:0,bust:0};
+      for(const s of startTotals){ for(const k in final){ final[k]+= s.p * s.dist[k]; } }
+      return final;
+    }
+
+    // ---------- EV Engine ----------
+    function compareResult(pTotal, dTotal){
+      if(pTotal>21) return -1;
+      if(dTotal>21) return 1;
+      if(pTotal>dTotal) return 1;
+      if(pTotal<dTotal) return -1;
+      return 0;
+    }
+
+    function standEV(playerCards, dist, opts){
+      const {best} = handTotals(playerCards);
+      // Natural blackjack payout handled outside (depends on peek/upcard)
+      let ev = 0;
+      for(const k of [17,18,19,20,21]){ ev += compareResult(best, Number(k)) * dist[k]; }
+      ev += compareResult(best, 22) * dist.bust; // dealer bust -> player win
+      return ev;
+    }
+
+    function bustChanceIfHit(playerCards, shoe, finite){
+      const probs = eachRankProb(shoe, finite);
+      let bust = 0; const { totals } = handTotals(playerCards);
+      // For each next card, compute if all totals >21 (i.e., bust)
+      for(const r of RANKS){
+        const p = probs[r]; if(p<=0) continue;
+        const newTotals = handTotals([...playerCards, r]).totals;
+        const safe = [...newTotals].some(t=>t<=21);
+        if(!safe) bust += p;
+      }
+      return bust;
+    }
+
+    function oneCardThenStandEV(playerCards, distByNextCard, opts){
+      // When doubling, EV is 2 * E[stand after 1 card]
+      let sum = 0;
+      for(const r in distByNextCard){
+        const {p, cards} = distByNextCard[r];
+        const {best, totals} = handTotals(cards);
+        const evstand = standEV(cards, opts.dealerDist, opts);
+        sum += p * evstand;
+      }
+      return sum;
+    }
+
+    function buildNextCardDistribution(playerCards, shoe, finite){
+      const probs = eachRankProb(shoe, finite);
+      const map = {};
+      for(const r of RANKS){
+        const p = probs[r]; if(p<=0) continue;
+        map[r] = { p, cards: [...playerCards, r] };
+      }
+      return map;
+    }
+
+    // Recursive optimal EV for Hit/Stand (without double/split)
+    function optimalEV(playerCards, opts, shoe, finite, depth=0, memo=new Map()){
+      // Key includes composition; to control size, summarize by counts array
+      const key = finite ? `${playerCards.join('-')}|${Object.values(shoe).join(',')}` : playerCards.join('-');
+      if(memo.has(key)) return memo.get(key);
+      const totalsInfo = handTotals(playerCards);
+      const best = totalsInfo.best;
+      if(best>21){ memo.set(key, {stand: -1, hit: -1, best: -1}); return memo.get(key); }
+
+      // Stand EV
+      const evStand = standEV(playerCards, opts.dealerDist, opts);
+
+      // Hit EV: draw one, then choose max(hit again vs stand) recursively
+      let evHit = 0;
+      const probs = eachRankProb(shoe, finite);
+      for(const r of RANKS){
+        if(finite && shoe[r]===0) continue;
+        const p = probs[r]; if(p<=0) continue;
+        const nshoe = finite? removeCard(shoe, r, 1): shoe;
+        const newHand = [...playerCards, r];
+        const after = optimalEV(newHand, opts, nshoe, finite, depth+1, memo);
+        evHit += p * Math.max(after.stand, after.hit); // choose best next step
+      }
+
+      const res = { stand: evStand, hit: evHit, best: Math.max(evStand, evHit) };
+      memo.set(key,res); return res;
+    }
+
+    function doubleEV(playerCards, opts, shoe, finite){
+      // Draw one card and stand; payout x2
+      const probs = eachRankProb(shoe, finite);
+      let sum = 0;
+      for(const r of RANKS){
+        if(finite && shoe[r]===0) continue;
+        const p = probs[r]; if(p<=0) continue;
+        const newHand = [...playerCards, r];
+        const evStand = standEV(newHand, opts.dealerDist, opts);
+        sum += p * (2*evStand);
+      }
+      return sum;
+    }
+
+    function surrenderEV(playerCards, opts){
+      // Late surrender: -0.5 unless dealer blackjack on peek
+      if(!opts.surrender) return null;
+      if(!opts.peek) return -0.5;
+      // If dealer peeks and has blackjack, surrender not allowed (loss -1)
+      const pDealerBJ = opts.pDealerBJ || 0;
+      return -0.5 * (1 - pDealerBJ) + (-1) * pDealerBJ;
+    }
+
+    function splitEV(playerCards, opts, shoe, finite){
+      // Simplified: one split only, aces receive one card and stand; others play optimally; DAS supported
+      if(playerCards.length!==2 || playerCards[0]!==playerCards[1]) return null;
+      const rank = playerCards[0];
+      const probs = eachRankProb(shoe, finite);
+      const handEV = (firstCard) => {
+        let ev = 0;
+        for(const r of RANKS){
+          if(finite && shoe[r]===0) continue;
+          const p = probs[r]; if(p<=0) continue;
+          const sh2 = finite? removeCard(shoe, r, 1): shoe;
+          const base = [firstCard, r];
+          if(firstCard==='A'){
+            // One card only
+            ev += p * standEV(base, opts.dealerDist, opts);
+          } else {
+            // Allow optimal play; allow double after split if DAS
+            const memo = new Map();
+            const opt = optimalEV(base, opts, sh2, finite, 0, memo);
+            let totalEV = opt.best;
+            if(opts.das){
+              // Consider double on first action as alternative
+              const dev = doubleEV(base, opts, sh2, finite);
+              totalEV = Math.max(totalEV, dev);
+            }
+            ev += p * totalEV;
+          }
+        }
+        return ev;
+      };
+      // Two independent hands after split, EV is sum of both
+      let perHandEV = handEV(rank);
+      return 2*perHandEV;
+    }
+
+    function naturalBlackjackEV(playerCards, upcard, opts){
+      if(!isBlackjack(playerCards)) return null;
+      // If dealer upcard is Ace or Ten and peek is enabled, immediate push if dealer also has BJ, else 3:2 or 6:5
+      const pDealerBJ = opts.pDealerBJ || 0;
+      const winPay = opts.bjpayout; // 1.5 or 1.2
+      if(opts.peek && (upcard===10 || upcard==='A')){
+        return (1 - pDealerBJ) * winPay + (0) * pDealerBJ; // push when dealer BJ
+      }
+      // Otherwise, expect push probability = pDealerBJ; win otherwise
+      return (1 - pDealerBJ) * winPay + (0) * pDealerBJ;
+    }
+
+    // ---------- UI Wiring ----------
+    const decksSel = document.getElementById('decks');
+    const bjSel = document.getElementById('bjpayout');
+    const h17Chk = document.getElementById('h17');
+    const dasChk = document.getElementById('das');
+    const surChk = document.getElementById('surrender');
+    const peekChk = document.getElementById('peek');
+    const finiteChk = document.getElementById('finite');
+
+    const shoeRow = document.getElementById('shoeRow');
+    const dealerChips = document.getElementById('dealerChips');
+    const playerChips = document.getElementById('playerChips');
+    const dealerHandEl = document.getElementById('dealerHand');
+    const playerHandEl = document.getElementById('playerHand');
+
+    const ptotal = document.getElementById('ptotal');
+    const bustEl = document.getElementById('bust');
+    const dbustEl = document.getElementById('dbust');
+    const dealerBars = document.getElementById('dealerBars');
+    const evList = document.getElementById('evList');
+    const nextOutcomes = document.getElementById('nextOutcomes');
+    const recBadge = document.getElementById('recBadge');
+    const recText = document.getElementById('recText');
+
+    const undoBtn = document.getElementById('undo');
+    const resetBtn = document.getElementById('reset');
+    const analyzeBtn = document.getElementById('analyze');
+    const freshBtn = document.getElementById('fresh');
+    const clearShoeBtn = document.getElementById('clearshoe');
+
+    let state = {
+      shoe: freshShoe(Number(decksSel.value)),
+      player: [],
+      dealer: [],
+      history: []
+    };
+
+    function renderShoe(){
+      shoeRow.innerHTML = '';
+      for(const r of RANKS){
+        const wrapper = document.createElement('div');
+        wrapper.className = 'control';
+        const lab = document.createElement('label'); lab.textContent = `${LABEL(r)} count`;
+        const inp = document.createElement('input'); inp.type = 'number'; inp.min = 0; inp.step = 1; inp.value = state.shoe[r]||0; inp.addEventListener('input', ()=>{
+          state.shoe[r] = Math.max(0, parseInt(inp.value||'0',10));
+        });
+        wrapper.appendChild(lab); wrapper.appendChild(inp);
+        shoeRow.appendChild(wrapper);
+      }
+    }
+
+    function chip(label, handler){
+      const el = document.createElement('div'); el.className = 'chip'; el.textContent = label; el.addEventListener('click', handler); return el;
+    }
+
+    function renderHand(){
+      dealerHandEl.innerHTML = ''; playerHandEl.innerHTML='';
+      state.dealer.forEach(c=>{
+        const d = document.createElement('div'); d.className='cardui'; d.textContent = LABEL(c); dealerHandEl.appendChild(d);
+      });
+      state.player.forEach(c=>{
+        const d = document.createElement('div'); d.className='cardui'; d.textContent = LABEL(c); playerHandEl.appendChild(d);
+      });
+      const t = handTotals(state.player);
+      const txt = t.totals.size ? (t.soft? `Soft ${t.best}` : `Hard ${t.best}`) : '—';
+      ptotal.textContent = state.player.length? txt : '—';
+    }
+
+    function renderChips(){
+      dealerChips.innerHTML=''; playerChips.innerHTML='';
+      for(const r of RANKS){
+        dealerChips.appendChild(chip(LABEL(r), ()=>{ pushHistory(); state.dealer.push(r); renderHand(); }));
+      }
+      for(const r of RANKS){
+        playerChips.appendChild(chip(LABEL(r), ()=>{ pushHistory(); state.player.push(r); renderHand(); }));
+      }
+    }
+
+    function pushHistory(){ state.history.push({player:[...state.player], dealer:[...state.dealer]}); if(state.history.length>100) state.history.shift(); }
+
+    function resetHands(){ pushHistory(); state.player=[]; state.dealer=[]; renderHand(); clearResults(); }
+
+    function clearResults(){
+      bustEl.textContent = '—'; dbustEl.textContent='—'; dealerBars.innerHTML=''; evList.innerHTML=''; nextOutcomes.innerHTML='';
+      recBadge.textContent='—'; recBadge.className='tag'; recText.textContent='Add cards & press Analyze.';
+    }
+
+    function makeBar(label, p){
+      const row = document.createElement('div');
+      row.style.display='grid'; row.style.gridTemplateColumns='80px 1fr 60px'; row.style.gap='8px'; row.style.alignItems='center';
+      const L = document.createElement('div'); L.className='muted'; L.textContent=label; row.appendChild(L);
+      const bar = document.createElement('div'); bar.className='bar'; const span=document.createElement('span'); span.style.width=(p*100).toFixed(2)+'%'; bar.appendChild(span); row.appendChild(bar);
+      const R = document.createElement('div'); R.style.textAlign='right'; R.textContent=fmtPct(p); row.appendChild(R);
+      return row;
+    }
+
+    function analyze(){
+      if(!state.player.length || !state.dealer.length){ recText.textContent='Please add player & dealer cards.'; return; }
+      // Options
+      const opts = {
+        h17: h17Chk.checked,
+        das: dasChk.checked,
+        surrender: surChk.checked,
+        peek: peekChk.checked,
+        bjpayout: Number(bjSel.value)
+      };
+      const decks = Number(decksSel.value);
+      // Build shoe baseline for finite mode (start from fresh, then remove observed cards unless user customizes)
+      let baseShoe = finiteChk.checked ? deepClone(state.shoe) : null;
+      if(finiteChk.checked && shoeTotal(baseShoe)===0){ baseShoe = freshShoe(decks); }
+
+      // Remove observed cards from shoe copy
+      const useFinite = finiteChk.checked;
+      let shoeForDealer = useFinite ? deepClone(baseShoe) : null;
+      if(useFinite){
+        for(const c of state.player){ shoeForDealer = removeCard(shoeForDealer, c, 1); }
+        for(const c of state.dealer){ shoeForDealer = removeCard(shoeForDealer, c, 1); }
+      }
+
+      const up = state.dealer[0];
+      const dist = dealerDistribution(up, {h17:opts.h17}, shoeForDealer||{}, useFinite);
+      opts.dealerDist = dist;
+
+      // Dealer bust chance display
+      dbustEl.textContent = fmtPct(dist.bust);
+      dealerBars.innerHTML='';
+      for(const k of [17,18,19,20,21,'bust']){
+        dealerBars.appendChild(makeBar(k.toString().toUpperCase(), dist[k]||0));
+      }
+
+      // Dealer blackjack probability for peek logic
+      let pDealerBJ = 0;
+      const upIsTen = (up===10), upIsAce = (up==='A');
+      if(opts.peek && upIsAce){
+        if(useFinite){
+          let shx = deepClone(shoeForDealer);
+          const need = 10;
+          const tot = shoeTotal(shx);
+          pDealerBJ = (shx[need]||0)/tot;
+        } else {
+          pDealerBJ = INF_P[10];
+        }
+      }
+      opts.pDealerBJ = pDealerBJ;
+
+      // KPIs
+      const bustP = bustChanceIfHit(state.player, useFinite?shoeForDealer: {}, useFinite);
+      bustEl.textContent = fmtPct(bustP);
+
+      // Next card outcome list
+      nextOutcomes.innerHTML='';
+      const nextMap = buildNextCardDistribution(state.player, useFinite?shoeForDealer:{}, useFinite);
+      const frag = document.createDocumentFragment();
+      Object.entries(nextMap).sort((a,b)=>b[1].p - a[1].p).forEach(([r, info])=>{
+        const t = handTotals(info.cards);
+        const row = document.createElement('div'); row.className='row'; row.style.alignItems='center'; row.style.justifyContent='space-between';
+        const left = document.createElement('div'); left.className='pill'; left.innerHTML = `<strong>${LABEL(r)}</strong> <span class="small">→ ${t.totals.size? (t.soft? 'Soft ':'Hard ')+t.best : 'Bust'}</span>`;
+        const right = document.createElement('div'); right.className='muted'; right.textContent = fmtPct(info.p);
+        row.appendChild(left); row.appendChild(right); frag.appendChild(row);
+      });
+      nextOutcomes.appendChild(frag);
+
+      // Natural blackjack EV special case
+      let natEV = naturalBlackjackEV(state.player, up, opts);
+
+      // EVs
+      const memo = new Map();
+      const useShoeForPlay = useFinite? shoeForDealer : {};
+      const opt = optimalEV(state.player, opts, useShoeForPlay, useFinite, 0, memo);
+      const evStand = standEV(state.player, dist, opts);
+      const evHit = opt.hit; // already considers repeated hits
+      const evDouble = doubleEV(state.player, opts, useShoeForPlay, useFinite);
+      const evSurrender = surrenderEV(state.player, opts);
+      const evSplit = splitEV(state.player, opts, useShoeForPlay, useFinite);
+
+      // If natural BJ, override stand EV with BJ payout (unless dealer also BJ -> push)
+      if(natEV!==null){
+        // In our standEV calc, natural BJ counted as normal 21; adjust by adding bonus over +1 win
+        // Here, simpler: show a separate line for Natural BJ EV
+      }
+
+      // Build EV List UI
+      evList.innerHTML='';
+      const actions = [
+        {name:'Stand', ev: evStand},
+        {name:'Hit (optimal chain)', ev: evHit},
+        {name:'Double', ev: evDouble},
+        {name:'Surrender', ev: evSurrender},
+        {name:'Split', ev: evSplit}
+      ].filter(x=> x.ev!==null && !Number.isNaN(x.ev));
+
+      const bestAction = actions.slice().sort((a,b)=>b.ev-a.ev)[0];
+      const rec = bestAction ? bestAction.name : '—';
+      recBadge.textContent = rec;
+      recBadge.className = 'tag ' + (bestAction && bestAction.ev>0 ? 'ok' : (bestAction && bestAction.ev>-0.1? 'warn':'bad'));
+      const tinfo = handTotals(state.player);
+      recText.textContent = `For ${tinfo.soft? 'Soft':'Hard'} ${tinfo.best} vs dealer ${LABEL(up)} → choose ${rec}.`;
+
+      actions.forEach(a=>{
+        const row = document.createElement('div'); row.className='row'; row.style.justifyContent='space-between'; row.style.marginBottom='6px';
+        const l = document.createElement('div'); l.className='pill'; l.innerHTML = `<strong>${a.name}</strong>`; row.appendChild(l);
+        const r = document.createElement('div'); r.className='pill'; r.style.background='rgba(255,255,255,.06)'; r.textContent = `EV ${fmtEV(a.ev)}`; row.appendChild(r);
+        evList.appendChild(row);
+      });
+    }
+
+    // ---------- Init UI ----------
+    function init(){
+      renderShoe(); renderChips(); renderHand(); clearResults();
+      // Wire buttons
+      undoBtn.onclick = ()=>{ if(!state.history.length) return; const last = state.history.pop(); state.player=last.player; state.dealer=last.dealer; renderHand(); };
+      resetBtn.onclick = ()=> resetHands();
+      analyzeBtn.onclick = ()=> analyze();
+      freshBtn.onclick = ()=>{ state.shoe = freshShoe(Number(decksSel.value)); renderShoe(); };
+      clearShoeBtn.onclick = ()=>{ for(const r of RANKS){ state.shoe[r]=0; } renderShoe(); };
+
+      // Settings change
+      decksSel.onchange = ()=>{ if(!finiteChk.checked){ state.shoe = freshShoe(Number(decksSel.value)); renderShoe(); } };
+      finiteChk.onchange = ()=>{ if(!finiteChk.checked){ state.shoe = freshShoe(Number(decksSel.value)); renderShoe(); } };
+    }
+
+    init();
+  </script>
+</body>
+</html>

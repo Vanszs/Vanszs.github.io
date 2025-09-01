@@ -1,4 +1,4 @@
-PORTFOLIO BUILD CONTEXT — AI AGENT BRIEF
+
 Owner: Bevantyo Satria Pinandhita
 Primary Brand: “Vibe Coder” — creative builder with strong technical fundamentals
 Primary Language: Indonesian (default) | Secondary: English (optional switch)
@@ -78,6 +78,8 @@ EXPERIENCE (HAMS bullets; avoid duplication; dates are Month/Year range)
 4) Blockchain Developer Intern — Seeds Finance (12/2024–04/2025)
    - Built decentralized marketplace on Diamante: NFT minting, listing, buying/selling.
    - Contract testing and optimization for secure, efficient flows.
+      - NFT solutions integrated with front-end; performance analysis and debugging for high-volume tx.
+   - Code optimizations reduced latency (approx. 15%).
    Stack: Diamante SDK, Solidity/Go/JS (as applicable).
 
 5) Blockchain Developer — Seeds Finance (12/2024–Present)
