@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+
+# Package managers
+*.tgz
+package-lock.json
+yarn-error.log
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build / output
+dist/
+build/
+out/
+coverage/
+.cache/
+.next/
+.vercel/
+.netlify/
+parcel-cache/
+.parcel-cache/
+.tmp/
+
+# Static site / tooling caches
+.sass-cache/
+.cache-loader/
+.hugo_build.lock
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Misc
+*.pid
+*.seed
+*.orig
