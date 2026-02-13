@@ -9,61 +9,16 @@
     <title>Flowers</title>
 </head>
 <body>
-    <!-- GREETINGS DIHAPUS -->
-    <div class="description">
-        <span>Alo Lia, Aku ada hadiah spesial buat kamu!!</span>
+    <div class="container">
+        <div class="description">
+            <span>Alo Lia, Aku ada hadiah spesial buat kamu!!</span>
+        </div>
+        <div class="button">
+            <a href="flower.html" class="pulse-button">Klik disini</a>
+        </div>
+        <div class="valentine-msg">
+            <span>Happy Valentine manisss</span>
+        </div>
     </div>
-    <div class="button">
-        <button id="giftButton" disabled>
-            <a href="#" id="giftLink">Klik disini</a>
-        </button>
-        <div id="countdown" style="color: white; margin-top: 20px; font-size: 1.2em;"></div>
-    </div>
-
-    <script>
-        // Target: 14 Februari 2025, 00:01 WIB (UTC+7)
-        const unlockDate = new Date('2025-02-14T00:01:00+07:00');
-        
-        function checkTimeLock() {
-            const now = new Date();
-            const button = document.getElementById('giftButton');
-            const link = document.getElementById('giftLink');
-            const countdownEl = document.getElementById('countdown');
-            
-            if (now < unlockDate) {
-                // Masih terkunci
-                button.disabled = true;
-                button.style.opacity = '0.5';
-                button.style.cursor = 'not-allowed';
-                link.href = '#';
-                link.onclick = (e) => {
-                    e.preventDefault();
-                    return false;
-                };
-                
-                // Hitung sisa waktu
-                const diff = unlockDate - now;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                countdownEl.textContent = `⏰ Sabar ya... ${days} hari ${hours} jam ${minutes} menit ${seconds} detik lagi`;
-                
-                // Cek lagi setiap detik
-                setTimeout(checkTimeLock, 1000);
-            } else {
-                // Sudah bisa dibuka
-                button.disabled = false;
-                button.style.opacity = '1';
-                button.style.cursor = 'pointer';
-                link.href = 'flower.html';
-                link.onclick = null;
-                countdownEl.textContent = '🎁 Hadiah sudah bisa dibuka!';
-            }
-        }
-        
-        checkTimeLock();
-    </script>
 </body>
 </html>

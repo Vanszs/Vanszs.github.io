@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -13,17 +14,11 @@
   <link rel="stylesheet" href="assets/fonts/fonts.css">
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/gallery.css" />
-  <link rel="stylesheet" href="assets/css/gallery-fix.css" />
   <link rel="icon" type="image/png" href="assets/favicon.png" />
-  
-  <!-- Add direct testing image tags to help gallery.js detect them -->
-  <img data-gallery-hint src="img/1731736478597.jpg" style="display:none;" alt="Gallery hint" />
-  <img data-gallery-hint src="img/1731736512560.jpg" style="display:none;" alt="Gallery hint" />
-  <img data-gallery-hint src="img/1737432761763.jpg" style="display:none;" alt="Gallery hint" />
 </head>
+
 <body>
   <a class="skip-link" href="#main">Lewati ke konten utama</a>
-  
   <!-- Header sama seperti homepage -->
   <header class="site-header" id="top">
     <div class="container nav-bar">
@@ -60,14 +55,7 @@
           <h1 class="gradient" data-i18n="gallery.title">Galeri</h1>
           <p class="lead" data-i18n="gallery.subtitle">Koleksi visual yang menangkap momen dan inspirasi dalam perjalanan sebagai Vibe Coder — sebuah kolase modern dari pengalaman teknologi dan kreativitas.</p>
         </div>
-        
-        <!-- Filter Controls -->
-        <div class="gallery-filters" data-reveal>
-          <button class="filter-btn active" data-filter="all" data-i18n="gallery.filter.all">Semua</button>
-          <button class="filter-btn" data-filter="visual">Visual</button>
-          <button class="filter-btn" data-filter="moments">Moments</button>
-          <button class="filter-btn" data-filter="gallery">Gallery</button>
-        </div>
+ 
       </div>
     </section>
 
@@ -79,23 +67,6 @@
           <div class="gallery-loading">
             <div class="loading-spinner"></div>
             <p data-i18n="gallery.loading">Memuat galeri...</p>
-          </div>
-          
-          <!-- Direct image test (will be hidden if JS works) -->
-          <div id="direct-test" style="margin-top: 30px; padding: 20px; border: 1px dashed #666; text-align: center;">
-            <h3>Citra langsung (test fallback):</h3>
-            <img src="img/1731736478597.jpg" alt="Test Image 1" style="max-width: 200px; margin: 10px; display: inline-block;">
-            <img src="img/1731736512560.jpg" alt="Test Image 2" style="max-width: 200px; margin: 10px; display: inline-block;">
-            <img src="img/1737432761763.jpg" alt="Test Image 3" style="max-width: 200px; margin: 10px; display: inline-block;">
-            <p><small>Catatan: Bagian ini seharusnya tersembunyi jika galeri berfungsi dengan benar.</small></p>
-            <script>
-              // Hide this test section if gallery loads properly
-              setTimeout(function() {
-                if (document.querySelectorAll('.gallery-item').length > 0) {
-                  document.getElementById('direct-test').style.display = 'none';
-                }
-              }, 2000);
-            </script>
           </div>
         </div>
       </div>
@@ -118,81 +89,12 @@
         </div>
       </div>
     </div>
-    
-    <!-- Manual modal script as a fallback -->
-    <script>
-      // Global variables for modal control
-      let currentImageIndex = 0;
-      let allModalImages = [];
-      
-      // Functions to control modal display
-      function openImageModal(index) {
-        const modal = document.getElementById('image-modal');
-        const modalImg = document.getElementById('modal-image');
-        
-        // Get all images if not already loaded
-        if (allModalImages.length === 0) {
-          document.querySelectorAll('.gallery-image').forEach(img => {
-            allModalImages.push(img.src);
-          });
-        }
-        
-        // Set current index and image
-        currentImageIndex = index;
-        if (allModalImages[currentImageIndex]) {
-          modalImg.src = allModalImages[currentImageIndex];
-        }
-        
-        // Show modal
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-      }
-      
-      function closeImageModal() {
-        const modal = document.getElementById('image-modal');
-        modal.classList.remove('active');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      }
-      
-      function showPrevImage() {
-        currentImageIndex = (currentImageIndex - 1 + allModalImages.length) % allModalImages.length;
-        document.getElementById('modal-image').src = allModalImages[currentImageIndex];
-      }
-      
-      function showNextImage() {
-        currentImageIndex = (currentImageIndex + 1) % allModalImages.length;
-        document.getElementById('modal-image').src = allModalImages[currentImageIndex];
-      }
-      
-      // Register global openModal function to be compatible with gallery.js
-      window.openModal = openImageModal;
-      
-      // Add keyboard navigation
-      document.addEventListener('keydown', function(e) {
-        const modal = document.getElementById('image-modal');
-        if (!modal.classList.contains('active')) return;
-        
-        switch (e.key) {
-          case 'Escape':
-            closeImageModal();
-            break;
-          case 'ArrowLeft':
-            showPrevImage();
-            break;
-          case 'ArrowRight':
-            showNextImage();
-            break;
-        }
-      });
-      
-      // Close modal when clicking backdrop
-      document.querySelector('.modal-backdrop')?.addEventListener('click', closeImageModal);
-    </script>
   </main>
 
   <!-- Footer sama seperti homepage -->
+  
+  
+
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="foot-brand">
@@ -218,33 +120,9 @@
     </div>
   </footer>
 
-  <!-- Ensure the scripts are loaded correctly -->
-  <script>
-    // Debug script to help diagnose issues
-    console.log('Debug: Page init started');
-    window.addEventListener('DOMContentLoaded', function() {
-      console.log('Debug: DOM loaded');
-    });
-    
-    // Pre-define the image list to ensure gallery works
-    window.GALLERY_IMAGE_LIST = ["1731736478597.jpg","1731736512560.jpg","1737432761763.jpg"];
-  </script>
+  <!-- Load image list first -->
+  <script src="assets/js/image-list.js"></script>
   <script src="assets/js/shared.js"></script>
   <script src="assets/js/gallery.js"></script>
-  <script src="assets/js/gallery-fix.js"></script>
-  <script>
-    // Verify scripts loaded
-    console.log('Debug: All scripts loaded');
-    
-    // Force gallery load after a delay
-    setTimeout(function() {
-      console.log('Debug: Forcing gallery reload');
-      if (typeof loadImagesFromFolder === 'function') {
-        loadImagesFromFolder();
-      } else {
-        console.error('Debug: loadImagesFromFolder not found!');
-      }
-    }, 1000);
-  </script>
 </body>
 </html>

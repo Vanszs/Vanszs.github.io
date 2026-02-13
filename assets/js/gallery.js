@@ -1,465 +1,283 @@
-// Gallery functionality with automatic image loading
-// Uses global functions from shared.js
-
-// Gallery state
-let allImages = [];
-let filteredImages = [];
-let currentImageIndex = 0;
-
-// Gallery translations
-const galleryTranslations = {
-  id: {
-    'gallery.title': 'Galeri',
-    'gallery.subtitle': 'Dokumentasi perjalanan sebagai Vibe Coder — momen penting dalam pengembangan teknologi, membangun komunitas, dan menciptakan inovasi.',
-    'gallery.filter.all': 'Semua',
-    'gallery.filter.projects': 'Proyek',
-    'gallery.filter.events': 'Acara', 
-    'gallery.filter.community': 'Komunitas',
-    'gallery.filter.tech': 'Teknologi',
-    'gallery.loading': 'Memuat galeri...',
-    'nav.gallery': 'Galeri',
-    'cta.linkedin': 'Kunjungi LinkedIn'
-  },
-  en: {
-    'gallery.title': 'Gallery',
-    'gallery.subtitle': 'Documentation of the Vibe Coder journey — important moments in technology development, community building, and creating innovation.',
-    'gallery.filter.all': 'All',
-    'gallery.filter.projects': 'Projects',
-    'gallery.filter.events': 'Events',
-    'gallery.filter.community': 'Community', 
-    'gallery.filter.tech': 'Technology',
-    'gallery.loading': 'Loading gallery...',
-    'nav.gallery': 'Gallery',
-    'cta.linkedin': 'Visit LinkedIn'
+// Smart Balanced Gallery
+(function(){
+  
+  function getImageFiles(){
+    if (window.GALLERY_IMAGES?.length) return window.GALLERY_IMAGES;
+    if (window.GALLERY_IMAGE_LIST?.length) return window.GALLERY_IMAGE_LIST;
+    return [
+      '1731736478597.jpg','1731736512560.jpg','1737432761763.jpg',
+      'id card-04.jpg', 'IMG_0409.jpg', 'IMG_0789.JPG', 'IMG_1478.jpg',
+      '1731736478597 - Copy.jpg','1731736512560 - Copy.jpg','1737432761763 - Copy.jpg',
+      '1731736478597 - Copy (2).jpg','1731736512560 - Copy (2).jpg','1737432761763 - Copy (2).jpg',
+      '1731736478597 - Copy (3).jpg','1731736512560 - Copy (3).jpg','1737432761763 - Copy (3).jpg'
+    ];
   }
-};
 
-// Supported image formats
-const imageFormats = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
-
-// ===== Removed GitHub API (local pattern scan only) =====
-// Konfigurasi opsional: jika ingin memastikan semua file muncul tanpa tebakan,
-// buat file script sebelum gallery.js dengan:
-// <script>window.GALLERY_IMAGE_LIST = ['1731736478597.jpg','1731736512560.jpg','1737432761763.jpg'];</script>
-// atau update array itu saat menambah gambar baru.
-
-const IMG_DIR_PATH = 'img';
-const IMAGE_EXTENSIONS = ['jpg','jpeg','png','webp','gif','svg'];
-const MANIFEST_CACHE_KEY = 'gallery-image-manifest-v1';
-const MANIFEST_CACHE_TTL = 1000 * 60 * 30; // 30 menit cache nama file yang sudah terdeteksi sukses
-const MANIFEST_FILE = `${IMG_DIR_PATH}/manifest.json`;
-
-// Override: jika user menyediakan daftar manual, sistem akan memakai daftar itu langsung.
-function hasManualList() {
-  return Array.isArray(window.GALLERY_IMAGE_LIST) && window.GALLERY_IMAGE_LIST.length > 0;
-}
-
-// Auto-detect images from img folder (LOCAL ONLY)
-async function loadImagesFromFolder() {
-  try {
-    console.log('🔍 Local image detection start');
-
-    // 0. Try manifest.json (paling akurat)
-    const manifestList = await loadManifestList();
-    if (manifestList && manifestList.length) {
-      console.log(`📄 Using manifest.json (${manifestList.length} files)`);
-      allImages = manifestList.filter(isSupportedImageName).map(buildImageObjectFromName);
-      filteredImages = [...allImages];
-      renderGallery();
-      cacheManifest(manifestList);
-      return;
-    }
-
-    // 1. Manual list override
-    if (hasManualList()) {
-      console.log('📝 Using manual window.GALLERY_IMAGE_LIST');
-      allImages = window.GALLERY_IMAGE_LIST.filter(isSupportedImageName).map(n => buildImageObjectFromName(n));
-      filteredImages = [...allImages];
-      renderGallery();
-      cacheManifest(window.GALLERY_IMAGE_LIST);
-      return;
-    }
-
-    // 2. Cache
-    const cached = getCachedManifest();
-    if (cached) {
-      console.log(`🗃 Using cached manifest (${cached.length})`);
-      allImages = cached.map(buildImageObjectFromName);
-      filteredImages = [...allImages];
-      renderGallery();
-      return;
-    }
-
-    // 3. Heuristic scan fallback
-    const possible = await generateHeuristicList();
-    console.log(`📋 Heuristic candidates: ${possible.length}`);
-    const results = await Promise.allSettled(possible.map(checkImageExists));
-    allImages = results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
-
-    console.log(`✅ Detected ${allImages.length} images locally`);
-
-    if (allImages.length === 0) {
-      showEmptyState();
-    } else {
-      filteredImages = [...allImages];
-      renderGallery();
-      cacheManifest(allImages.map(i => extractFileName(i.src)));
-    }
-  } catch (e) {
-    console.error('💥 Local load error', e);
-    showErrorState();
+  function verifyImages(files){
+    const dir = 'img';
+    return Promise.all(files.map(f => 
+      fetch(`${dir}/${f}`, {method: 'HEAD'})
+        .then(r => r.ok ? `${dir}/${f}` : null)
+        .catch(() => null)
+    )).then(results => results.filter(Boolean));
   }
-}
 
-async function loadManifestList() {
-  try {
-    console.log('🔍 Mencoba memuat manifest dari:', MANIFEST_FILE + `?v=${Date.now()}`);
-    const res = await fetch(MANIFEST_FILE + `?v=${Date.now()}`); // cache buster dev
-    if (!res.ok) {
-      console.error('❌ Gagal memuat manifest:', res.status, res.statusText);
-      return null;
-    }
-    console.log('✅ Manifest ditemukan, memproses data');
-    const data = await res.json();
-    console.log('📊 Data manifest:', data);
-    if (Array.isArray(data)) {
-      console.log('✅ Data manifest valid (array)');
-      return data;
-    }
-    console.error('❌ Data manifest bukan array:', typeof data);
-    return null;
-  } catch (err) {
-    console.error('💥 Error memuat manifest:', err);
-    return null;
+  function getImageDimensions(src) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const aspectRatio = img.naturalWidth / img.naturalHeight;
+        let sizeClass = 'medium';
+        
+        // Lebih presisi: horizontal lebar = aspect ratio > 1.6
+        if (aspectRatio > 1.6) {
+          sizeClass = 'wide';
+        } else if (aspectRatio < 0.75) {
+          sizeClass = 'tall';
+        }
+        
+        resolve({ aspectRatio, sizeClass });
+      };
+      img.onerror = () => resolve({ aspectRatio: 1, sizeClass: 'medium' });
+      img.src = src;
+    });
   }
-}
 
-// Support helpers (clean versions)
-function isSupportedImageName(name) {
-  const ext = name.split('.').pop().toLowerCase();
-  return IMAGE_EXTENSIONS.includes(ext);
-}
+  function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
 
-function extractFileName(path) { return path.split('/').pop(); }
-
-function buildImageObjectFromName(name, directUrl = null) {
-  return { src: directUrl || `${IMG_DIR_PATH}/${name}`, title: '', description: '', tags: [], category: 'all' };
-}
-
-function getCachedManifest() {
-  try {
-    const raw = localStorage.getItem(MANIFEST_CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (Date.now() - parsed.timestamp > MANIFEST_CACHE_TTL) { localStorage.removeItem(MANIFEST_CACHE_KEY); return null; }
-    if (!Array.isArray(parsed.files)) return null;
-    return parsed.files;
-  } catch { return null; }
-}
-
-function cacheManifest(fileNames) {
-  try { localStorage.setItem(MANIFEST_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), files: fileNames })); } catch {}
-}
-
-// Heuristic list (dipadatkan agar tidak terlalu banyak 404)
-async function generateHeuristicList() {
-  const list = [];
-  const exts = ['.jpg','.jpeg','.png','.webp'];
-
-  // 1) Angka 1..30
-  for (let i=1;i<=30;i++) for (const e of exts) list.push({ src: `${IMG_DIR_PATH}/${i}${e}`, name: `${i}${e}` });
-
-  // 2) Timestamp 13 digit yang sudah ada di cache localStorage (jika pernah terdeteksi)
-  const previous = getCachedManifest() || [];
-  previous.forEach(fn => { list.push({ src: `${IMG_DIR_PATH}/${fn}`, name: fn }); });
-
-  // 3) Pola generik: file yang sudah benar-benar ada (jika user menambahkan <img hidden> sebagai hint)
-  document.querySelectorAll('img[data-gallery-hint]')
-    .forEach(h => { const n = extractFileName(h.getAttribute('src')||''); if (n && isSupportedImageName(n)) list.push({ src: `${IMG_DIR_PATH}/${n}`, name: n }); });
-
-  // 4) Nama panjang 13 digit umum (prefiks 17 / 18 / 19) terbatas 10 percobaan masing-masing
-  const prefixes = ['17','18','19'];
-  prefixes.forEach(p => { for (let i=0;i<10;i++) { const stub = p + String(Date.now()).slice(2, 13 - p.length); for (const e of exts) list.push({ src: `${IMG_DIR_PATH}/${stub}${e}`, name: `${stub}${e}` }); }});
-
-  // 5) Huruf a-f
-  for (const l of ['a','b','c','d','e','f']) for (const e of exts) list.push({ src: `${IMG_DIR_PATH}/${l}${e}`, name: `${l}${e}` });
-
-  // Deduplicate by src
-  const seen = new Set();
-  return list.filter(item => { if (seen.has(item.src)) return false; seen.add(item.src); return true; });
-}
-
-// Check if image exists by trying to load it
-function checkImageExists(imageInfo) {
-  return new Promise((resolve) => {
-    const img = new Image();
+  function distributeImages(imageData) {
+    // Simple sequential distribution to prevent clustering
+    const tall = imageData.filter(img => img.sizeClass === 'tall');
+    const wide = imageData.filter(img => img.sizeClass === 'wide');
+    const medium = imageData.filter(img => img.sizeClass === 'medium');
     
-    img.onload = () => {
-      console.log(`✅ Image found: ${imageInfo.src}`);
-      // Generate metadata based on filename
-      const metadata = generateImageMetadata(imageInfo.name);
-      resolve({
-        src: imageInfo.src,
-        title: metadata.title,
-        description: metadata.description,
-        tags: metadata.tags,
-        category: metadata.category
-      });
-    };
+    console.log(`Image distribution: ${medium.length} medium, ${tall.length} tall, ${wide.length} wide`);
     
-    img.onerror = () => {
-      // Silently fail - this is expected for most attempts
-      resolve(null);
-    };
+    // Safer pattern: more medium images as spacers
+    const distributed = [];
+    let tallIndex = 0, wideIndex = 0, mediumIndex = 0;
     
-    img.src = imageInfo.src;
-  });
-}
-
-// Generate metadata (simplified for visual focus)
-function generateImageMetadata(filename) {
-  const metadata = {
-    title: '', // No titles needed - pure visual
-    description: '',
-    tags: [],
-    category: 'all'
-  };
-  
-  // Simple category assignment for variety
-  const hash = filename.split('').reduce((a, b) => {
-    a = ((a << 5) - a) + b.charCodeAt(0);
-    return a & a;
-  }, 0);
-  
-  const categories = ['all', 'visual', 'moments', 'gallery'];
-  metadata.category = categories[Math.abs(hash) % categories.length];
-  
-  return metadata;
-}
-
-// Format title from filename
-function formatTitle(filename) {
-  return filename
-    .replace(/[0-9]/g, ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .split(' ')
-    .filter(word => word.length > 0)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
-// Render gallery grid (clean visual focus)
-function renderGallery() {
-  const galleryGrid = qSel('#gallery-grid');
-  
-  galleryGrid.innerHTML = filteredImages.map((image, index) => `
-    <div class="gallery-item" data-category="${image.category}" data-index="${index}" data-reveal>
-      <img class="gallery-image" src="${image.src}" alt="Gallery Image ${index + 1}" loading="lazy" />
-    </div>
-  `).join('');
-  
-  // Add click listeners for modal
-  galleryGrid.querySelectorAll('.gallery-item').forEach((item, index) => {
-    item.addEventListener('click', () => openModal(index));
-  });
-  
-  // Initialize reveal animations
-  initReveal();
-}
-
-// Filter functionality
-function initFilters() {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  
-  filterButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Update active button
-      filterButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    // Sequential placement: medium → medium → tall → medium → wide
+    const safePattern = ['medium', 'medium', 'tall', 'medium', 'wide'];
+    let patternIndex = 0;
+    
+    while (tallIndex < tall.length || wideIndex < wide.length || mediumIndex < medium.length) {
+      const currentType = safePattern[patternIndex % safePattern.length];
       
-      // Filter images
-      const filter = btn.dataset.filter;
-      if (filter === 'all') {
-        filteredImages = [...allImages];
-      } else {
-        filteredImages = allImages.filter(img => img.category === filter);
+      if (currentType === 'tall' && tallIndex < tall.length) {
+        distributed.push(tall[tallIndex++]);
+      } else if (currentType === 'wide' && wideIndex < wide.length) {
+        distributed.push(wide[wideIndex++]);
+      } else if (mediumIndex < medium.length) {
+        distributed.push(medium[mediumIndex++]);
+      } else if (tallIndex < tall.length) {
+        distributed.push(tall[tallIndex++]);
+      } else if (wideIndex < wide.length) {
+        distributed.push(wide[wideIndex++]);
+      }
+      patternIndex++;
+    }
+    
+    console.log('Distribution pattern created:', distributed.map(img => `${img.sizeClass}:${img.src.split('/').pop()}`));
+    return distributed;
+  }
+
+  function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  async function buildSmartGallery(imageList){
+    const grid = document.getElementById('gallery-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    // Get dimensions for each image
+    const imageData = await Promise.all(
+      imageList.map(async (src, index) => {
+        const dimensions = await getImageDimensions(src);
+        return { src, index, ...dimensions };
+      })
+    );
+    
+    // Smart distribution for balanced layout
+    const distributedImages = distributeImages(imageData);
+    
+    // ENHANCED collision detection system
+    const gridCols = 4;
+    const gridMap = new Map(); // Track what's at each position
+    
+    function isPositionFree(col, row, colSpan, rowSpan) {
+      // Check bounds
+      if (col < 1 || row < 1 || col + colSpan - 1 > gridCols) {
+        return false;
       }
       
-      // Re-render gallery
-      renderGallery();
-    });
-  });
-}
-
-// Modal functionality
-function initModal() {
-  const modal = qSel('#image-modal');
-  const modalImage = qSel('#modal-image');
-  const modalTitle = qSel('#modal-title');
-  const modalDescription = qSel('#modal-description');
-  const modalTags = qSel('#modal-tags');
-  const closeBtn = qSel('.modal-close');
-  const prevBtn = qSel('.modal-prev');
-  const nextBtn = qSel('.modal-next');
-  const backdrop = qSel('.modal-backdrop');
-  
-  // Close modal
-  function closeModal() {
-    modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-  
-  // Open modal
-  window.openModal = function(index) {
-    currentImageIndex = index;
-    showImageInModal(filteredImages[index]);
-    modal.classList.add('active');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  };
-  
-  // Show image in modal (simplified)
-  function showImageInModal(image) {
-    modalImage.src = image.src;
-    modalImage.alt = 'Gallery Image';
-    modalTitle.textContent = '';
-    modalDescription.textContent = '';
-    modalTags.innerHTML = '';
-  }
-  
-  // Navigation
-  function showPrevImage() {
-    currentImageIndex = (currentImageIndex - 1 + filteredImages.length) % filteredImages.length;
-    showImageInModal(filteredImages[currentImageIndex]);
-  }
-  
-  function showNextImage() {
-    currentImageIndex = (currentImageIndex + 1) % filteredImages.length;
-    showImageInModal(filteredImages[currentImageIndex]);
-  }
-  
-  // Event listeners
-  closeBtn.addEventListener('click', closeModal);
-  backdrop.addEventListener('click', closeModal);
-  prevBtn.addEventListener('click', showPrevImage);
-  nextBtn.addEventListener('click', showNextImage);
-  
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (!modal.classList.contains('active')) return;
-    
-    switch (e.key) {
-      case 'Escape':
-        closeModal();
-        break;
-      case 'ArrowLeft':
-        showPrevImage();
-        break;
-      case 'ArrowRight':
-        showNextImage();
-        break;
+      // Check each cell in the span
+      for (let c = col; c < col + colSpan; c++) {
+        for (let r = row; r < row + rowSpan; r++) {
+          const key = `${c}-${r}`;
+          if (gridMap.has(key)) {
+            return false; // Cell is occupied
+          }
+        }
+      }
+      return true;
     }
-  });
-}
-
-// Show empty state when no images found
-function showEmptyState() {
-  const galleryGrid = qSel('#gallery-grid');
-  galleryGrid.innerHTML = `
-    <div class="gallery-loading">
-      <div style="font-size: 3rem; margin-bottom: 1rem;">📷</div>
-      <h3>Mencari gambar...</h3>
-      <p>Sistem sedang mencari gambar di folder <code>img/</code>...</p>
-      <p style="font-size: 0.875rem; margin-top: 1rem; color: var(--text-muted);">
-        Format yang didukung: JPG, PNG, WebP, GIF, SVG<br>
-        Periksa console browser untuk detail deteksi.
-      </p>
-    </div>
-  `;
-}
-
-// Show error state
-function showErrorState() {
-  const galleryGrid = qSel('#gallery-grid');
-  galleryGrid.innerHTML = `
-    <div class="gallery-loading">
-      <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
-      <h3>Gagal memuat galeri</h3>
-      <p>Terjadi kesalahan saat memuat gambar. Silakan coba refresh halaman.</p>
-    </div>
-  `;
-}
-
-// Reveal animation
-function initReveal() {
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(() => {
-      document.querySelectorAll('[data-reveal]').forEach(el => {
-        revealObserver.observe(el);
-      });
-    });
-  } else {
-    setTimeout(() => {
-      document.querySelectorAll('[data-reveal]').forEach(el => {
-        revealObserver.observe(el);
-      });
-    }, 100);
-  }
-}
-
-// Language support
-function updateLanguage(lang) {
-  const elements = document.querySelectorAll('[data-i18n]');
-  elements.forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (galleryTranslations[lang] && galleryTranslations[lang][key]) {
-      el.textContent = galleryTranslations[lang][key];
-    }
-  });
-}
-
-// Navigation toggle
-function initNavigation() {
-  const navToggle = qSel('.nav-toggle');
-  const navList = qSel('#nav-list');
-  
-  navToggle?.addEventListener('click', () => {
-    const shown = navList.classList.toggle('show');
-    navToggle.setAttribute('aria-expanded', shown);
-  });
-  
-  // Language toggle
-  const langToggle = qSel('#lang-toggle');
-  let currentLang = localStorage.getItem('preferred-language') || 'id';
-  
-  if (langToggle) {
-    langToggle.textContent = currentLang === 'id' ? 'EN' : 'ID';
-    updateLanguage(currentLang);
     
-    langToggle.addEventListener('click', () => {
-      currentLang = currentLang === 'id' ? 'en' : 'id';
-      langToggle.textContent = currentLang === 'id' ? 'EN' : 'ID';
-      document.documentElement.lang = currentLang;
-      updateLanguage(currentLang);
-      localStorage.setItem('preferred-language', currentLang);
+    function markOccupied(col, row, colSpan, rowSpan, imageName) {
+      for (let c = col; c < col + colSpan; c++) {
+        for (let r = row; r < row + rowSpan; r++) {
+          const key = `${c}-${r}`;
+          gridMap.set(key, imageName);
+        }
+      }
+    }
+    
+    function findNextPosition(colSpan, rowSpan, imageName) {
+      for (let row = 1; row <= 50; row++) {
+        for (let col = 1; col <= gridCols - colSpan + 1; col++) {
+          if (isPositionFree(col, row, colSpan, rowSpan)) {
+            return { col, row };
+          }
+        }
+      }
+      console.error(`❌ NO POSITION FOUND for ${imageName} (${colSpan}x${rowSpan})`);
+      return null;
+    }
+    
+    // Process images with collision detection
+    distributedImages.forEach((data, index) => {
+      const imageName = data.src.split('/').pop();
+      const item = document.createElement('div');
+      item.className = `gallery-item ${data.sizeClass}`;
+      item.dataset.index = index;
+      item.dataset.image = imageName;
+      item.setAttribute('data-reveal', '');
+      
+      // Unique z-index for each item to prevent stacking
+      item.style.zIndex = 10 + index;
+      
+      // Determine span
+      let colSpan = 1, rowSpan = 1;
+      if (data.sizeClass === 'wide') {
+        colSpan = 2;
+        rowSpan = 1;
+      } else if (data.sizeClass === 'tall') {
+        colSpan = 1;
+        rowSpan = 2;
+      }
+      
+      // Find position with collision detection
+      const position = findNextPosition(colSpan, rowSpan, imageName);
+      
+      if (position) {
+        // Set explicit grid position with clear boundaries
+        item.style.gridColumn = `${position.col} / ${position.col + colSpan}`;
+        item.style.gridRow = `${position.row} / ${position.row + rowSpan}`;
+        item.style.gridColumnStart = position.col;
+        item.style.gridColumnEnd = position.col + colSpan;
+        item.style.gridRowStart = position.row;
+        item.style.gridRowEnd = position.row + rowSpan;
+        
+        // Mark as occupied
+        markOccupied(position.col, position.row, colSpan, rowSpan, imageName);
+        
+        console.log(`✅ ${imageName} placed at [${position.col},${position.row}] size ${colSpan}x${rowSpan} z-index:${10 + index}`);
+        
+        // Special logging for problematic images
+        if (imageName === '1737432761763.jpg' || imageName === 'IMG_0409.jpg') {
+          console.warn(`🔍 SPECIAL: ${imageName} at [${position.col},${position.row}] ${colSpan}x${rowSpan} z:${10 + index}`);
+          // Force higher z-index for problematic image
+          item.style.zIndex = 100 + index;
+        }
+      } else {
+        // Emergency fallback with unique position
+        console.error(`❌ EMERGENCY: ${imageName} using fallback positioning`);
+        item.style.gridColumn = 'auto';
+        item.style.gridRow = 'auto';
+        item.style.zIndex = 200 + index; // Very high z-index for fallback
+      }
+      
+      const img = document.createElement('img');
+      img.className = 'gallery-image';
+      img.src = data.src;
+      img.alt = `Gallery Photo ${index + 1}`;
+      img.loading = 'lazy';
+      
+      // Modal click handler
+      item.addEventListener('click', () => {
+        if (window.openModal) openModal(index);
+      });
+      
+      item.appendChild(img);
+      grid.appendChild(item);
+    });
+    
+    console.log(`✨ Gallery created with ${distributedImages.length} images`);
+    console.log('🗺️ Final grid map:', Object.fromEntries(gridMap));
+    
+    // Verify no overlaps with detailed logging
+    const positions = Array.from(gridMap.entries());
+    const conflicts = positions.filter(([key, img1], i) => 
+      positions.slice(i + 1).some(([key2, img2]) => key === key2 && img1 !== img2)
+    );
+    
+    if (conflicts.length > 0) {
+      console.error('❌ CONFLICTS DETECTED:', conflicts);
+      console.error('🚨 OVERLAPPING POSITIONS:', conflicts.map(([key]) => key));
+    } else {
+      console.log('✅ NO CONFLICTS - All images positioned safely');
+    }
+    
+    // Additional check for 1737432761763.jpg visibility
+    const problemImage = document.querySelector('[data-image="1737432761763.jpg"]');
+    if (problemImage) {
+      console.log('🔍 Problem image element:', problemImage);
+      console.log('🔍 Problem image styles:', {
+        gridColumn: problemImage.style.gridColumn,
+        gridRow: problemImage.style.gridRow,
+        zIndex: problemImage.style.zIndex
+      });
+    }
+  }
+
+  function initializeGallery() {
+    const files = getImageFiles();
+    verifyImages(files).then(foundImages => {
+      if (!foundImages.length) {
+        console.warn('[gallery] No images found');
+        showEmptyState();
+        return;
+      }
+      buildSmartGallery(foundImages);
     });
   }
-}
 
-// Initialize everything
-function init() {
-  loadImagesFromFolder();
-  initFilters();
-  initModal();
-  initNavigation();
-  
-  // Set current year
-  const yearEl = qSel('#year');
-  if (yearEl) {
-    yearEl.textContent = new Date().getFullYear();
+  function showEmptyState() {
+    const grid = document.getElementById('gallery-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = `
+      <div class="gallery-loading">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📸</div>
+        <h3>Tidak ada gambar ditemukan</h3>
+        <p>Letakkan gambar Anda di folder <code>img/</code> dan refresh halaman.</p>
+      </div>
+    `;
   }
-}
 
-// Start when DOM is ready
-document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', initializeGallery);
+})();
