@@ -433,6 +433,71 @@ footer {
 .footer-disc { font-size: 9px; color: var(--muted); margin-top: var(--space-2); text-transform: uppercase; letter-spacing: .08em; }
 
 /* ── RESPONSIVE ── */
+
+/* ── EXPAND / COLLAPSE DETAIL ROW ── */
+.expand-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); cursor: pointer;
+  padding: 2px 6px; border: 1px solid var(--rule);
+  background: transparent; margin-top: 4px;
+  transition: border-color .1s, color .1s;
+}
+.expand-btn:hover { border-color: var(--black); color: var(--black); }
+.expand-btn.open { border-color: var(--blue); color: var(--blue); }
+
+.detail-row { display: none; background: #FAFAF9; }
+.detail-row.open { display: table-row; }
+.detail-row td { padding: var(--space-4) var(--space-7) var(--space-5); }
+.detail-inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.detail-card {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  padding: var(--space-3) var(--space-4);
+}
+.detail-card-title {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); margin-bottom: var(--space-2);
+  padding-bottom: var(--space-1); border-bottom: 1px solid var(--rule);
+}
+.detail-stat { display: flex; justify-content: space-between; padding: 3px 0; font-size: var(--f-xs); border-bottom: 1px solid #F0F0EE; }
+.detail-stat:last-child { border-bottom: none; }
+.detail-stat-lbl { color: var(--muted); }
+.detail-stat-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+.detail-thesis { font-size: var(--f-xs); color: var(--black); line-height: 1.7; margin-top: var(--space-2); padding: var(--space-3) var(--space-4); background: var(--off); border-left: 3px solid var(--rule); grid-column: 1 / -1; }
+
+/* ── HYPOTHETICAL PnL note ── */
+.hypo-note { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+
+/* ── MODEL AGREE BADGE ── */
+.agree-badge { font-size: 9px; font-weight: 700; color: var(--muted); margin-top: 3px; }
+.agree-badge.strong { color: var(--green); }
+.agree-badge.split  { color: var(--yellow); }
+
+/* ── SL/TP HIT BADGE ── */
+.hit-sl { background: var(--red); color: var(--white); padding: 1px 5px; font-size: 8px; font-weight: 700; margin-top: 3px; display: inline-block; }
+.hit-tp { background: var(--green); color: var(--white); padding: 1px 5px; font-size: 8px; font-weight: 700; margin-top: 3px; display: inline-block; }
+.near-sl { color: var(--yellow); font-size: 9px; font-weight: 700; margin-top: 2px; }
+.near-tp { color: var(--green); font-size: 9px; font-weight: 700; margin-top: 2px; }
+
+/* ── TREND BIAS ICON ── */
+.bias-up   { color: var(--green); font-size: 9px; font-weight: 700; }
+.bias-dn   { color: var(--red); font-size: 9px; font-weight: 700; }
+
+/* ── ATR CONTEXT ── */
+.atr-note { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+@media (max-width: 768px) {
+  .detail-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .detail-inner { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 900px) {
   header { grid-template-columns: 1fr; gap: var(--space-4); }
   .header-right { align-items: flex-start; }
@@ -701,80 +766,193 @@ function distToTrigger(ticker, row) {
 }
 
 /* ── RENDER TABLE ── */
+let _rowId = 0;
 function renderTable(key) {
   const m = MODELS[key];
   const rows = TICKERS.map(t => {
     const r = m.rows[t];
     const st = status(t, r);
     const pp = pnl(t);
-    const entryHit = r.action === 'BUY' && r.en != null;  // true only for actual open positions
     const c = P[t].close;
+    const rowId = 'row-' + key + '-' + t;
 
+    // ── Status badge + trend bias ──
+    const biasBadge = r.tdir === 'up'
+      ? `<span class="bias-up">↑ BULL BREAK</span>`
+      : r.tdir === 'dn'
+        ? `<span class="bias-dn">↓ DIP ENTRY</span>`
+        : '';
     const stBadge = r.failed
       ? `<span class="badge b-fail">✗ Failed</span>`
-      : st==='hot'
-        ? `<span class="badge b-hot">● Hot Entry</span>`
+      : st === 'hot'
+        ? `<span class="badge b-hot">🔥 HOT ENTRY</span>`
         : `<span class="badge b-watch">○ Watching</span>`;
-
     const rcLine = r.rc ? `<div class="recheck">${r.rc}</div>` : '';
-    const confStr = r.conf!=null ? Math.round(r.conf*100)+'%' : '—';
 
+    // ── Signal badge: WNS stays WNS; if hot AND has entry → show intent ──
+    const signalBadge = `<span class="badge b-wns">WNS</span>`;
+
+    // ── Conf + model agreement ──
+    const confStr = r.conf != null ? Math.round(r.conf * 100) + '%' : '—';
+    const agreeCount = Object.values(MODELS).filter(mx => {
+      const rx = mx.rows[t]; return !rx.failed && rx.tdir === r.tdir;
+    }).length;
+    const agreeCls = agreeCount >= 4 ? 'strong' : agreeCount >= 2 ? 'split' : '';
+    const agreeLine = r.tdir ? `<div class="agree-badge ${agreeCls}">${agreeCount}/6 agree dir</div>` : '';
+
+    // ── Entry cell ──
     const entryCell = r.en
-      ? `<div class="entry-main num">$${r.en.toFixed(2)}</div>${r.rr?`<div class="rr-pill">${r.rr}</div>`:''}`
+      ? `<div class="entry-main num">$${r.en.toFixed(2)}</div>${r.rr ? `<div class="rr-pill">${r.rr}</div>` : ''}`
       : r.rr
         ? `<span class="neut">—</span><div class="rr-pill">${r.rr}</div>`
         : `<span class="dash">—</span>`;
     const starBadge = r.star ? `<div class="badge b-best">⭐ Best setup</div>` : '';
 
-    const slTp = (r.sl||r.tp)
-      ? `<div class="sl-tp">${r.sl?`<div class="sl-line"><span class="num neg">$${r.sl.toFixed(2)}</span></div>`:''
-      }${r.tp?`<div class="tp-line"><span class="num pos">$${r.tp.toFixed(2)}</span></div>`:''}</div>`
+    // ── Trigger cell with ATR context ──
+    const periodRange = P[t].high - P[t].low;
+    const atrApprox = periodRange;
+    const atrPct = (atrApprox / c * 100).toFixed(1);
+    const triggerCell = r.tr
+      ? `<div class="trigger-main num">$${r.tr.toFixed(2)}</div>${distToTrigger(t, r)}<div class="atr-note">Range ATR ~${atrPct}%</div>`
       : `<span class="dash">—</span>`;
 
-    const trigger = r.tr
-      ? `<div class="trigger-main num">$${r.tr.toFixed(2)}</div>${distToTrigger(t,r)}`
+    // ── SL/TP cell with hit detection ──
+    const slHit = r.sl && P[t].low <= r.sl;
+    const tpHit = r.tp && P[t].high >= r.tp;
+    const nearSL = r.sl && !slHit && (c - r.sl) / c < 0.04;  // within 4% of SL
+    const nearTP = r.tp && !tpHit && (r.tp - c) / c < 0.05;  // within 5% of TP
+    const riskPerShare = (r.en && r.sl) ? Math.abs(r.en - r.sl) : null;
+    const slTp = (r.sl || r.tp)
+      ? `<div class="sl-tp">
+          ${r.sl ? `<div class="sl-line"><span class="num neg">$${r.sl.toFixed(2)}</span>${slHit ? '<span class="hit-sl">⚡ HIT</span>' : nearSL ? '<span class="near-sl">⚠ Near</span>' : ''}</div>` : ''}
+          ${r.tp ? `<div class="tp-line"><span class="num pos">$${r.tp.toFixed(2)}</span>${tpHit ? '<span class="hit-tp">✓ Reached</span>' : nearTP ? '<span class="near-tp">↑ Near</span>' : ''}</div>` : ''}
+          ${riskPerShare ? `<div style="font-size:9px;color:var(--muted);margin-top:2px">Risk $${riskPerShare.toFixed(2)}/sh</div>` : ''}
+        </div>`
       : `<span class="dash">—</span>`;
 
-    // Running PnL: only meaningful if position entered.
-    // WNS = not entered → show "—" with note. 
+    // ── PnL cell: only if entered (WNS = no position) ──
+    const entryHit = r.en != null;
     let pnlHtml;
     if (entryHit) {
-      pnlHtml = `<div class="pnl-primary num ${cls(pp.pct)}">${pc(pp.pct)}</div>`
-              + `<div class="pnl-secondary num ${cls(pp.abs)}">${pp.abs>=0?'+':''}$${Math.abs(pp.abs).toFixed(2)}</div>`;
+      // Real PnL from entry price
+      const entryPnl = { pct: (c - r.en) / r.en * 100, abs: c - r.en };
+      pnlHtml = `<div class="pnl-primary num ${cls(entryPnl.pct)}">${pc(entryPnl.pct)}</div>`
+              + `<div class="pnl-secondary num ${cls(entryPnl.abs)}">${entryPnl.abs >= 0 ? '+' : ''}$${Math.abs(entryPnl.abs).toFixed(2)}</div>`;
     } else {
-      pnlHtml = `<span class="dash" title="No position (WNS)">—</span>`;
+      pnlHtml = `<span class="dash" title="WNS — no open position">—</span>`;
     }
 
-    // Max Drawdown: only shown when position is ENTERED (BUY with actual entry).
-    // WNS = no position → show dash. Prevents misleading period-range stat.
+    // ── Max Drawdown cell: only if entered ──
     let ddHtml;
     if (entryHit) {
       const dd = maxDDfromEntry(r.en, t);
-      const slHit = r.sl && P[t].low <= r.sl;
       ddHtml = `<div class="dd-main num ${dd.dd_pct < 0 ? 'neg' : 'pos'}">${pc(dd.dd_pct)}</div>`
-             + `<div class="dd-range">Entry $${r.en.toFixed(2)} → Low $${dd.low.toFixed(2)}</div>`
-             + (slHit ? `<div class="badge b-fail" style="margin-top:4px">⚡ SL Hit</div>` : '');
+             + `<div class="dd-range">$${r.en.toFixed(2)} → $${dd.low.toFixed(2)}</div>`
+             + (slHit ? `<div class="hit-sl">⚡ SL HIT</div>` : '');
     } else {
-      // WNS — position not entered, max drawdown not applicable
-      ddHtml = `<span class="dash" title="No position (WNS)">—</span>`;
+      // WNS — but show hypothetical IF SL would have been hit
+      const hypothSLhit = r.sl && P[t].low <= r.sl;
+      const hypothTPreach = r.tp && P[t].high >= r.tp;
+      if (hypothSLhit || hypothTPreach) {
+        ddHtml = `<div style="font-size:9px;color:var(--muted);margin-bottom:2px">Hypothetical (no entry)</div>`
+               + (hypothSLhit ? `<div class="near-sl">⚠ SL level touched (${pc((r.sl - P[t].low)/r.sl*100,1)} thru)</div>` : '')
+               + (hypothTPreach ? `<div class="near-tp">✓ TP level reached</div>` : '');
+      } else {
+        ddHtml = `<span class="dash" title="WNS — no open position">—</span>`;
+      }
     }
 
-    const thesisClass = st==='hot' ? 'thesis thesis-hot' : 'thesis';
+    // ── Expand button ──
+    const expandBtn = `<button class="expand-btn" id="btn-${rowId}" onclick="toggleDetail('${rowId}')">▸ Detail</button>`;
 
-    return `<tr${r.star?' class="star-row"':''}>
-      <td><span class="tk">${t}</span><div class="tk-ref">Ref $${SP[t].toFixed(2)}</div></td>
-      <td><span class="badge b-wns">WNS</span></td>
-      <td class="num">${confStr}</td>
+    // ── Detail row content ──
+    const hypoEntry = r.en != null;
+    const hypoPnL = hypoEntry ? ((c - r.en) / r.en * 100) : pp.pct;
+    const hypoPnLabs = hypoEntry ? (c - r.en) : pp.abs;
+    const ddFromRef = ((P[t].low - SP[t]) / SP[t] * 100);
+    const highFromRef = ((P[t].high - SP[t]) / SP[t] * 100);
+    const ddFromEntry = r.en ? ((P[t].low - r.en) / r.en * 100) : null;
+    const pnlIfNoSL = r.en ? ((c - r.en) / r.en * 100) : null;
+    const maxFavorable = r.en ? ((P[t].high - r.en) / r.en * 100) : null;
+    const rewardDist = (r.en && r.tp) ? Math.abs(r.tp - r.en) : null;
+    const riskDist   = (r.en && r.sl) ? Math.abs(r.en - r.sl) : null;
+    const rrCalc     = (rewardDist && riskDist) ? (rewardDist / riskDist).toFixed(2) : null;
+    const confNum    = r.conf || 0;
+    const ev = (rewardDist && riskDist && confNum)
+      ? ((confNum * rewardDist) - ((1 - confNum) * riskDist)).toFixed(2)
+      : null;
+
+    const detailHtml = `
+      <div class="detail-inner">
+        <div class="detail-card">
+          <div class="detail-card-title">Position Tracker</div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Status</span><span class="detail-stat-val">${r.failed ? 'FAILED' : st.toUpperCase()}</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Signal type</span><span class="detail-stat-val">WNS ${r.tdir === 'up' ? '(Breakout)' : r.tdir === 'dn' ? '(Dip buy)' : ''}</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Confidence</span><span class="detail-stat-val">${confStr}</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Entry trigger</span><span class="detail-stat-val">${r.tr ? '$' + r.tr.toFixed(2) : '—'}</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Trigger hit?</span><span class="detail-stat-val ${st === 'hot' ? 'pos' : 'neg'}">${st === 'hot' ? '✓ Yes' : '✗ Not yet'}</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Recheck date</span><span class="detail-stat-val">${r.rc || '—'}</span></div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card-title">PnL & Drawdown</div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Signal ref price</span><span class="detail-stat-val">$${SP[t].toFixed(2)}</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Last price</span><span class="detail-stat-val">$${c.toFixed(2)}</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Δ from ref price</span><span class="detail-stat-val ${cls(pp.pct)}">${pc(pp.pct)} ($${pp.abs >= 0 ? '+' : ''}${pp.abs.toFixed(2)})</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Period low</span><span class="detail-stat-val neg">$${P[t].low.toFixed(2)} (${pc(ddFromRef, 1)} from ref)</span></div>
+          <div class="detail-stat"><span class="detail-stat-lbl">Period high</span><span class="detail-stat-val pos">$${P[t].high.toFixed(2)} (+${highFromRef.toFixed(1)}% from ref)</span></div>
+          ${r.en ? `<div class="detail-stat"><span class="detail-stat-lbl">PnL if entered ${r.en.toFixed(2)}</span><span class="detail-stat-val ${cls(pnlIfNoSL)}">${pc(pnlIfNoSL, 2)}</span></div>` : ''}
+          ${r.en ? `<div class="detail-stat"><span class="detail-stat-lbl">Max DD from entry</span><span class="detail-stat-val neg">${pc(ddFromEntry, 2)}</span></div>` : ''}
+          ${r.en ? `<div class="detail-stat"><span class="detail-stat-lbl">Max favorable</span><span class="detail-stat-val pos">${pc(maxFavorable, 2)}</span></div>` : ''}
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card-title">SL / TP Analysis</div>
+          ${r.sl ? `<div class="detail-stat"><span class="detail-stat-lbl">Stop Loss</span><span class="detail-stat-val neg">$${r.sl.toFixed(2)}</span></div>` : ''}
+          ${r.sl ? `<div class="detail-stat"><span class="detail-stat-lbl">SL hit (period)?</span><span class="detail-stat-val ${slHit ? 'neg' : 'pos'}">${slHit ? '⚡ YES — Hit $' + P[t].low.toFixed(2) : '✓ No (Low $' + P[t].low.toFixed(2) + ')'}</span></div>` : ''}
+          ${r.sl && !slHit ? `<div class="detail-stat"><span class="detail-stat-lbl">Buffer to SL</span><span class="detail-stat-val">${pc((c - r.sl) / c * 100, 1)}</span></div>` : ''}
+          ${r.tp ? `<div class="detail-stat"><span class="detail-stat-lbl">Take Profit</span><span class="detail-stat-val pos">$${r.tp.toFixed(2)}</span></div>` : ''}
+          ${r.tp ? `<div class="detail-stat"><span class="detail-stat-lbl">TP reached (period)?</span><span class="detail-stat-val ${tpHit ? 'pos' : 'neut'}">${tpHit ? '✓ YES — High $' + P[t].high.toFixed(2) : '✗ No (High $' + P[t].high.toFixed(2) + ')'}</span></div>` : ''}
+          ${r.tp && !tpHit ? `<div class="detail-stat"><span class="detail-stat-lbl">Distance to TP</span><span class="detail-stat-val">${pc((r.tp - c) / c * 100, 1)}</span></div>` : ''}
+          ${riskPerShare ? `<div class="detail-stat"><span class="detail-stat-lbl">Risk per share</span><span class="detail-stat-val neg">$${riskPerShare.toFixed(2)}</span></div>` : ''}
+          ${rrCalc ? `<div class="detail-stat"><span class="detail-stat-lbl">Calculated R:R</span><span class="detail-stat-val" style="color:var(--purple)">${rrCalc}:1</span></div>` : ''}
+          ${ev ? `<div class="detail-stat"><span class="detail-stat-lbl">Expected Value/sh</span><span class="detail-stat-val ${parseFloat(ev) >= 0 ? 'pos' : 'neg'}">$${ev}</span></div>` : ''}
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card-title">Model Consensus (${t})</div>
+          ${Object.entries(MODELS).map(([mk, mx]) => {
+            const rx = mx.rows[t];
+            if (rx.failed) return `<div class="detail-stat"><span class="detail-stat-lbl">${mx.label.split('(')[0].trim()}</span><span class="detail-stat-val neg">Failed</span></div>`;
+            const sxt = status(t, rx);
+            const trigStr = rx.tr ? '$' + rx.tr.toFixed(2) : 'No trigger';
+            return `<div class="detail-stat"><span class="detail-stat-lbl">${mx.label.split('(')[0].trim()}</span><span class="detail-stat-val ${sxt === 'hot' ? 'pos' : 'neut'}">${Math.round((rx.conf||0)*100)}% ${trigStr}</span></div>`;
+          }).join('')}
+        </div>
+
+        <div class="detail-thesis">${r.thesis}</div>
+      </div>`;
+
+    const mainRow = `<tr${r.star ? ' class="star-row"' : ''} style="cursor:pointer" onclick="toggleDetail('${rowId}')">
+      <td><span class="tk">${t}</span><div class="tk-ref">$${SP[t].toFixed(2)} signal</div>${expandBtn}</td>
+      <td>${signalBadge}</td>
+      <td class="num">${confStr}${agreeLine}${biasBadge ? '<div class="' + (r.tdir === 'up' ? 'bias-up' : 'bias-dn') + '">' + (r.tdir === 'up' ? '↑ BREAK' : '↓ DIP') + '</div>' : ''}</td>
       <td><div class="status-block">${stBadge}${rcLine}</div></td>
       <td>${entryCell}${starBadge}</td>
       <td class="num">$${SP[t].toFixed(2)}</td>
       <td class="num">$${c.toFixed(2)}</td>
       <td>${pnlHtml}</td>
-      <td>${trigger}</td>
+      <td>${triggerCell}</td>
       <td>${slTp}</td>
       <td>${ddHtml}</td>
-      <td class="${thesisClass}">${r.thesis}</td>
+      <td class="thesis">${r.thesis.substring(0, 120)}${r.thesis.length > 120 ? '…' : ''}</td>
     </tr>`;
+
+    const detailRowHtml = `<tr class="detail-row" id="${rowId}">
+      <td colspan="12">${detailHtml}</td>
+    </tr>`;
+
+    return mainRow + detailRowHtml;
   }).join('');
 
   return `<div class="table-wrap">
@@ -782,16 +960,16 @@ function renderTable(key) {
 <thead><tr>
   <th>Ticker</th>
   <th>Signal</th>
-  <th>Conf</th>
+  <th>Conf / Agree / Bias</th>
   <th>Status / Recheck</th>
   <th>Planned Entry</th>
   <th>Signal Price</th>
   <th>Last Price</th>
   <th>Running PnL</th>
-  <th>WNS Trigger (Δ% dist)</th>
-  <th>SL / TP</th>
-  <th>Max Drawdown from Entry</th>
-  <th>Thesis &amp; Mandate</th>
+  <th>Trigger (dist + ATR)</th>
+  <th>SL / TP (hit?)</th>
+  <th>Max DD / Hypothetical</th>
+  <th>Thesis (click row for detail)</th>
 </tr></thead>
 <tbody>${rows}</tbody>
 </table></div>`;
@@ -821,7 +999,6 @@ function renderModel(key) {
 function renderConsensus() {
   const cards = TICKERS.map(t => {
     const pp = pnl(t);
-    const entryHit = r.action === 'BUY' && r.en != null;  // true only for actual open positions
     const modelVotes = Object.values(MODELS).map(m => {
       const r = m.rows[t];
       if (r.failed) return null;
@@ -892,6 +1069,18 @@ function renderConsensus() {
     </div>
     <div class="action-grid">${actions}</div>
   </div>`;
+}
+
+/* ── EXPAND / COLLAPSE ── */
+function toggleDetail(rowId) {
+  const row = document.getElementById(rowId);
+  const btn = document.getElementById('btn-' + rowId);
+  if (!row) return;
+  const isOpen = row.classList.toggle('open');
+  if (btn) {
+    btn.classList.toggle('open', isOpen);
+    btn.textContent = isOpen ? '▾ Close' : '▸ Detail';
+  }
 }
 
 /* ── SHOW ── */
