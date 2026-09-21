@@ -790,7 +790,9 @@ function renderTable(key) {
     const rcLine = r.rc ? `<div class="recheck">${r.rc}</div>` : '';
 
     // ── Signal badge: WNS stays WNS; if hot AND has entry → show intent ──
-    const signalBadge = `<span class="badge b-wns">WNS</span>`;
+    const signalBadge = st === 'hot'
+      ? `<span class="badge b-wns" style="background:rgba(0,132,61,.15);color:#00843D;border-color:rgba(0,132,61,.3)">✓ TRIGGERED</span>`
+      : `<span class="badge b-wns">WNS</span>`;
 
     // ── Conf + model agreement ──
     const confStr = r.conf != null ? Math.round(r.conf * 100) + '%' : '—';
@@ -855,8 +857,8 @@ function renderTable(key) {
       const hypothTPreach = r.tp && P[t].high >= r.tp;
       if (hypothSLhit || hypothTPreach) {
         ddHtml = `<div style="font-size:9px;color:var(--muted);margin-bottom:2px">Hypothetical (no entry)</div>`
-               + (hypothSLhit ? `<div class="near-sl">⚠ SL level touched (${pc((r.sl - P[t].low)/r.sl*100,1)} thru)</div>` : '')
-               + (hypothTPreach ? `<div class="near-tp">✓ TP level reached</div>` : '');
+               + (hypothSLhit ? `<div class="near-sl">⚠ SL level would have been hit ($${P[t].low.toFixed(2)} < SL $${r.sl.toFixed(2)}) — WNS position not open</div>` : '')
+               + (hypothTPreach ? `<div class="near-tp">✓ TP level would have been reached ($${P[t].high.toFixed(2)} ≥ TP $${r.tp.toFixed(2)}) — WNS not open</div>` : '');
       } else {
         ddHtml = `<span class="dash" title="WNS — no open position">—</span>`;
       }
@@ -899,6 +901,7 @@ function renderTable(key) {
           <div class="detail-stat"><span class="detail-stat-lbl">Signal ref price</span><span class="detail-stat-val">$${SP[t].toFixed(2)}</span></div>
           <div class="detail-stat"><span class="detail-stat-lbl">Last price</span><span class="detail-stat-val">$${c.toFixed(2)}</span></div>
           <div class="detail-stat"><span class="detail-stat-lbl">Δ from ref price</span><span class="detail-stat-val ${cls(pp.pct)}">${pc(pp.pct)} ($${pp.abs >= 0 ? '+' : ''}${pp.abs.toFixed(2)})</span></div>
+          ${r.en != null ? `<div class="detail-stat"><span class="detail-stat-lbl" style="color:var(--purple);font-weight:700">Hypo PnL if entered ${r.en.toFixed(2)}</span><span class="detail-stat-val ${cls(pnlIfNoSL)}" style="color:var(--purple)">${pc(pnlIfNoSL, 2)} <small style="font-weight:400;opacity:.7">(WNS — not entered)</small></span></div>` : ''}
           <div class="detail-stat"><span class="detail-stat-lbl">Period low</span><span class="detail-stat-val neg">$${P[t].low.toFixed(2)} (${pc(ddFromRef, 1)} from ref)</span></div>
           <div class="detail-stat"><span class="detail-stat-lbl">Period high</span><span class="detail-stat-val pos">$${P[t].high.toFixed(2)} (+${highFromRef.toFixed(1)}% from ref)</span></div>
           ${r.en ? `<div class="detail-stat"><span class="detail-stat-lbl">PnL if entered ${r.en.toFixed(2)}</span><span class="detail-stat-val ${cls(pnlIfNoSL)}">${pc(pnlIfNoSL, 2)}</span></div>` : ''}
@@ -940,7 +943,7 @@ function renderTable(key) {
       <td><div class="status-block">${stBadge}${rcLine}</div></td>
       <td>${entryCell}${starBadge}</td>
       <td class="num">$${SP[t].toFixed(2)}</td>
-      <td class="num">$${c.toFixed(2)}</td>
+      <td class="num">$${c.toFixed(2)}${P[t].change_pct != null ? `<div style="font-size:9px;margin-top:1px;font-weight:700;color:${P[t].change_pct>=0?'var(--green)':'var(--red)'};">${P[t].change_pct>=0?'+':''}${P[t].change_pct.toFixed(2)}%</div>` : ''}</td>
       <td>${pnlHtml}</td>
       <td>${triggerCell}</td>
       <td>${slTp}</td>
@@ -963,11 +966,11 @@ function renderTable(key) {
   <th>Conf / Agree / Bias</th>
   <th>Status / Recheck</th>
   <th>Planned Entry</th>
-  <th>Signal Price</th>
-  <th>Last Price</th>
+  <th>Signal Ref</th>
+  <th>Last Close ↑%</th>
   <th>Running PnL</th>
   <th>Trigger (dist + ATR)</th>
-  <th>SL / TP (hit?)</th>
+  <th>SL / TP (hit since signal)</th>
   <th>Max DD / Hypothetical</th>
   <th>Thesis (click row for detail)</th>
 </tr></thead>
