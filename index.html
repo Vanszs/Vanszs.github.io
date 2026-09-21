@@ -682,9 +682,15 @@ function pnl(ticker) {
   return { pct:(c-sp)/sp*100, abs:c-sp };
 }
 
-function maxDD(ticker) {
-  const h=P[ticker].high, l=P[ticker].low;
-  return (l-h)/h*100;
+function maxDDfromEntry(entryPrice, ticker) {
+  // Only meaningful when position is ENTERED (BUY/SELL with actual entry price).
+  // Returns { dd_pct, dd_abs, sl_hit } from entry to lowest low in period.
+  if (!entryPrice) return null;
+  const low  = P[ticker].low;
+  const high = P[ticker].high;
+  const dd_abs = low - entryPrice;          // negative = drawdown
+  const dd_pct = dd_abs / entryPrice * 100;
+  return { dd_abs, dd_pct, low, high };
 }
 
 function distToTrigger(ticker, row) {
@@ -701,7 +707,7 @@ function renderTable(key) {
     const r = m.rows[t];
     const st = status(t, r);
     const pp = pnl(t);
-    const dd = maxDD(t);
+    const entryHit = r.action === 'BUY' && r.en != null;  // true only for actual open positions
     const c = P[t].close;
 
     const stBadge = r.failed
@@ -729,9 +735,29 @@ function renderTable(key) {
       ? `<div class="trigger-main num">$${r.tr.toFixed(2)}</div>${distToTrigger(t,r)}`
       : `<span class="dash">—</span>`;
 
-    const pnlHtml = `<div class="pnl-primary num ${cls(pp.pct)}">${pc(pp.pct)}</div><div class="pnl-secondary num ${cls(pp.abs)}">${pp.abs>=0?'+':''}$${Math.abs(pp.abs).toFixed(2)}</div>`;
+    // Running PnL: only meaningful if position entered.
+    // WNS = not entered → show "—" with note. 
+    let pnlHtml;
+    if (entryHit) {
+      pnlHtml = `<div class="pnl-primary num ${cls(pp.pct)}">${pc(pp.pct)}</div>`
+              + `<div class="pnl-secondary num ${cls(pp.abs)}">${pp.abs>=0?'+':''}$${Math.abs(pp.abs).toFixed(2)}</div>`;
+    } else {
+      pnlHtml = `<span class="dash" title="No position (WNS)">—</span>`;
+    }
 
-    const ddHtml = `<div class="dd-main num neg">${pc(dd)}</div><div class="dd-range">$${P[t].low.toFixed(2)} – $${P[t].high.toFixed(2)}</div>`;
+    // Max Drawdown: only shown when position is ENTERED (BUY with actual entry).
+    // WNS = no position → show dash. Prevents misleading period-range stat.
+    let ddHtml;
+    if (entryHit) {
+      const dd = maxDDfromEntry(r.en, t);
+      const slHit = r.sl && P[t].low <= r.sl;
+      ddHtml = `<div class="dd-main num ${dd.dd_pct < 0 ? 'neg' : 'pos'}">${pc(dd.dd_pct)}</div>`
+             + `<div class="dd-range">Entry $${r.en.toFixed(2)} → Low $${dd.low.toFixed(2)}</div>`
+             + (slHit ? `<div class="badge b-fail" style="margin-top:4px">⚡ SL Hit</div>` : '');
+    } else {
+      // WNS — position not entered, max drawdown not applicable
+      ddHtml = `<span class="dash" title="No position (WNS)">—</span>`;
+    }
 
     const thesisClass = st==='hot' ? 'thesis thesis-hot' : 'thesis';
 
@@ -761,10 +787,10 @@ function renderTable(key) {
   <th>Planned Entry</th>
   <th>Signal Price</th>
   <th>Last Price</th>
-  <th>Running PnL (if held)</th>
+  <th>Running PnL</th>
   <th>WNS Trigger (Δ% dist)</th>
   <th>SL / TP</th>
-  <th>Max Drawdown (period range)</th>
+  <th>Max Drawdown from Entry</th>
   <th>Thesis &amp; Mandate</th>
 </tr></thead>
 <tbody>${rows}</tbody>
@@ -795,7 +821,7 @@ function renderModel(key) {
 function renderConsensus() {
   const cards = TICKERS.map(t => {
     const pp = pnl(t);
-    const dd = maxDD(t);
+    const entryHit = r.action === 'BUY' && r.en != null;  // true only for actual open positions
     const modelVotes = Object.values(MODELS).map(m => {
       const r = m.rows[t];
       if (r.failed) return null;
@@ -833,7 +859,7 @@ function renderConsensus() {
         <div class="cons-stat-row"><span class="cons-stat-lbl">Avg Conf</span><span class="cons-stat-val">${barW}%</span></div>
         <div class="cons-stat-row"><span class="cons-stat-lbl">Models agree</span><span class="cons-stat-val">${modelVotes.length}/6</span></div>
         <div class="cons-stat-row"><span class="cons-stat-lbl" style="color:var(--green)">Hot entry</span><span class="cons-stat-val" style="color:var(--green)">${hotN} model${hotN!==1?'s':''}</span></div>
-        <div class="cons-stat-row"><span class="cons-stat-lbl">Max DD</span><span class="cons-stat-val neg">${pc(dd)}</span></div>
+        <div class="cons-stat-row"><span class="cons-stat-lbl">Max DD</span><span class="cons-stat-val neut">— (WNS)</span></div>
         <div class="cons-stat-row"><span class="cons-stat-lbl">Range</span><span class="cons-stat-val">$${P[t].low.toFixed(2)}–$${P[t].high.toFixed(2)}</span></div>
       </div>
       <div class="cons-triggers">${dipLine}${upLine}</div>
