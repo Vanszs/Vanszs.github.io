@@ -27,7 +27,7 @@ jobs:
         run: |
           python3 - <<'INNEREOF'
           import yfinance as yf, json, pytz
-          from datetime import datetime, timezone, date, timedelta
+          from datetime import datetime, timezone
 
           TICKERS = ['SNOW','MSFT','AVGO','NVDA','TSLA']
           SIGNAL_PRICES = {'SNOW':332.43,'MSFT':493.78,'AVGO':357.61,'NVDA':222.27,'TSLA':364.27}
@@ -35,31 +35,27 @@ jobs:
 
           prices = {}
           for t in TICKERS:
-              # Fetch from day BEFORE signal date to capture full range since signal
-              # Using start=day_before ensures we get data from the next trading day onward
-              signal_dt = datetime.strptime(SIGNAL_DATE, '%Y-%m-%d').date()
-              day_before = (signal_dt - timedelta(days=1)).strftime('%Y-%m-%d')
-              
-              hist = yf.download(t, start=SIGNAL_DATE, progress=False, auto_adjust=True)
+              # Ticker.history with start captures all trading days from signal_date onward
+              # start=SIGNAL_DATE on weekend just moves to next trading day automatically
+              hist = yf.Ticker(t).history(start=SIGNAL_DATE, auto_adjust=True)
               if hist.empty:
-                  # Fallback: recent data only
-                  hist = yf.download(t, period='5d', progress=False, auto_adjust=True)
+                  hist = yf.Ticker(t).history(period='5d', auto_adjust=True)
               if hist.empty:
                   continue
 
               close = float(hist['Close'].iloc[-1])
-              # low/high since signal date (full period for SL/TP detection)
+              # Capture full range since signal date for accurate SL/TP detection
               low   = float(hist['Low'].min())
               high  = float(hist['High'].max())
               prev  = float(hist['Close'].iloc[-2]) if len(hist) > 1 else close
-              bar_count = len(hist)
-              
+              bar_count = int(len(hist))
+
               prices[t] = {
-                  'close':      round(close, 2),
-                  'low':        round(low, 2),
-                  'high':       round(high, 2),
-                  'prev_close': round(prev, 2),
-                  'change_pct': round((close - prev) / prev * 100, 2),
+                  'close':             round(close, 2),
+                  'low':               round(low, 2),
+                  'high':              round(high, 2),
+                  'prev_close':        round(prev, 2),
+                  'change_pct':        round((close - prev) / prev * 100, 2),
                   'bars_since_signal': bar_count
               }
 
