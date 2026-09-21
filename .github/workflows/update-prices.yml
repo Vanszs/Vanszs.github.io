@@ -35,8 +35,12 @@ jobs:
 
           prices = {}
           for t in TICKERS:
+              # Try start=SIGNAL_DATE first, fallback to period=5d if empty
               hist = yf.Ticker(t).history(start=SIGNAL_DATE)
-              if hist.empty: continue
+              if hist.empty:
+                  hist = yf.Ticker(t).history(period='5d')
+              if hist.empty:
+                  continue
               close = float(hist['Close'].iloc[-1])
               low   = float(hist['Low'].min())
               high  = float(hist['High'].max())
@@ -62,7 +66,8 @@ jobs:
           }
           with open('prices.json','w') as f:
               json.dump(data, f, indent=2)
-          print(json.dumps(data, indent=2))
+          import sys
+          print(json.dumps(data, indent=2), file=sys.stderr)
           INNEREOF
 
       - name: Commit and push prices.json
