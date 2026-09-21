@@ -1,0 +1,49 @@
+{
+  "updated": "2026-09-20T21:00:00Z",
+  "market_status": "closed",
+  "prices": {
+    "SNOW": {
+      "close": 332.43,
+      "low": 317.45,
+      "high": 344.66,
+      "prev_close": 330.1,
+      "change_pct": 0.71
+    },
+    "MSFT": {
+      "close": 493.78,
+      "low": 487.23,
+      "high": 509.95,
+      "prev_close": 490.12,
+      "change_pct": 0.75
+    },
+    "AVGO": {
+      "close": 357.61,
+      "low": 335.81,
+      "high": 363.28,
+      "prev_close": 355.0,
+      "change_pct": 0.74
+    },
+    "NVDA": {
+      "close": 222.27,
+      "low": 208.93,
+      "high": 222.73,
+      "prev_close": 219.34,
+      "change_pct": 1.33
+    },
+    "TSLA": {
+      "close": 364.27,
+      "low": 354.05,
+      "high": 374.12,
+      "prev_close": 360.0,
+      "change_pct": 1.19
+    }
+  },
+  "signal_date": "2026-09-20",
+  "signal_prices": {
+    "SNOW": 332.43,
+    "MSFT": 493.78,
+    "AVGO": 357.61,
+    "NVDA": 222.27,
+    "TSLA": 364.27
+  }
+}
