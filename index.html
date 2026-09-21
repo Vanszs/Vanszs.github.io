@@ -539,8 +539,8 @@ footer {
       <div>Vanszs · Bevantyo Satria Pinandhita</div>
     </div>
   </div>
-  <div class="alert-band" style="grid-column:1/-1">
-    <span>⚠ MARKET CLOSED — Prices as of NYSE/NASDAQ close Fri 2026-09-18. All signals: Wait and See (WNS).</span>
+  <div class="alert-band" id="data-banner" style="grid-column:1/-1">
+    <span>⏳ Loading live prices...</span>
     <span>Next session: Mon 2026-09-22 09:30 ET</span>
   </div>
 </header>
@@ -1091,6 +1091,45 @@ function show(key, el) {
   el.classList.add('active');
 }
 
+
+/* ══════════════════════════════════════════════
+   LIVE DATA FETCH from prices.json
+   Same-origin GitHub Pages static file — no CORS
+   Refreshes every 30 min via GitHub Actions cron
+   ══════════════════════════════════════════════ */
+async function loadLivePrices() {
+  const banner = document.getElementById('data-banner');
+  try {
+    const res = await fetch('./prices.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.prices) {
+      Object.entries(data.prices).forEach(([t, v]) => {
+        if (P[t]) { P[t].close = v.close; P[t].low = v.low; P[t].high = v.high;
+                    P[t].prev_close = v.prev_close; P[t].change_pct = v.change_pct; }
+      });
+    }
+    if (data.signal_prices) {
+      Object.entries(data.signal_prices).forEach(([t, v]) => { SP[t] = v; });
+    }
+    const updated = new Date(data.updated);
+    const ageMin  = Math.round((Date.now() - updated) / 60000);
+    const mColor  = data.market_status === 'open' ? '#3fb950' : '#d29922';
+    if (banner) {
+      banner.innerHTML =
+        `<span>🟢 LIVE DATA — Updated ${ageMin < 2 ? 'just now' : ageMin + 'm ago'} `
+        + `· Market: <strong style="color:${mColor}">${data.market_status.toUpperCase()}</strong></span>`
+        + `<span>${updated.toLocaleString('en-US',{hour12:false})} UTC+0</span>`;
+      banner.style.background = '#0a1f0e';
+    }
+    return true;
+  } catch (e) {
+    if (banner) banner.innerHTML =
+      `<span>⚠ Using cached prices (2026-09-18) — ${e.message}</span><span>prices.json fetch failed</span>`;
+    return false;
+  }
+}
+
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.getElementById('root');
@@ -1122,6 +1161,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // timestamp
   document.getElementById('ts').textContent =
     'Updated ' + new Date().toLocaleString('en-US',{hour12:false}) + ' local';
+  // Fetch live prices then re-render all sections with fresh data
+  loadLivePrices().then(ok => {
+    if (ok) {
+      document.querySelectorAll('.model-section').forEach(el => el.remove());
+      Object.keys(MODELS).forEach(k => {
+        const div = document.createElement('div');
+        div.id = 's-' + k;
+        div.className = 'model-section' + (k === 'gemini' ? ' active' : '');
+        div.innerHTML = renderModel(k);
+        root.appendChild(div);
+      });
+      const cons2 = document.createElement('div');
+      cons2.id = 's-consensus';
+      cons2.className = 'model-section';
+      cons2.innerHTML = renderConsensus();
+      root.appendChild(cons2);
+      let hot = 0;
+      TICKERS.forEach(t => Object.keys(MODELS).forEach(k => {
+        const r = MODELS[k].rows[t];
+        if (!r.failed && status(t, r) === 'hot') hot++;
+      }));
+      document.getElementById('hot-stat').textContent = hot;
+    }
+  });
 });
 </script>
 </body>
