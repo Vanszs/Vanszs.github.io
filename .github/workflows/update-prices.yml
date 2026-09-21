@@ -2,7 +2,7 @@ name: Update Stock Prices
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '0 21 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -35,8 +35,6 @@ jobs:
 
           prices = {}
           for t in TICKERS:
-              # Ticker.history with start captures all trading days from signal_date onward
-              # start=SIGNAL_DATE on weekend just moves to next trading day automatically
               hist = yf.Ticker(t).history(start=SIGNAL_DATE, auto_adjust=True)
               if hist.empty:
                   hist = yf.Ticker(t).history(period='5d', auto_adjust=True)
@@ -44,11 +42,9 @@ jobs:
                   continue
 
               close = float(hist['Close'].iloc[-1])
-              # Capture full range since signal date for accurate SL/TP detection
               low   = float(hist['Low'].min())
               high  = float(hist['High'].max())
               prev  = float(hist['Close'].iloc[-2]) if len(hist) > 1 else close
-              bar_count = int(len(hist))
 
               prices[t] = {
                   'close':             round(close, 2),
@@ -56,7 +52,7 @@ jobs:
                   'high':              round(high, 2),
                   'prev_close':        round(prev, 2),
                   'change_pct':        round((close - prev) / prev * 100, 2),
-                  'bars_since_signal': bar_count
+                  'bars_since_signal': int(len(hist))
               }
 
           ny = pytz.timezone('America/New_York')
