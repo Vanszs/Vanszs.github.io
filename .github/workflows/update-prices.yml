@@ -27,7 +27,7 @@ jobs:
         run: |
           python3 - <<'INNEREOF'
           import yfinance as yf, json, pytz
-          from datetime import datetime, timezone
+          from datetime import datetime, timezone, date, timedelta
 
           TICKERS = ['SNOW','MSFT','AVGO','NVDA','TSLA']
           SIGNAL_PRICES = {'SNOW':332.43,'MSFT':493.78,'AVGO':357.61,'NVDA':222.27,'TSLA':364.27}
@@ -35,22 +35,32 @@ jobs:
 
           prices = {}
           for t in TICKERS:
-              # Try start=SIGNAL_DATE first, fallback to period=5d if empty
-              hist = yf.Ticker(t).history(start=SIGNAL_DATE)
+              # Fetch from day BEFORE signal date to capture full range since signal
+              # Using start=day_before ensures we get data from the next trading day onward
+              signal_dt = datetime.strptime(SIGNAL_DATE, '%Y-%m-%d').date()
+              day_before = (signal_dt - timedelta(days=1)).strftime('%Y-%m-%d')
+              
+              hist = yf.download(t, start=SIGNAL_DATE, progress=False, auto_adjust=True)
               if hist.empty:
-                  hist = yf.Ticker(t).history(period='5d')
+                  # Fallback: recent data only
+                  hist = yf.download(t, period='5d', progress=False, auto_adjust=True)
               if hist.empty:
                   continue
+
               close = float(hist['Close'].iloc[-1])
+              # low/high since signal date (full period for SL/TP detection)
               low   = float(hist['Low'].min())
               high  = float(hist['High'].max())
               prev  = float(hist['Close'].iloc[-2]) if len(hist) > 1 else close
+              bar_count = len(hist)
+              
               prices[t] = {
                   'close':      round(close, 2),
                   'low':        round(low, 2),
                   'high':       round(high, 2),
                   'prev_close': round(prev, 2),
-                  'change_pct': round((close-prev)/prev*100, 2)
+                  'change_pct': round((close - prev) / prev * 100, 2),
+                  'bars_since_signal': bar_count
               }
 
           ny = pytz.timezone('America/New_York')
@@ -64,7 +74,7 @@ jobs:
               'signal_date':   SIGNAL_DATE,
               'signal_prices': SIGNAL_PRICES
           }
-          with open('prices.json','w') as f:
+          with open('prices.json', 'w') as f:
               json.dump(data, f, indent=2)
           import sys
           print(json.dumps(data, indent=2), file=sys.stderr)
