@@ -1,0 +1,74 @@
+name: Update Stock Prices
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance pytz
+
+      - name: Fetch prices and write prices.json
+        run: |
+          python3 - <<'INNEREOF'
+          import yfinance as yf, json, pytz
+          from datetime import datetime, timezone
+
+          TICKERS = ['SNOW','MSFT','AVGO','NVDA','TSLA']
+          SIGNAL_PRICES = {'SNOW':332.43,'MSFT':493.78,'AVGO':357.61,'NVDA':222.27,'TSLA':364.27}
+          SIGNAL_DATE = '2026-09-20'
+
+          prices = {}
+          for t in TICKERS:
+              hist = yf.Ticker(t).history(start=SIGNAL_DATE)
+              if hist.empty: continue
+              close = float(hist['Close'].iloc[-1])
+              low   = float(hist['Low'].min())
+              high  = float(hist['High'].max())
+              prev  = float(hist['Close'].iloc[-2]) if len(hist) > 1 else close
+              prices[t] = {
+                  'close':      round(close, 2),
+                  'low':        round(low, 2),
+                  'high':       round(high, 2),
+                  'prev_close': round(prev, 2),
+                  'change_pct': round((close-prev)/prev*100, 2)
+              }
+
+          ny = pytz.timezone('America/New_York')
+          now_ny = datetime.now(ny)
+          market_open = now_ny.weekday() < 5 and 9 <= now_ny.hour < 16
+
+          data = {
+              'updated':       datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+              'market_status': 'open' if market_open else 'closed',
+              'prices':        prices,
+              'signal_date':   SIGNAL_DATE,
+              'signal_prices': SIGNAL_PRICES
+          }
+          with open('prices.json','w') as f:
+              json.dump(data, f, indent=2)
+          print(json.dumps(data, indent=2))
+          INNEREOF
+
+      - name: Commit and push prices.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add prices.json
+          git diff --cached --quiet || git commit -m "data: update prices.json [skip ci]"
+          git push
