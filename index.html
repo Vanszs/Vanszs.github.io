@@ -3,571 +3,911 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vanszs TradingAgents — Multi-Model Signal Report</title>
+<title>TradingAgents — Multi-Model Signal Report</title>
 <style>
-  :root {
-    --bg: #0d1117; --bg2: #161b22; --bg3: #21262d;
-    --border: #30363d; --text: #e6edf3; --muted: #8b949e;
-    --green: #3fb950; --red: #f85149; --yellow: #d29922;
-    --blue: #58a6ff; --purple: #bc8cff; --orange: #ffa657;
-    --accent: #1f6feb;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+/* =====================================================
+   SWISS INTERNATIONAL TYPOGRAPHIC STYLE
+   Grid: 12-col / 8px baseline / Neue Haas Grotesk tone
+   Palette: #000 / #FFF / #FF3A3A (signal red) / #0047FF (data blue)
+   ===================================================== */
 
-  /* HEADER */
-  header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-  .logo { font-size: 20px; font-weight: 800; color: var(--blue); letter-spacing: -0.5px; }
-  .logo span { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
-  .header-links { display: flex; gap: 16px; align-items: center; }
-  .header-links a { color: var(--muted); text-decoration: none; font-size: 12px; transition: color .15s; }
-  .header-links a:hover { color: var(--text); }
-  .header-meta { font-size: 11px; color: var(--muted); text-align: right; line-height: 1.6; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
 
-  /* NAV TABS */
-  nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
-  nav::-webkit-scrollbar { display: none; }
-  nav a { display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; color: var(--muted); text-decoration: none; font-size: 12px; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s; cursor: pointer; }
-  nav a:hover { color: var(--text); }
-  nav a.active { color: var(--blue); border-bottom-color: var(--blue); }
-  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+:root {
+  --black:     #0A0A0A;
+  --white:     #FFFFFF;
+  --off:       #F5F5F4;
+  --rule:      #E8E8E6;
+  --muted:     #8A8A85;
+  --red:       #FF3A3A;
+  --blue:      #0047FF;
+  --green:     #00843D;
+  --yellow:    #E8A000;
+  --purple:    #6B21A8;
 
-  /* SUMMARY BAR */
-  .summary-bar { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; gap: 32px; flex-wrap: wrap; align-items: center; }
-  .stat { text-align: center; }
-  .stat-val { font-size: 22px; font-weight: 800; line-height: 1; font-family: monospace; }
-  .stat-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-top: 3px; }
-  .stat-sep { width: 1px; height: 36px; background: var(--border); }
-  .alert-banner { flex: 1; background: rgba(31,111,235,.12); border: 1px solid rgba(88,166,255,.25); border-radius: 6px; padding: 8px 14px; font-size: 11px; color: var(--blue); min-width: 200px; }
-  .alert-banner strong { display: block; margin-bottom: 2px; }
+  --f-xs:  10px;
+  --f-sm:  11px;
+  --f-base:13px;
+  --f-md:  15px;
+  --f-lg:  18px;
+  --f-xl:  24px;
+  --f-2xl: 36px;
+  --f-3xl: 56px;
 
-  /* CONTAINER */
-  .container { padding: 20px 24px; max-width: 1600px; margin: 0 auto; }
-  .model-section { display: none; }
-  .model-section.active { display: block; }
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+}
 
-  /* MODEL HEADER */
-  .model-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; padding: 14px 18px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; }
-  .model-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
-  .model-badge { background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; font-family: monospace; }
-  .model-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
-  .model-sub { font-size: 11px; color: var(--muted); }
-  .model-tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
-  .tag { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 1px 8px; font-size: 10px; color: var(--muted); }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--white);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
 
-  /* TABLE */
-  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; background: var(--bg2); min-width: 900px; }
-  th { background: var(--bg3); color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .7px; padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); font-weight: 600; white-space: nowrap; }
-  td { padding: 11px 12px; border-bottom: 1px solid rgba(48,54,61,.5); vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,.018); }
-  tr.highlight-row td { background: rgba(31,111,235,.06); border-left: 3px solid var(--accent); }
-  tr.highlight-row:hover td { background: rgba(31,111,235,.1); }
+/* ── RULE UTILITY ── */
+.rule-x { border-top: 1px solid var(--black); }
+.rule-x-light { border-top: 1px solid var(--rule); }
+.rule-b { border-bottom: 1px solid var(--black); }
+.rule-b-light { border-bottom: 1px solid var(--rule); }
 
-  /* BADGES */
-  .ticker { font-weight: 800; font-size: 15px; color: var(--blue); font-family: monospace; display: block; }
-  .ticker-sub { font-size: 9px; color: var(--muted); margin-top: 1px; }
-  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-  .badge-wns { background: rgba(210,153,34,.15); color: var(--yellow); border: 1px solid rgba(210,153,34,.3); }
-  .badge-hot { background: rgba(63,185,80,.2); color: var(--green); border: 1px solid rgba(63,185,80,.4); box-shadow: 0 0 8px rgba(63,185,80,.2); }
-  .badge-watching { background: rgba(88,166,255,.1); color: var(--blue); border: 1px solid rgba(88,166,255,.25); }
-  .badge-failed { background: rgba(248,81,73,.12); color: var(--red); border: 1px solid rgba(248,81,73,.25); }
-  .badge-best { background: rgba(188,140,255,.15); color: var(--purple); border: 1px solid rgba(188,140,255,.3); }
+/* ── HEADER ── */
+header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 2px solid var(--black);
+}
+.header-left {}
+.site-title {
+  font-size: var(--f-3xl);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: .95;
+  text-transform: uppercase;
+  color: var(--black);
+}
+.site-sub {
+  font-size: var(--f-sm);
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 100%;
+  gap: var(--space-3);
+}
+.header-meta {
+  font-size: var(--f-xs);
+  color: var(--muted);
+  text-align: right;
+  line-height: 1.8;
+  font-variant-numeric: tabular-nums;
+}
+.header-links { display: flex; gap: var(--space-4); }
+.header-links a {
+  font-size: var(--f-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--black);
+  text-decoration: none;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--black);
+}
+.header-links a:hover { color: var(--blue); border-color: var(--blue); }
+.alert-band {
+  grid-column: 1 / -1;
+  background: var(--black);
+  color: var(--white);
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--f-xs);
+  font-weight: 500;
+  letter-spacing: .06em;
+  display: flex;
+  justify-content: space-between;
+}
 
-  /* VALUES */
-  .pos { color: var(--green); font-weight: 600; }
-  .neg { color: var(--red); font-weight: 600; }
-  .neutral { color: var(--muted); }
-  .mono { font-family: monospace; }
-  .rr { color: var(--purple); font-size: 10px; margin-top: 2px; }
-  .trigger-val { font-family: monospace; font-size: 12px; }
-  .trigger-dist { font-size: 10px; margin-top: 2px; }
-  .recheck { font-size: 10px; color: var(--muted); font-family: monospace; margin-top: 3px; }
-  .thesis-cell { font-size: 10.5px; color: var(--muted); line-height: 1.55; max-width: 280px; min-width: 180px; }
-  .thesis-cell.has-detail { cursor: pointer; }
-  .thesis-cell.has-detail:hover { color: var(--text); }
-  .pnl-block { font-family: monospace; }
-  .pnl-pct { font-size: 13px; font-weight: 700; }
-  .pnl-abs { font-size: 10px; opacity: .8; margin-top: 1px; }
-  .sl-tp { display: flex; flex-direction: column; gap: 2px; font-family: monospace; font-size: 11px; }
-  .sl-line::before { content: 'SL '; color: var(--muted); font-size: 9px; }
-  .tp-line::before { content: 'TP '; color: var(--muted); font-size: 9px; }
-  .dd-block { font-family: monospace; }
-  .dd-pct { font-size: 12px; }
-  .dd-note { font-size: 9px; color: var(--muted); margin-top: 1px; }
-  
-  /* STAR SETUP */
-  .star-setup { display: inline-flex; align-items: center; gap: 4px; background: rgba(188,140,255,.1); border: 1px solid rgba(188,140,255,.3); border-radius: 4px; padding: 2px 6px; font-size: 9px; color: var(--purple); margin-top: 4px; }
+/* ── STAT ROW ── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--black);
+}
+.stat-cell {
+  padding: var(--space-4) var(--space-5);
+  border-right: 1px solid var(--black);
+}
+.stat-cell:last-child { border-right: none; }
+.stat-val {
+  font-size: var(--f-2xl);
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-lbl {
+  font-size: var(--f-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-top: var(--space-1);
+}
 
-  /* CONSENSUS TABLE */
-  .consensus-section { margin-top: 28px; }
-  .consensus-section h3 { font-size: 13px; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .5px; }
-  .consensus-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-  .cons-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
-  .cons-ticker { font-weight: 800; font-size: 16px; color: var(--blue); font-family: monospace; }
-  .cons-price { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: monospace; }
-  .cons-pnl { font-size: 20px; font-weight: 800; font-family: monospace; margin: 8px 0 4px; }
-  .cons-bar { height: 4px; border-radius: 2px; background: var(--border); margin: 6px 0; overflow: hidden; }
-  .cons-bar-fill { height: 100%; border-radius: 2px; }
-  .cons-votes { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; }
-  .vote-item { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
-  .vote-item strong { color: var(--text); }
-  .cons-trigger { font-size: 10px; margin-top: 6px; padding: 4px 8px; background: var(--bg3); border-radius: 4px; font-family: monospace; }
-  .cons-trigger.hot { color: var(--green); border-left: 2px solid var(--green); }
-  .cons-trigger.watching { color: var(--blue); border-left: 2px solid var(--blue); }
+/* ── NAV ── */
+nav {
+  display: flex;
+  border-bottom: 1px solid var(--black);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav::-webkit-scrollbar { display: none; }
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--f-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  cursor: pointer;
+  border-right: 1px solid var(--rule);
+  white-space: nowrap;
+  transition: color .1s, background .1s;
+  user-select: none;
+}
+.nav-item:hover { color: var(--black); background: var(--off); }
+.nav-item.active {
+  color: var(--white);
+  background: var(--black);
+}
+.nav-item.active .nav-num { background: var(--white); color: var(--black); }
+.nav-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.nav-sep { margin-left: auto; }
+.nav-consensus {
+  border-left: 2px solid var(--black);
+  color: var(--blue);
+  border-right: none;
+}
+.nav-consensus.active { background: var(--blue); color: var(--white); }
 
-  /* FOOTER */
-  footer { text-align: center; padding: 28px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); margin-top: 32px; line-height: 2; }
-  footer a { color: var(--blue); text-decoration: none; }
+/* ── SECTION ── */
+.model-section { display: none; }
+.model-section.active { display: block; }
 
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .container { padding: 12px; }
-    th, td { padding: 8px 10px; }
-    .thesis-cell { max-width: 140px; min-width: 120px; }
-    .summary-bar { gap: 16px; }
-    .consensus-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 480px) { .consensus-grid { grid-template-columns: 1fr; } }
+/* ── MODEL INTRO BAR ── */
+.model-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--rule);
+  background: var(--off);
+}
+.model-index {
+  font-size: var(--f-2xl);
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--muted);
+  line-height: 1;
+  min-width: 40px;
+}
+.model-info {}
+.model-name { font-size: var(--f-md); font-weight: 700; letter-spacing: -.3px; }
+.model-desc { font-size: var(--f-xs); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+.model-tags { display: flex; gap: var(--space-2); margin-top: var(--space-2); flex-wrap: wrap; }
+.tag {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  padding: 2px 6px;
+  border: 1px solid var(--rule);
+  color: var(--muted);
+}
+.model-stat-mini { display: flex; gap: var(--space-5); }
+.mini-stat { text-align: right; }
+.mini-val { font-size: var(--f-lg); font-weight: 900; letter-spacing: -1px; line-height: 1; }
+.mini-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 1px; }
+
+/* ── SIGNAL TABLE ── */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+thead th {
+  padding: var(--space-2) var(--space-4);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--muted);
+  text-align: left;
+  border-bottom: 1px solid var(--black);
+  background: var(--white);
+  white-space: nowrap;
+}
+thead th:first-child { padding-left: var(--space-6); }
+tbody td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+  font-size: var(--f-base);
+}
+tbody td:first-child { padding-left: var(--space-6); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--off); }
+tbody tr.star-row td {
+  background: #FFFDF5;
+  border-left: 3px solid var(--yellow);
+}
+tbody tr.star-row td:first-child { padding-left: calc(var(--space-6) - 3px); }
+tbody tr.star-row:hover td { background: #FFF9E6; }
+
+/* ── TICKER ── */
+.tk { font-size: var(--f-lg); font-weight: 900; letter-spacing: -0.5px; color: var(--black); display: block; line-height: 1; }
+.tk-ref { font-size: var(--f-xs); color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  white-space: nowrap;
+}
+.b-wns   { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+.b-hot   { background: var(--green); color: var(--white); }
+.b-watch { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+.b-fail  { background: transparent; color: var(--red); border: 1px solid var(--red); }
+.b-best  { background: var(--purple); color: var(--white); font-size: 8px; margin-top: 3px; display: inline-block; }
+
+.status-block { display: flex; flex-direction: column; gap: 3px; }
+.recheck { font-size: var(--f-xs); color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.recheck::before { content: '↻ '; }
+
+/* ── NUMBERS ── */
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pos  { color: var(--green); font-weight: 600; }
+.neg  { color: var(--red); font-weight: 600; }
+.neut { color: var(--muted); }
+.dash { color: var(--rule); }
+
+.pnl-primary { font-size: var(--f-md); font-weight: 700; letter-spacing: -.3px; }
+.pnl-secondary { font-size: var(--f-xs); opacity: .75; margin-top: 1px; }
+
+.entry-main { font-size: var(--f-md); font-weight: 700; letter-spacing: -.3px; }
+.rr-pill {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 5px;
+  background: var(--purple);
+  color: var(--white);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.trigger-main { font-size: var(--f-base); font-weight: 600; }
+.trigger-dist { font-size: var(--f-xs); color: var(--muted); margin-top: 1px; }
+
+.sl-tp { display: flex; flex-direction: column; gap: 2px; }
+.sl-line { font-size: var(--f-sm); }
+.sl-line::before { content: 'SL '; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.tp-line { font-size: var(--f-sm); }
+.tp-line::before { content: 'TP '; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+.dd-main { font-size: var(--f-base); font-weight: 600; }
+.dd-range { font-size: var(--f-xs); color: var(--muted); margin-top: 1px; }
+
+.thesis { font-size: var(--f-xs); color: var(--muted); line-height: 1.55; max-width: 260px; min-width: 160px; }
+.thesis-hot { color: var(--black); }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--rule);
+}
+.label-line { flex: 1; height: 1px; background: var(--rule); }
+.label-text {
+  font-size: var(--f-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── CONSENSUS ── */
+.consensus-wrap { padding: var(--space-6); }
+.consensus-title {
+  font-size: var(--f-2xl);
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin-bottom: var(--space-1);
+}
+.consensus-sub { font-size: var(--f-sm); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: var(--space-6); }
+
+.cons-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--black);
+}
+.cons-card {
+  padding: var(--space-5);
+  border-right: 1px solid var(--black);
+}
+.cons-card:last-child { border-right: none; }
+.cons-ticker { font-size: var(--f-xl); font-weight: 900; letter-spacing: -1px; }
+.cons-price { font-size: var(--f-xs); color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.cons-pnl { font-size: var(--f-2xl); font-weight: 900; letter-spacing: -1px; margin: var(--space-3) 0 var(--space-2); }
+.cons-hr { height: 3px; margin-bottom: var(--space-3); }
+.cons-stats { display: flex; flex-direction: column; gap: var(--space-2); }
+.cons-stat-row { display: flex; justify-content: space-between; font-size: var(--f-xs); }
+.cons-stat-lbl { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.cons-stat-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+.cons-triggers { margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+.cons-trigger-row {
+  padding: var(--space-2) var(--space-3);
+  border-left: 2px solid;
+  font-size: var(--f-xs);
+}
+.cons-trigger-row.hot { border-color: var(--green); background: #F0FDF4; }
+.cons-trigger-row.watch { border-color: var(--blue); background: #EFF6FF; }
+.cons-trigger-lbl { font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; }
+.cons-trigger-val { font-variant-numeric: tabular-nums; margin-top: 1px; font-size: var(--f-sm); }
+
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--black);
+  margin-top: var(--space-6);
+}
+.action-card {
+  background: var(--white);
+  padding: var(--space-5);
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+.action-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+.action-title { font-size: var(--f-base); font-weight: 700; margin-bottom: var(--space-1); }
+.action-detail { font-size: var(--f-xs); color: var(--muted); line-height: 1.6; }
+.action-detail strong { color: var(--black); }
+.action-border-l { border-left: 4px solid; }
+
+/* ── FOOTER ── */
+footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  padding: var(--space-5) var(--space-6);
+  border-top: 2px solid var(--black);
+  margin-top: var(--space-7);
+}
+.footer-left { font-size: var(--f-xs); color: var(--muted); line-height: 1.8; }
+.footer-right { text-align: right; font-size: var(--f-xs); color: var(--muted); line-height: 1.8; }
+.footer-right a { color: var(--black); text-decoration: none; font-weight: 600; border-bottom: 1px solid var(--black); }
+.footer-disc { font-size: 9px; color: var(--muted); margin-top: var(--space-2); text-transform: uppercase; letter-spacing: .08em; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  header { grid-template-columns: 1fr; gap: var(--space-4); }
+  .header-right { align-items: flex-start; }
+  .site-title { font-size: var(--f-2xl); }
+  .stat-row { grid-template-columns: repeat(4, 1fr); }
+  footer { grid-template-columns: 1fr; gap: var(--space-3); }
+  .footer-right { text-align: left; }
+  .cons-grid { grid-template-columns: 1fr 1fr; }
+  .cons-card { border-bottom: 1px solid var(--black); }
+  .action-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  header, .model-bar, .consensus-wrap { padding-left: var(--space-4); padding-right: var(--space-4); }
+  thead th:first-child, tbody td:first-child { padding-left: var(--space-4); }
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .cons-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
 <header>
-  <div>
-    <div class="logo">Vanszs TradingAgents <span>Multi-Model Signal Report</span></div>
-    <div style="font-size:11px;color:var(--muted);margin-top:4px;">
-      Signal Date: 2026-09-20 &nbsp;·&nbsp; 6 Models &nbsp;·&nbsp; 5 Stocks &nbsp;·&nbsp; Live Analysis (No Backtest, No Kronos)
-    </div>
+  <div class="header-left">
+    <div class="site-title">Trading<br>Agents</div>
+    <div class="site-sub">Multi-Model Signal Report · 2026-09-20 · No Backtest · No Kronos</div>
   </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+  <div class="header-right">
     <div class="header-links">
-      <a href="gallery.html">📸 Gallery</a>
-      <a href="krs.html">📋 KRS</a>
-      <a href="https://github.com/Vanszs" target="_blank" rel="noopener">⚡ GitHub</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="krs.html">KRS</a>
+      <a href="https://github.com/Vanszs" target="_blank" rel="noopener">GitHub</a>
     </div>
     <div class="header-meta">
-      <div id="timestamp">Loading...</div>
-      <div style="margin-top:2px;">Data: NYSE/NASDAQ Closing Fri 2026-09-18</div>
+      <div id="ts">—</div>
+      <div>NYSE close 2026-09-18 · Market reopens Mon 2026-09-22</div>
+      <div>Vanszs · Bevantyo Satria Pinandhita</div>
     </div>
+  </div>
+  <div class="alert-band" style="grid-column:1/-1">
+    <span>⚠ MARKET CLOSED — Prices as of NYSE/NASDAQ close Fri 2026-09-18. All signals: Wait and See (WNS).</span>
+    <span>Next session: Mon 2026-09-22 09:30 ET</span>
   </div>
 </header>
 
-<nav>
-  <a href="#" class="active" onclick="showModel('gemini',this);return false;"><span class="nav-dot" style="color:var(--green)"></span>ag_gemini_3_8_flash</a>
-  <a href="#" onclick="showModel('gpt',this);return false;"><span class="nav-dot" style="color:var(--purple)"></span>cx_gpt_luna</a>
-  <a href="#" onclick="showModel('muse',this);return false;"><span class="nav-dot" style="color:var(--orange)"></span>ocg_muse_spark_1_3</a>
-  <a href="#" onclick="showModel('deepseek',this);return false;"><span class="nav-dot" style="color:var(--blue)"></span>ocg_deepseek_4_1</a>
-  <a href="#" onclick="showModel('glm',this);return false;"><span class="nav-dot" style="color:var(--yellow)"></span>ocg_glm_5_3_flash</a>
-  <a href="#" onclick="showModel('kimi',this);return false;"><span class="nav-dot" style="color:var(--muted)"></span>kimi_k2_7_code</a>
-  <a href="#" onclick="showModel('consensus',this);return false;" style="margin-left:auto;color:var(--blue);font-weight:600;">📊 Consensus</a>
-</nav>
-
-<div class="summary-bar">
-  <div class="stat"><div class="stat-val" style="color:var(--text)">28</div><div class="stat-lbl">Total Signals</div></div>
-  <div class="stat-sep"></div>
-  <div class="stat"><div class="stat-val" style="color:var(--yellow)">28</div><div class="stat-lbl">WNS</div></div>
-  <div class="stat"><div class="stat-val" style="color:var(--red)">2</div><div class="stat-lbl">Failed (Quota)</div></div>
-  <div class="stat-sep"></div>
-  <div class="stat"><div id="hot-count" class="stat-val" style="color:var(--green)">—</div><div class="stat-lbl">🔥 Hot Entry</div></div>
-  <div class="stat"><div id="watching-count" class="stat-val" style="color:var(--blue)">—</div><div class="stat-lbl">Watching</div></div>
-  <div class="stat-sep"></div>
-  <div class="stat"><div class="stat-val" style="color:var(--purple)">5.74:1</div><div class="stat-lbl">Best R:R (NVDA Gemini)</div></div>
-  <div class="stat"><div class="stat-val" style="color:var(--orange)">2026-10-02</div><div class="stat-lbl">Nearest Recheck</div></div>
-  <div class="alert-banner">
-    <strong>⚠️ Market Closed (Weekend)</strong>
-    All prices as of NYSE/NASDAQ close Fri 2026-09-18. Market reopens Mon 2026-09-22.
-    Next session will update Running PnL.
+<!-- ═══════════════════════════════════════════
+     STAT ROW
+═══════════════════════════════════════════ -->
+<div class="stat-row">
+  <div class="stat-cell">
+    <div class="stat-val">6</div>
+    <div class="stat-lbl">Models</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">5</div>
+    <div class="stat-lbl">Stocks</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">28</div>
+    <div class="stat-lbl">Signals</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val" style="color:var(--yellow)">28</div>
+    <div class="stat-lbl">WNS</div>
+  </div>
+  <div class="stat-cell">
+    <div id="hot-stat" class="stat-val" style="color:var(--green)">—</div>
+    <div class="stat-lbl">Hot Entry</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val" style="color:var(--purple)">5.74:1</div>
+    <div class="stat-lbl">Best R:R</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val" style="color:var(--red)">2</div>
+    <div class="stat-lbl">Failed (Quota)</div>
   </div>
 </div>
 
-<div class="container" id="main-container"></div>
+<!-- ═══════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════ -->
+<nav id="main-nav">
+  <span class="nav-item active" onclick="show('gemini',this)"><span class="nav-num">1</span>Gemini 3.8 Flash</span>
+  <span class="nav-item" onclick="show('gpt',this)"><span class="nav-num">2</span>GPT Luna</span>
+  <span class="nav-item" onclick="show('muse',this)"><span class="nav-num">3</span>Muse Spark 1.3</span>
+  <span class="nav-item" onclick="show('deepseek',this)"><span class="nav-num">4</span>DeepSeek 4.1</span>
+  <span class="nav-item" onclick="show('glm',this)"><span class="nav-num">5</span>GLM 5.3 Flash</span>
+  <span class="nav-item" onclick="show('kimi',this)"><span class="nav-num">6</span>Kimi K2.7</span>
+  <span class="nav-item nav-consensus nav-sep" onclick="show('consensus',this)"><span class="nav-num" style="background:var(--blue)">∑</span>Consensus</span>
+</nav>
 
+<!-- ═══════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════ -->
+<main id="root"></main>
+
+<footer>
+  <div class="footer-left">
+    <div><strong>TradingAgents Multi-Model Framework</strong></div>
+    <div>Signal Date: 2026-09-20 · Published: 2026-09-21</div>
+    <div class="footer-disc">Not financial advice · Research tool only · Past performance ≠ future results</div>
+  </div>
+  <div class="footer-right">
+    <div><a href="https://github.com/Vanszs" target="_blank">github.com/Vanszs</a></div>
+    <div>Models: ag_gemini_3_8_flash · cx_gpt_luna · ocg_muse_spark_1_3</div>
+    <div>ocg_deepseek_4_1 · ocg_glm_5_3_flash · kimi_k2_7_code</div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     DATA + RENDER ENGINE
+═══════════════════════════════════════════ -->
 <script>
-// ============================================================
-// LIVE PRICES — as of NYSE close 2026-09-18
-// ============================================================
-const LIVE = {
-  SNOW: { close: 332.43, low: 317.45, high: 344.66 },
-  MSFT: { close: 493.78, low: 487.23, high: 509.95 },
-  AVGO: { close: 357.61, low: 335.81, high: 363.28 },
-  NVDA: { close: 222.27, low: 208.93, high: 222.73 },
-  TSLA: { close: 364.27, low: 354.05, high: 374.12 },
-};
+'use strict';
 
-// Signal date reference prices (from multi-agent tickers 2026-09-20)
-const SIGNAL_PRICE = {
-  SNOW: 332.43, MSFT: 493.78, AVGO: 357.61, NVDA: 222.27, TSLA: 364.27
+/* ── PRICES (NYSE close 2026-09-18) ── */
+const P = {
+  SNOW: { close:332.43, low:317.45, high:344.66 },
+  MSFT: { close:493.78, low:487.23, high:509.95 },
+  AVGO: { close:357.61, low:335.81, high:363.28 },
+  NVDA: { close:222.27, low:208.93, high:222.73 },
+  TSLA: { close:364.27, low:354.05, high:374.12 },
 };
-
+const SP = { SNOW:332.43, MSFT:493.78, AVGO:357.61, NVDA:222.27, TSLA:364.27 };
 const TICKERS = ['SNOW','MSFT','AVGO','NVDA','TSLA'];
 
+/* ── MODEL DEFINITIONS ── */
 const MODELS = {
   gemini: {
-    id: 'ag_gemini_3_8_flash', num: 1,
-    label: 'Gemini 3.8 Flash (AG)', color: '#3fb950',
-    sub: 'TradingAgents · ag/gemini-3.8-flash-high · High Effort · ~130s per stock',
-    tags: ['Fastest', 'Fibonacci-focused', 'Strict R:R ≥1.8'],
-    data: {
-      SNOW: { conf:0.85, trigger:301.02, triggerDir:'down', tp:null, sl:null, entry:null, rr:null, recheck:'2026-11-20', ctype:'BOTH', thesis:'Spot 332.43 trapped mid-range chop 301.02–384.56. R:R 1.43:1 fails 1.8:1 min threshold. Stand aside until support test at 301.02 or structural breakout above 384.56.' },
-      MSFT: { conf:0.80, trigger:517.78, triggerDir:'up', tp:null, sl:null, entry:null, rr:null, recheck:'2026-09-25', ctype:'BOTH', thesis:'Price 493.78 mid-range below 517.78 60D/20D resistance. Immediate upside 24.00 pts vs risk 25.86 pts → R:R 0.93:1 negative expectancy. Gated pending breakout above 517.78 or flush to 433.16 support.' },
-      AVGO: { conf:0.90, trigger:368.39, triggerDir:'up', tp:null, sl:null, entry:null, rr:null, recheck:'2026-09-22', ctype:'BOTH', thesis:'Sub-200 SMA (368.39) and sub-50 SMA (379.76). Distribution phase active. Support 335.81 fragile; breakdown targets 52-week low 289.50. Alokasi 0%.' },
-      NVDA: { conf:0.80, trigger:212.04, triggerDir:'down', tp:246.71, sl:206.00, entry:212.04, rr:'5.74:1', recheck:'2026-11-18', ctype:'BOTH', thesis:'Mid-range 212.04–236.00. Tactical R:R 1.20:1 fails 2.0:1 mandate at current spot 222.27. T1_LIMIT entry $212.04 (Fib 50% support), SL $206.00, TP $246.71 = R:R 5.74:1. Wait for price to dip to support.', highlight:true, isBest:true },
-      TSLA: { conf:0.85, trigger:384.05, triggerDir:'up', tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-03', ctype:'BOTH', thesis:'364.27 below declining 200 SMA (397.33). EBIT margin 1.41%, negative FCF, NHTSA overhang. Fib 50% support 365.12 failed → air pocket to 52-week low 297.38. Breakout above 384.05 needed.' },
+    id:'ag_gemini_3_8_flash', n:1, color:'var(--green)',
+    label:'Gemini 3.8 Flash (AG)',
+    desc:'ag/gemini-3.8-flash-high · High Effort · ~130s / stock',
+    tags:['Fastest','Fibonacci-strict','Min R:R 1.8×'],
+    stats:{ conf:'80–90%', speed:'130s' },
+    rows:{
+      SNOW:{ conf:.85, tr:301.02, tdir:'dn', tp:null, sl:null, en:null, rr:null, rc:'2026-11-20', ctype:'BOTH',
+        thesis:'Spot $332.43 trapped mid-range $301.02–$384.56. R:R 1.43× fails 1.8× mandate. Stand aside until support retest $301.02 or breakout $384.56.' },
+      MSFT:{ conf:.80, tr:517.78, tdir:'up', tp:null, sl:null, en:null, rr:null, rc:'2026-09-25', ctype:'BOTH',
+        thesis:'$493.78 below 60D/20D resistance $517.78. Upside 24pts vs risk 25.86pts → R:R 0.93× negative expectancy. Gate: breakout $517.78 or flush to $433.16.' },
+      AVGO:{ conf:.90, tr:368.39, tdir:'up', tp:null, sl:null, en:null, rr:null, rc:'2026-09-22', ctype:'BOTH',
+        thesis:'Sub-SMA200 ($368.39) and sub-SMA50 ($379.76). Distribution active. Support $335.81 fragile; breakdown → $289.50. Zero allocation.' },
+      NVDA:{ conf:.80, tr:212.04, tdir:'dn', tp:246.71, sl:206.00, en:212.04, rr:'5.74:1', rc:'2026-11-18', ctype:'BOTH', star:true,
+        thesis:'Mid-range $212.04–$236.00. Tactical R:R 1.20× fails 2.0× at spot $222.27. T1 Limit $212.04 (Fib 50% support) → SL $206.00 / TP $246.71 = 5.74:1 asymmetry. Wait for dip.' },
+      TSLA:{ conf:.85, tr:384.05, tdir:'up', tp:null, sl:null, en:null, rr:null, rc:'2026-10-03', ctype:'BOTH',
+        thesis:'$364.27 below declining SMA200 ($397.33). FCF negative, NHTSA overhang. Fib 50% $365.12 failed → air pocket to 52W low $297.38. Breakout $384.05 needed.' },
     }
   },
   gpt: {
-    id: 'cx_gpt_luna', num: 2,
-    label: 'GPT Luna (CX)', color: '#bc8cff',
-    sub: 'TradingAgents · cx/gpt-5.6-luna · High Effort · Deep reasoning 380–897s',
-    tags: ['Highest Confidence 90–98%', 'Fundamental-integrated', 'Deepest reasoning'],
-    data: {
-      SNOW: { conf:0.90, trigger:301.02, triggerDir:'down', tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-16', ctype:'PRICE_TOUCH', thesis:'Below 384.56 resistance, above 301.02–303.89 accumulation zone. Upside 430.01 conditional on breakout. ATR 15.98 makes stop 301.02 vulnerable to noise. Neg GAAP margin + SBC > FCF weight against long.' },
-      MSFT: { conf:0.95, trigger:478.53, triggerDir:'down', tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-16', ctype:'BOTH', thesis:'Below 517.78 60D breakout near tactical upper range. R:R asymmetry insufficient at 493.78. Demanding valuation, elevated AI capex ($29.88B), compressed FCF to $5.88B. Modal dikunci 0% until breakout 517.78 confirmed.' },
-      AVGO: { conf:0.94, trigger:368.39, triggerDir:'up', tp:null, sl:null, entry:null, rr:null, recheck:null, ctype:'PRICE_TOUCH', thesis:'AI revenue $16.7B (+221% YoY), FY2026 guidance $58B, FCF $30.6B. Below SMA200 (368.39) with MACD negative → no valid buy. Upside 459–492 conditional on structural 368.39 reclaim. Below 329.70 → 289.50 downside.' },
-      NVDA: { conf:0.98, trigger:236.00, triggerDir:'up', tp:null, sl:206.74, entry:null, rr:null, recheck:null, ctype:'PRICE_TOUCH', thesis:'222.27 below dense resistance zone 234.50–236.00. Support 212.04 unconfirmed by volume. Breakout trigger 236.00 + volume required. Cancel below 206.74; hard invalidation 203.50. Highest confidence WNS.' },
-      TSLA: { conf:0.98, trigger:381.11, triggerDir:'up', tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-01', ctype:'BOTH', thesis:'364.27 below Fib 50% support 365.12. Downside 335.93 (-7.78%) exceeds 5% daily-ATR policy. Upside 469.71/516.59 theoretical without FCF improvement. Zero capital until reclaim of 381.11.' },
+    id:'cx_gpt_luna', n:2, color:'var(--purple)',
+    label:'GPT Luna (CX)',
+    desc:'cx/gpt-5.6-luna · High Effort · Deep reasoning 380–897s',
+    tags:['90–98% Confidence','Fundamental-integrated','Deepest reasoning'],
+    stats:{ conf:'90–98%', speed:'380–897s' },
+    rows:{
+      SNOW:{ conf:.90, tr:301.02, tdir:'dn', tp:null, sl:null, en:null, rr:null, rc:'2026-10-16', ctype:'PRICE_TOUCH',
+        thesis:'Below $384.56 resistance, above $301.02–$303.89 accumulation. Upside $430.01 conditional; ATR 15.98 makes stop vulnerable to noise. Neg GAAP margin + SBC > FCF.' },
+      MSFT:{ conf:.95, tr:478.53, tdir:'dn', tp:null, sl:null, en:null, rr:null, rc:'2026-10-16', ctype:'BOTH',
+        thesis:'Below $517.78 breakout, near tactical upper range. R:R asymmetry insufficient. Elevated AI capex $29.88B compressing FCF to $5.88B. Zero until breakout $517.78 confirmed.' },
+      AVGO:{ conf:.94, tr:368.39, tdir:'up', tp:null, sl:null, en:null, rr:null, rc:null, ctype:'PRICE_TOUCH',
+        thesis:'AI rev $16.7B (+221% YoY), FCF $30.6B. Below SMA200 $368.39, MACD negative. Upside $459–$492 conditional on reclaim. Below $329.70 → $289.50 downside.' },
+      NVDA:{ conf:.98, tr:236.00, tdir:'up', tp:null, sl:206.74, en:null, rr:null, rc:null, ctype:'PRICE_TOUCH',
+        thesis:'$222.27 below dense resistance $234.50–$236.00. Support $212.04 unconfirmed by volume. Breakout $236.00 + volume required. Hard invalidation $203.50.' },
+      TSLA:{ conf:.98, tr:381.11, tdir:'up', tp:null, sl:null, en:null, rr:null, rc:'2026-10-01', ctype:'BOTH',
+        thesis:'$364.27 below Fib 50% $365.12. Downside $335.93 exceeds 5% policy. Upside $469–$516 theoretical without FCF improvement. Zero capital until $381.11 reclaim.' },
     }
   },
   muse: {
-    id: 'ocg_muse_spark_1_3', num: 3,
-    label: 'Muse Spark 1.3 (OCG)', color: '#ffa657',
-    sub: 'TradingAgents · ocg/muse-spark-1.3-contributor · High Effort · Fallback recovery active',
-    tags: ['70% Conf (Fallback)', 'Conservative', 'Capital preservation'],
-    data: {
-      SNOW: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — capital protection mode. Stand aside until market structure clarifies.' },
-      MSFT: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — capital protection mode. Stand aside until market structure clarifies.' },
-      AVGO: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — capital protection mode. Stand aside until market structure clarifies.' },
-      NVDA: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — capital protection mode. Stand aside until market structure clarifies.' },
-      TSLA: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — capital protection mode. Stand aside until market structure clarifies.' },
+    id:'ocg_muse_spark_1_3', n:3, color:'var(--yellow)',
+    label:'Muse Spark 1.3 (OCG)',
+    desc:'ocg/muse-spark-1.3-contributor · High Effort · Fallback recovery',
+    tags:['70% Conf','Conservative','Capital preservation'],
+    stats:{ conf:'70%', speed:'322–417s' },
+    rows:{
+      SNOW:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — capital protection mode active. Stand aside until structure clarifies.' },
+      MSFT:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — resist entry below institutional supply zone.' },
+      AVGO:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — distribution phase, fragile support. Protect capital.' },
+      NVDA:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — avoid false breakout trap near ceiling. Confirm direction first.' },
+      TSLA:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — macro downtrend below SMA200. Hold cash.' },
     }
   },
   deepseek: {
-    id: 'ocg_deepseek_4_1', num: 4,
-    label: 'DeepSeek Flash 4.1 (OCG)', color: '#58a6ff',
-    sub: 'TradingAgents · ocg/deepseek-flash · High Effort · ~300s per stock',
-    tags: ['70% Conf (Fallback)', 'Balanced speed', 'Risk-averse'],
-    data: {
-      SNOW: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — structural consolidation without volume confirmation. Await directional trigger.' },
-      MSFT: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — resist entry below institutional supply zone. Await breakout confirmation.' },
-      AVGO: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — distribution phase, fragile support. Protect capital against potential breakdown.' },
-      NVDA: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — avoid false breakout trap near ATH zone. Confirm direction first.' },
-      TSLA: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — macro downtrend below 200 SMA, no structural base. Hold cash.' },
+    id:'ocg_deepseek_4_1', n:4, color:'var(--blue)',
+    label:'DeepSeek Flash 4.1 (OCG)',
+    desc:'ocg/deepseek-flash · High Effort · ~300s / stock',
+    tags:['70% Conf','Balanced speed','Risk-averse'],
+    stats:{ conf:'70%', speed:'284–327s' },
+    rows:{
+      SNOW:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — structural consolidation, no volume confirmation. Await directional trigger.' },
+      MSFT:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — resist entry below supply zone. Await breakout confirmation.' },
+      AVGO:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — distribution active, support fragile. Protect against breakdown.' },
+      NVDA:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — false breakout risk near ATH zone. Confirm direction first.' },
+      TSLA:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — no structural base. Hold cash.' },
     }
   },
   glm: {
-    id: 'ocg_glm_5_3_flash', num: 5,
-    label: 'GLM 5.3 Flash (OCG)', color: '#d29922',
-    sub: 'TradingAgents · ocg/glm-5.3-flash · High Effort · Tiered setup analysis',
-    tags: ['Gated Setups', 'Multi-TP levels', 'Honest R:R math'],
-    data: {
-      SNOW: { conf:0.70, trigger:303.89, triggerDir:'down', tp:null, sl:null, entry:null, rr:null, recheck:'2026-11-27', ctype:'BOTH', thesis:'332.43 mid-20D range 303.89–384.56. No edge at median. Gate A: close <303.89 & reclaim 332.43 → revisit 301.02 entry; Gate B: breakout >384.56 → targets 430.01/487.82.' },
-      MSFT: { conf:0.70, trigger:517.78, triggerDir:'up', tp:null, sl:null, entry:null, rr:null, recheck:null, ctype:null, thesis:'493.78 top quartile 60D range. ATR squeeze pending expansion. False-break risk at 517.78. Reassess post earnings + AI-capex disclosure.' },
-      AVGO: { conf:0.70, trigger:335.81, triggerDir:'down', tp:null, sl:null, entry:null, rr:null, recheck:'2026-12-10', ctype:'BOTH', thesis:'Price lower half 60D range. Double-floor at 335.81 one untested hold. Hard rule: close <335.81 = Falling Knife regime, no averaging down.' },
-      NVDA: { conf:0.70, trigger:225.50, triggerDir:'up', tp:null, sl:211.90, entry:null, rr:'4.6:1 (dip)', recheck:'2026-09-25', ctype:'BOTH', thesis:'Trigger2 dip ~216/stop 211.9/TP1 235.09 = 4.6:1. Trigger1 breakout ~226 = 0.58:1. Zero capital until trigger fires. Close <212.04 = thesis dead.', isBest:false },
-      TSLA: { conf:0.72, trigger:384.04, triggerDir:'up', tp:469.71, sl:341.90, entry:null, rr:'~4.7:1 gated', recheck:'2026-10-02', ctype:'BOTH', thesis:'Higher lows off 297.38. Gate: daily close >384.04 + MACD re-expansion → half-size entry, SL 341.90, TP1 390.67/TP2 403.87/TP3 469.71. Full conviction only above 200 SMA 397.3.', highlight:true },
+    id:'ocg_glm_5_3_flash', n:5, color:'var(--yellow)',
+    label:'GLM 5.3 Flash (OCG)',
+    desc:'ocg/glm-5.3-flash · High Effort · Tiered setup analysis',
+    tags:['Gated Setups','Multi-TP','Honest R:R math'],
+    stats:{ conf:'70–72%', speed:'231–507s' },
+    rows:{
+      SNOW:{ conf:.70, tr:303.89, tdir:'dn', tp:null, sl:null, en:null, rr:null, rc:'2026-11-27', ctype:'BOTH',
+        thesis:'$332.43 mid-20D range $303.89–$384.56. No edge at median. Gate A: close <$303.89 → revisit $301.02 entry; Gate B: breakout >$384.56 → targets $430.01/$487.82.' },
+      MSFT:{ conf:.70, tr:517.78, tdir:'up', tp:null, sl:null, en:null, rr:null, rc:null, ctype:null,
+        thesis:'$493.78 top quartile 60D range. ATR squeeze pending expansion. False-break risk at $517.78. Reassess post earnings + AI-capex disclosure.' },
+      AVGO:{ conf:.70, tr:335.81, tdir:'dn', tp:null, sl:null, en:null, rr:null, rc:'2026-12-10', ctype:'BOTH',
+        thesis:'Lower half 60D range. Double-floor $335.81 untested. Hard rule: close <$335.81 = Falling Knife regime, no averaging.' },
+      NVDA:{ conf:.70, tr:225.50, tdir:'up', tp:null, sl:211.90, en:null, rr:'4.6:1 dip', rc:'2026-09-25', ctype:'BOTH',
+        thesis:'Dip ~$216 / SL $211.90 / TP1 $235.09 = 4.6:1. Breakout ~$226 = 0.58:1. Zero capital until trigger fires. Close <$212.04 = thesis dead.' },
+      TSLA:{ conf:.72, tr:384.04, tdir:'up', tp:469.71, sl:341.90, en:null, rr:'~4.7:1 gated', rc:'2026-10-02', ctype:'BOTH', star:true,
+        thesis:'Higher lows off $297.38. Gate: daily close >$384.04 + MACD expansion → half-size, SL $341.90, TP1 $390.67 / TP2 $403.87 / TP3 $469.71. Full conviction above SMA200 $397.30.' },
     }
   },
   kimi: {
-    id: 'kimi_k2_7_code', num: 6,
-    label: 'Kimi K2.7 Code', color: '#8b949e',
-    sub: 'TradingAgents · kimi/kimi-k2.7-code · temp=1.0 · NVDA & TSLA 403 quota-failed',
-    tags: ['3/5 completed', '403 Quota on NVDA+TSLA', 'Rolling 5h limit'],
-    data: {
-      SNOW: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — completed successfully. Capital protection mode active.' },
-      MSFT: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — completed successfully. Stand aside below supply zone.' },
-      AVGO: { conf:0.70, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:'2026-10-04', ctype:null, thesis:'Fallback WNS — completed successfully. Await structural reclaim above SMA200.' },
-      NVDA: { conf:null, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:null, ctype:null, thesis:'FAILED — 403 Quota Exceeded. You\'ve reached your 5-hour usage limit. Re-run after quota reset.', failed:true },
-      TSLA: { conf:null, trigger:null, triggerDir:null, tp:null, sl:null, entry:null, rr:null, recheck:null, ctype:null, thesis:'FAILED — 403 Quota Exceeded. You\'ve reached your 5-hour usage limit. Re-run after quota reset.', failed:true },
+    id:'kimi_k2_7_code', n:6, color:'var(--muted)',
+    label:'Kimi K2.7 Code',
+    desc:'kimi/kimi-k2.7-code · temp=1.0 · NVDA & TSLA quota-failed (403)',
+    tags:['3/5 Completed','403 on NVDA+TSLA','Rolling 5h quota'],
+    stats:{ conf:'70% / N/A', speed:'402–705s' },
+    rows:{
+      SNOW:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — completed. Capital protection active.' },
+      MSFT:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — completed. Stand aside below supply zone.' },
+      AVGO:{ conf:.70, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:'2026-10-04', ctype:null, thesis:'Fallback WNS — completed. Await SMA200 reclaim.' },
+      NVDA:{ conf:null, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:null, ctype:null, failed:true, thesis:'FAILED — 403 Quota Exceeded. 5-hour rolling limit reached.' },
+      TSLA:{ conf:null, tr:null, tdir:null, tp:null, sl:null, en:null, rr:null, rc:null, ctype:null, failed:true, thesis:'FAILED — 403 Quota Exceeded. 5-hour rolling limit reached.' },
     }
   }
 };
 
-// ============================================================
-// HELPERS
-// ============================================================
-function fmt(v, dec=2) { return v==null ? '—' : v.toFixed(dec); }
-function pct(v, dec=2) { if(v==null) return '—'; return (v>=0?'+':'')+v.toFixed(dec)+'%'; }
-function pnlCls(v) { return v==null ? 'neutral' : v>0 ? 'pos' : v<0 ? 'neg' : 'neutral'; }
+/* ── HELPERS ── */
+const f = (v, d=2) => v==null ? '—' : v.toFixed(d);
+const pc = (v, d=2) => v==null ? '—' : (v>=0?'+':'')+v.toFixed(d)+'%';
+const cls = v => v==null ? 'neut' : v>0 ? 'pos' : v<0 ? 'neg' : 'neut';
 
-function getStatus(ticker, sig) {
-  if (sig.failed) return 'failed';
-  if (!sig.trigger || !LIVE[ticker].close) return 'watching';
-  const c = LIVE[ticker].close;
-  const t = sig.trigger;
-  if (sig.triggerDir === 'up') return c >= t ? 'hot' : 'watching';
-  if (sig.triggerDir === 'down') return c <= t ? 'hot' : 'watching';
-  return 'watching';
+function status(ticker, row) {
+  if (row.failed) return 'failed';
+  if (!row.tr || !P[ticker].close) return 'watch';
+  const c = P[ticker].close, t = row.tr;
+  return row.tdir==='up' ? (c>=t ? 'hot':'watch') : (c<=t ? 'hot':'watch');
 }
 
-function triggerDistStr(ticker, sig) {
-  if (!sig.trigger || !LIVE[ticker].close) return '';
-  const c = LIVE[ticker].close;
-  const dist = (sig.trigger - c) / c * 100;
-  const cls = dist > 0 ? 'neutral' : 'pos';
-  const label = sig.triggerDir === 'up' ? 'to breakout' : 'to dip';
-  return `<div class="trigger-dist ${cls}">${pct(dist)} ${label}</div>`;
+function pnl(ticker) {
+  const sp=SP[ticker], c=P[ticker].close;
+  return { pct:(c-sp)/sp*100, abs:c-sp };
 }
 
-function calcPnL(ticker) {
-  const sp = SIGNAL_PRICE[ticker], c = LIVE[ticker].close;
-  if (!c) return { pct: null, abs: null };
-  return { pct: (c-sp)/sp*100, abs: c-sp };
-}
-
-function calcMaxDD(ticker) {
-  const h = LIVE[ticker].high, l = LIVE[ticker].low;
-  if (!h||!l) return null;
+function maxDD(ticker) {
+  const h=P[ticker].high, l=P[ticker].low;
   return (l-h)/h*100;
 }
 
-function pnlIfNoSL(ticker, sig) {
-  // If held from signal price to current close, ignoring SL
-  const pnl = calcPnL(ticker);
-  return pnl;
+function distToTrigger(ticker, row) {
+  if (!row.tr || !P[ticker].close) return '';
+  const d = (row.tr - P[ticker].close) / P[ticker].close * 100;
+  const label = row.tdir==='up' ? 'to breakout' : 'to dip';
+  return `<div class="trigger-dist ${d>0?'neut':'pos'}">${pc(d)} ${label}</div>`;
 }
 
-// ============================================================
-// RENDER TABLE
-// ============================================================
-function renderTable(modelKey) {
-  const m = MODELS[modelKey];
+/* ── RENDER TABLE ── */
+function renderTable(key) {
+  const m = MODELS[key];
   const rows = TICKERS.map(t => {
-    const sig = m.data[t];
-    const status = getStatus(t, sig);
-    const pnl = calcPnL(t);
-    const dd = calcMaxDD(t);
-    const c = LIVE[t].close;
-    const sp = SIGNAL_PRICE[t];
+    const r = m.rows[t];
+    const st = status(t, r);
+    const pp = pnl(t);
+    const dd = maxDD(t);
+    const c = P[t].close;
 
-    const statusBadge = sig.failed
-      ? `<span class="badge badge-failed">✗ FAILED (Quota)</span>`
-      : status === 'hot'
-        ? `<span class="badge badge-hot">🔥 HOT ENTRY</span>`
-        : `<span class="badge badge-watching">◉ WATCHING</span>`;
+    const stBadge = r.failed
+      ? `<span class="badge b-fail">✗ Failed</span>`
+      : st==='hot'
+        ? `<span class="badge b-hot">● Hot Entry</span>`
+        : `<span class="badge b-watch">○ Watching</span>`;
 
-    const confStr = sig.conf == null ? '—' : Math.round(sig.conf*100)+'%';
-    const entryStr = sig.entry ? `<span class="mono">$${sig.entry.toFixed(2)}</span>` : '—';
-    const slHtml = sig.sl ? `<div class="sl-line"><span class="neg">$${sig.sl.toFixed(2)}</span></div>` : '';
-    const tpHtml = sig.tp ? `<div class="tp-line"><span class="pos">$${sig.tp.toFixed(2)}</span></div>` : '';
-    const slTpStr = (slHtml || tpHtml) ? `<div class="sl-tp">${slHtml}${tpHtml}</div>` : '—';
-    const rrHtml = sig.rr ? `<div class="rr">R:R ${sig.rr}</div>` : '';
-    const bestBadge = sig.isBest ? `<div class="star-setup">⭐ Best Setup</div>` : '';
-    const triggerStr = sig.trigger ? `<span class="trigger-val">$${sig.trigger.toFixed(2)}</span>${triggerDistStr(t, sig)}` : '—';
-    const liveStr = c ? `$${c.toFixed(2)}` : '<span class="neutral">N/A</span>';
-    const pnlHtml = pnl.pct != null
-      ? `<div class="pnl-block"><div class="pnl-pct ${pnlCls(pnl.pct)}">${pct(pnl.pct)}</div><div class="pnl-abs ${pnlCls(pnl.abs)}">${pnl.abs>=0?'+':''}$${Math.abs(pnl.abs).toFixed(2)}</div></div>`
-      : '—';
-    const ddHtml = dd != null
-      ? `<div class="dd-block"><div class="dd-pct neg">${pct(dd)}</div><div class="dd-note">$${LIVE[t].low.toFixed(2)}→$${LIVE[t].high.toFixed(2)}</div></div>`
-      : '—';
-    const recheckStr = sig.recheck ? `<div class="recheck">↻ ${sig.recheck}</div>` : '';
+    const rcLine = r.rc ? `<div class="recheck">${r.rc}</div>` : '';
+    const confStr = r.conf!=null ? Math.round(r.conf*100)+'%' : '—';
 
-    return `<tr class="${sig.highlight?'highlight-row':''}">
-      <td><span class="ticker">${t}</span><div class="ticker-sub">${sp.toFixed(2)} signal</div></td>
-      <td><span class="badge badge-wns">WNS</span></td>
-      <td class="mono">${confStr}</td>
-      <td>${statusBadge}${recheckStr}</td>
-      <td>${entryStr}${rrHtml}${bestBadge}</td>
-      <td class="mono">$${sp.toFixed(2)}</td>
-      <td class="mono">${liveStr}</td>
+    const entryCell = r.en
+      ? `<div class="entry-main num">$${r.en.toFixed(2)}</div>${r.rr?`<div class="rr-pill">${r.rr}</div>`:''}`
+      : r.rr
+        ? `<span class="neut">—</span><div class="rr-pill">${r.rr}</div>`
+        : `<span class="dash">—</span>`;
+    const starBadge = r.star ? `<div class="badge b-best">⭐ Best setup</div>` : '';
+
+    const slTp = (r.sl||r.tp)
+      ? `<div class="sl-tp">${r.sl?`<div class="sl-line"><span class="num neg">$${r.sl.toFixed(2)}</span></div>`:''
+      }${r.tp?`<div class="tp-line"><span class="num pos">$${r.tp.toFixed(2)}</span></div>`:''}</div>`
+      : `<span class="dash">—</span>`;
+
+    const trigger = r.tr
+      ? `<div class="trigger-main num">$${r.tr.toFixed(2)}</div>${distToTrigger(t,r)}`
+      : `<span class="dash">—</span>`;
+
+    const pnlHtml = `<div class="pnl-primary num ${cls(pp.pct)}">${pc(pp.pct)}</div><div class="pnl-secondary num ${cls(pp.abs)}">${pp.abs>=0?'+':''}$${Math.abs(pp.abs).toFixed(2)}</div>`;
+
+    const ddHtml = `<div class="dd-main num neg">${pc(dd)}</div><div class="dd-range">$${P[t].low.toFixed(2)} – $${P[t].high.toFixed(2)}</div>`;
+
+    const thesisClass = st==='hot' ? 'thesis thesis-hot' : 'thesis';
+
+    return `<tr${r.star?' class="star-row"':''}>
+      <td><span class="tk">${t}</span><div class="tk-ref">Ref $${SP[t].toFixed(2)}</div></td>
+      <td><span class="badge b-wns">WNS</span></td>
+      <td class="num">${confStr}</td>
+      <td><div class="status-block">${stBadge}${rcLine}</div></td>
+      <td>${entryCell}${starBadge}</td>
+      <td class="num">$${SP[t].toFixed(2)}</td>
+      <td class="num">$${c.toFixed(2)}</td>
       <td>${pnlHtml}</td>
-      <td>${triggerStr}</td>
-      <td>${slTpStr}</td>
+      <td>${trigger}</td>
+      <td>${slTp}</td>
       <td>${ddHtml}</td>
-      <td class="thesis-cell">${sig.thesis}</td>
+      <td class="${thesisClass}">${r.thesis}</td>
     </tr>`;
   }).join('');
 
-  return `<div class="table-wrap"><table>
-    <thead><tr>
-      <th>Ticker</th><th>Signal</th><th>Conf</th><th>Status / Recheck</th>
-      <th>Planned Entry</th><th>Signal Price</th><th>Last Price</th>
-      <th>Running PnL<br><span style="font-weight:400;color:var(--muted)">(if held)</span></th>
-      <th>WNS Trigger<br><span style="font-weight:400;color:var(--muted)">(Δ% to entry)</span></th>
-      <th>SL / TP</th>
-      <th>Max DD<br><span style="font-weight:400;color:var(--muted)">(period range)</span></th>
-      <th>Thesis & Mandate</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>`;
+  return `<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>Ticker</th>
+  <th>Signal</th>
+  <th>Conf</th>
+  <th>Status / Recheck</th>
+  <th>Planned Entry</th>
+  <th>Signal Price</th>
+  <th>Last Price</th>
+  <th>Running PnL (if held)</th>
+  <th>WNS Trigger (Δ% dist)</th>
+  <th>SL / TP</th>
+  <th>Max Drawdown (period range)</th>
+  <th>Thesis &amp; Mandate</th>
+</tr></thead>
+<tbody>${rows}</tbody>
+</table></div>`;
 }
 
-// ============================================================
-// RENDER CONSENSUS
-// ============================================================
+/* ── RENDER MODEL SECTION ── */
+function renderModel(key) {
+  const m = MODELS[key];
+  const statMini = `<div class="model-stat-mini">
+    <div class="mini-stat"><div class="mini-val" style="color:${m.color}">${m.stats.conf}</div><div class="mini-lbl">Confidence</div></div>
+    <div class="mini-stat"><div class="mini-val">${m.stats.speed}</div><div class="mini-lbl">Per Stock</div></div>
+  </div>`;
+
+  return `<div class="model-bar">
+    <div class="model-index">${String(m.n).padStart(2,'0')}</div>
+    <div class="model-info">
+      <div class="model-name">${m.label}</div>
+      <div class="model-desc">${m.desc}</div>
+      <div class="model-tags">${(m.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+    ${statMini}
+  </div>
+  ${renderTable(key)}`;
+}
+
+/* ── RENDER CONSENSUS ── */
 function renderConsensus() {
   const cards = TICKERS.map(t => {
-    const sp = SIGNAL_PRICE[t];
-    const c = LIVE[t].close;
-    const pnl = calcPnL(t);
-    const dd = calcMaxDD(t);
-
-    // Collect all triggers
-    const triggers = Object.values(MODELS)
-      .map(m => m.data[t])
-      .filter(sig => sig.trigger && !sig.failed)
-      .map(sig => ({ val: sig.trigger, dir: sig.triggerDir }));
-
-    // Most conservative trigger
-    const downTriggers = triggers.filter(t => t.dir==='down').map(t=>t.val);
-    const upTriggers = triggers.filter(t => t.dir==='up').map(t=>t.val);
-    const bestDip = downTriggers.length ? Math.max(...downTriggers) : null;
-    const bestBreakout = upTriggers.length ? Math.min(...upTriggers) : null;
-
-    const pnlColor = pnl.pct == null ? '#8b949e' : pnl.pct > 0 ? '#3fb950' : '#f85149';
-    const pnlStr = pnl.pct != null ? `${pct(pnl.pct)}` : '—';
-
-    // Count model agreement
-    const modelVotes = Object.entries(MODELS).map(([k, m]) => {
-      const sig = m.data[t];
-      if (sig.failed) return null;
-      const s = getStatus(t, sig);
-      return { model: m.label.split(' (')[0], status: s, conf: sig.conf };
+    const pp = pnl(t);
+    const dd = maxDD(t);
+    const modelVotes = Object.values(MODELS).map(m => {
+      const r = m.rows[t];
+      if (r.failed) return null;
+      return { st: status(t,r), conf: r.conf||0 };
     }).filter(Boolean);
+    const hotN = modelVotes.filter(v=>v.st==='hot').length;
+    const avgConf = modelVotes.reduce((s,v)=>s+v.conf,0)/modelVotes.length;
 
-    const hotCount = modelVotes.filter(v=>v.status==='hot').length;
-    const watchCount = modelVotes.filter(v=>v.status==='watching').length;
-    const avgConf = modelVotes.reduce((s,v)=>s+(v.conf||0),0)/modelVotes.length;
+    const dips = Object.values(MODELS).map(m=>m.rows[t]).filter(r=>r.tr&&r.tdir==='dn'&&!r.failed);
+    const ups  = Object.values(MODELS).map(m=>m.rows[t]).filter(r=>r.tr&&r.tdir==='up'&&!r.failed);
+    const bestDip = dips.length ? Math.max(...dips.map(r=>r.tr)) : null;
+    const bestUp  = ups.length  ? Math.min(...ups.map(r=>r.tr))  : null;
 
-    const dipStatus = bestDip && c <= bestDip ? 'hot' : 'watching';
-    const brkStatus = bestBreakout && c >= bestBreakout ? 'hot' : 'watching';
+    const dipSt  = bestDip && P[t].close<=bestDip ? 'hot' : 'watch';
+    const upSt   = bestUp  && P[t].close>=bestUp  ? 'hot' : 'watch';
+    const pcolor = pp.pct>0 ? 'var(--green)' : pp.pct<0 ? 'var(--red)' : 'var(--muted)';
+    const barW = Math.round(avgConf*100);
 
-    const dipLine = bestDip
-      ? `<div class="cons-trigger ${dipStatus}">Dip trigger: $${bestDip.toFixed(2)} ${dipStatus==='hot'?'🔥 REACHED':'('+(((bestDip-c)/c*100).toFixed(1))+'%)'}</div>`
-      : '';
-    const brkLine = bestBreakout
-      ? `<div class="cons-trigger ${brkStatus}">Breakout: $${bestBreakout.toFixed(2)} ${brkStatus==='hot'?'🔥 REACHED':'('+(((bestBreakout-c)/c*100).toFixed(1))+'%)'}</div>`
-      : '';
+    const dipLine = bestDip ? `<div class="cons-trigger-row ${dipSt}">
+      <div class="cons-trigger-lbl">${dipSt==='hot'?'🔥 Hot':'Dip trigger'}</div>
+      <div class="cons-trigger-val">$${bestDip.toFixed(2)} ${dipSt==='hot'?'REACHED':'('+(((bestDip-P[t].close)/P[t].close*100).toFixed(1))+'%)'}</div>
+    </div>` : '';
+
+    const upLine = bestUp ? `<div class="cons-trigger-row ${upSt}">
+      <div class="cons-trigger-lbl">${upSt==='hot'?'🔥 Hot':'Breakout'}</div>
+      <div class="cons-trigger-val">$${bestUp.toFixed(2)} ${upSt==='hot'?'REACHED':'('+(((bestUp-P[t].close)/P[t].close*100).toFixed(1))+'%)'}</div>
+    </div>` : '';
 
     return `<div class="cons-card">
       <div class="cons-ticker">${t}</div>
-      <div class="cons-price">Last $${c?c.toFixed(2):'—'} · Signal $${sp.toFixed(2)}</div>
-      <div class="cons-pnl" style="color:${pnlColor}">${pnlStr}</div>
-      <div class="cons-bar"><div class="cons-bar-fill" style="width:${Math.round(avgConf*100)}%;background:${pnlColor}"></div></div>
-      <div class="cons-votes">
-        <div class="vote-item"><span>Model consensus</span><strong>${modelVotes.length}/6</strong></div>
-        <div class="vote-item"><span>Avg confidence</span><strong>${Math.round(avgConf*100)}%</strong></div>
-        <div class="vote-item"><span>Hot entry</span><strong style="color:var(--green)">${hotCount} model${hotCount!==1?'s':''}</strong></div>
-        <div class="vote-item"><span>Max DD (period)</span><strong class="${dd<0?'neg':''}">${dd!=null?pct(dd):'—'}</strong></div>
+      <div class="cons-price">Last $${P[t].close.toFixed(2)} · Signal $${SP[t].toFixed(2)}</div>
+      <div class="cons-pnl ${cls(pp.pct)}" style="color:${pcolor}">${pc(pp.pct)}</div>
+      <div class="cons-hr" style="background:${pcolor};width:${barW}%"></div>
+      <div class="cons-stats">
+        <div class="cons-stat-row"><span class="cons-stat-lbl">Avg Conf</span><span class="cons-stat-val">${barW}%</span></div>
+        <div class="cons-stat-row"><span class="cons-stat-lbl">Models agree</span><span class="cons-stat-val">${modelVotes.length}/6</span></div>
+        <div class="cons-stat-row"><span class="cons-stat-lbl" style="color:var(--green)">Hot entry</span><span class="cons-stat-val" style="color:var(--green)">${hotN} model${hotN!==1?'s':''}</span></div>
+        <div class="cons-stat-row"><span class="cons-stat-lbl">Max DD</span><span class="cons-stat-val neg">${pc(dd)}</span></div>
+        <div class="cons-stat-row"><span class="cons-stat-lbl">Range</span><span class="cons-stat-val">$${P[t].low.toFixed(2)}–$${P[t].high.toFixed(2)}</span></div>
       </div>
-      ${dipLine}${brkLine}
+      <div class="cons-triggers">${dipLine}${upLine}</div>
     </div>`;
   }).join('');
 
-  return `
-    <div style="margin-bottom:24px;">
-      <h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">Cross-Model Consensus</h2>
-      <p style="font-size:12px;color:var(--muted);">Aggregated signal status across all 6 models. All signals are WNS (Wait and See). Prices as of NYSE close 2026-09-18.</p>
+  const actions = [
+    { icon:'⭐', border:'var(--purple)', title:'NVDA — Buy Limit $212.04 (Gemini)',
+      detail:'SL <strong>$206.00</strong> · TP <strong>$246.71</strong> · R:R <strong>5.74:1</strong><br>Trigger: price dips to Fib 50% support $212.04. Best asymmetric setup across all models.' },
+    { icon:'📌', border:'var(--yellow)', title:'TSLA — Gated Buy Stop >$384.04 (GLM 5.3)',
+      detail:'SL <strong>$341.90</strong> · TP1 $390.67 / TP2 $403.87 / TP3 <strong>$469.71</strong><br>Recheck: <strong>2026-10-02</strong> post-Q3 delivery report.' },
+    { icon:'👁', border:'var(--blue)', title:'NVDA — Breakout Watch $236.00 (GPT Luna 98%)',
+      detail:'Buy only on confirmed daily close above <strong>$236.00</strong> with volume.<br>Cancel below $206.74. Hard invalidation $203.50.' },
+    { icon:'👁', border:'var(--green)', title:'AVGO — Reclaim Watch $368.39 (3 Models)',
+      detail:'AI rev $16.7B (+221% YoY) · FCF $30.6B<br>Entry only on SMA200 reclaim <strong>$368.39</strong>. Below $329.70 → $289.50 risk.' },
+  ].map(a=>`<div class="action-card" style="border-left:4px solid ${a.border}">
+    <div class="action-icon">${a.icon}</div>
+    <div><div class="action-title">${a.title}</div><div class="action-detail">${a.detail}</div></div>
+  </div>`).join('');
+
+  return `<div class="consensus-wrap">
+    <div class="consensus-title">Cross-Model Consensus</div>
+    <div class="consensus-sub">Aggregated status across all 6 models · NYSE close 2026-09-18 · All signals: WNS</div>
+    <div class="cons-grid">${cards}</div>
+
+    <div class="section-label" style="margin-top:var(--space-7)">
+      <div class="label-line"></div>
+      <div class="label-text">Actionable Setups — Confirmed by ≥2 Models</div>
+      <div class="label-line"></div>
     </div>
-    <div class="consensus-grid">${cards}</div>
-    <div style="margin-top:28px;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;">
-      <h3 style="font-size:12px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">📌 Key Actionable Setups (Confirmed by ≥2 Models)</h3>
-      <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--purple);">
-          <span style="font-size:16px;">⭐</span>
-          <div>
-            <strong>NVDA — Buy Limit $212.04</strong> (Gemini Model)<br>
-            <span style="color:var(--muted);">SL $206.00 · TP $246.71 · R:R <strong style="color:var(--purple)">5.74:1</strong> · Trigger: price dips to Fib 50% support $212.04</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);">
-          <span style="font-size:16px;">📌</span>
-          <div>
-            <strong>TSLA — Gated Buy Stop above $384.04</strong> (GLM 5.3 Model)<br>
-            <span style="color:var(--muted);">SL $341.90 · TP1 $390.67 / TP2 $403.87 / TP3 $469.71 · Recheck: <strong>2026-10-02</strong> (post-Q3 deliveries)</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--blue);">
-          <span style="font-size:16px;">👁️</span>
-          <div>
-            <strong>NVDA — Breakout Watch $236.00</strong> (Luna 98% Conf)<br>
-            <span style="color:var(--muted);">Buy only on confirmed daily close above $236.00 with volume. Cancel below $206.74.</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--green);">
-          <span style="font-size:16px;">👁️</span>
-          <div>
-            <strong>AVGO — Reclaim Watch $368.39</strong> (3 Models Agree)<br>
-            <span style="color:var(--muted);">Fundamental AI powerhouse: $16.7B AI rev (+221% YoY), FCF $30.6B. Entry only on SMA200 reclaim.</span>
-          </div>
-        </div>
-      </div>
-    </div>`;
+    <div class="action-grid">${actions}</div>
+  </div>`;
 }
 
-// ============================================================
-// SHOW MODEL
-// ============================================================
-function showModel(key, el) {
-  document.querySelectorAll('.model-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  document.getElementById('section-'+key).classList.add('active');
+/* ── SHOW ── */
+function show(key, el) {
+  document.querySelectorAll('.model-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('s-'+key).classList.add('active');
   el.classList.add('active');
-  return false;
 }
 
-function countStatuses() {
-  let hot=0, watching=0;
-  TICKERS.forEach(t => {
-    Object.keys(MODELS).forEach(mk => {
-      const sig = MODELS[mk].data[t];
-      if (!sig.failed) {
-        const s = getStatus(t, sig);
-        if (s === 'hot') hot++;
-        else watching++;
-      }
-    });
-  });
-  document.getElementById('hot-count').textContent = hot;
-  document.getElementById('watching-count').textContent = watching;
-}
-
-// ============================================================
-// INIT
-// ============================================================
+/* ── INIT ── */
 document.addEventListener('DOMContentLoaded', () => {
-  const container = document.getElementById('main-container');
+  const root = document.getElementById('root');
 
+  // render model sections
   Object.keys(MODELS).forEach(k => {
-    const m = MODELS[k];
     const div = document.createElement('div');
-    div.id = 'section-'+k;
-    div.className = 'model-section' + (k==='gemini' ? ' active' : '');
-    div.innerHTML = `
-      <div class="model-header">
-        <div class="model-num">${m.num}</div>
-        <div style="flex:1">
-          <div class="model-title">${m.label}</div>
-          <div class="model-sub">${m.sub}</div>
-          <div class="model-tags">${(m.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-        </div>
-        <span class="model-badge" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${m.id}</span>
-      </div>
-      ${renderTable(k)}`;
-    container.appendChild(div);
+    div.id = 's-'+k;
+    div.className = 'model-section' + (k==='gemini'?' active':'');
+    div.innerHTML = renderModel(k);
+    root.appendChild(div);
   });
 
-  // Consensus section
-  const consensusDiv = document.createElement('div');
-  consensusDiv.id = 'section-consensus';
-  consensusDiv.className = 'model-section';
-  consensusDiv.innerHTML = renderConsensus();
-  container.appendChild(consensusDiv);
+  // render consensus
+  const cons = document.createElement('div');
+  cons.id = 's-consensus';
+  cons.className = 'model-section';
+  cons.innerHTML = renderConsensus();
+  root.appendChild(cons);
 
-  countStatuses();
-  document.getElementById('timestamp').textContent =
-    'Updated: ' + new Date().toLocaleString('en-US', { hour12: false }) + ' (local)';
+  // hot count
+  let hot=0;
+  TICKERS.forEach(t => Object.keys(MODELS).forEach(k => {
+    const r = MODELS[k].rows[t];
+    if (!r.failed && status(t,r)==='hot') hot++;
+  }));
+  document.getElementById('hot-stat').textContent = hot;
+
+  // timestamp
+  document.getElementById('ts').textContent =
+    'Updated ' + new Date().toLocaleString('en-US',{hour12:false}) + ' local';
 });
 </script>
-
-<footer>
-  <div><strong style="color:var(--text)">Vanszs TradingAgents — Multi-Model Signal Report</strong></div>
-  <div style="margin-top:4px;">Signal Date: 2026-09-20 &nbsp;·&nbsp; Report Published: 2026-09-21 &nbsp;·&nbsp; <a href="https://github.com/Vanszs" target="_blank">github.com/Vanszs</a></div>
-  <div style="margin-top:6px;font-size:10px;color:var(--muted);">⚠️ Not financial advice. All signals are WNS (Wait and See). Research tool only. Past performance ≠ future results.</div>
-  <div style="margin-top:4px;font-size:10px;color:var(--muted);">Generated by TradingAgents Multi-Model Framework (6 Models: ag_gemini_3_8_flash, cx_gpt_luna, ocg_muse_spark_1_3, ocg_deepseek_4_1, ocg_glm_5_3_flash, kimi_k2_7_code)</div>
-</footer>
-
 </body>
 </html>
