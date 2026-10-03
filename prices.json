@@ -1,46 +1,46 @@
 {
-  "updated": "2026-10-02T00:29:22Z",
+  "updated": "2026-10-03T00:07:01Z",
   "market_status": "closed",
   "prices": {
     "SNOW": {
       "close": NaN,
       "low": 316.63,
       "high": 348.61,
-      "prev_close": 339.56,
+      "prev_close": 341.99,
       "change_pct": NaN,
-      "bars_since_signal": 9
+      "bars_since_signal": 10
     },
     "MSFT": {
       "close": NaN,
       "low": 491.22,
-      "high": 519.83,
-      "prev_close": 512.9,
+      "high": 522.85,
+      "prev_close": 512.8,
       "change_pct": NaN,
-      "bars_since_signal": 9
+      "bars_since_signal": 10
     },
     "AVGO": {
       "close": NaN,
-      "low": 346.89,
+      "low": 343.29,
       "high": 366.55,
-      "prev_close": 351.19,
+      "prev_close": 343.64,
       "change_pct": NaN,
-      "bars_since_signal": 9
+      "bars_since_signal": 10
     },
     "NVDA": {
       "close": NaN,
       "low": 221.09,
       "high": 233.21,
-      "prev_close": 228.38,
+      "prev_close": 230.86,
       "change_pct": NaN,
-      "bars_since_signal": 9
+      "bars_since_signal": 10
     },
     "TSLA": {
       "close": NaN,
       "low": 345.88,
       "high": 386.83,
-      "prev_close": 354.81,
+      "prev_close": 354.11,
       "change_pct": NaN,
-      "bars_since_signal": 9
+      "bars_since_signal": 10
     }
   },
   "signal_date": "2026-09-20",
